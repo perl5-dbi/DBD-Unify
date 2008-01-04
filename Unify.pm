@@ -1,4 +1,4 @@
-#   Copyright (c) 1999-2007 H.Merijn Brand
+#   Copyright (c) 1999-2008 H.Merijn Brand
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -8,7 +8,9 @@ require 5.006;
 use strict;
 use warnings;
 
-use Carp;
+package DBD::Unify;
+
+our $VERSION = "0.70";
 
 =head1 NAME
 
@@ -77,14 +79,11 @@ DBD::Unify - DBI driver for Unify database systems
 
 ###############################################################################
 
-package DBD::Unify;
-
+use Carp;
 use DBI 1.42;
+
 use DynaLoader ();
-
-use vars qw(@ISA $VERSION);
-$VERSION = "0.66";
-
+use vars qw(@ISA);
 @ISA = qw(DynaLoader);
 bootstrap DBD::Unify $VERSION;
 
@@ -661,7 +660,7 @@ H.Merijn Brand, <h.m.brand@xs4all.nl> developed the DBD::Unify extension.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1999-2007 H.Merijn Brand
+Copyright (C) 1999-2008 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

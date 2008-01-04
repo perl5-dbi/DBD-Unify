@@ -11,12 +11,12 @@ REQUIREMENTS
     It has been ported and tested on DataServer 6.3AB, 6.3BE, 8.1CC, 8.1CE,
     8.1DAB, 8.2AC, 8.2AD, 8.2B, 8.3E/64, 8.3F/64, and 8.3KAB/64, but this
     does not mean it might not work on U2000 databases or other DataServer
-    releases. I do not yet have a DS 9.x to play with.
+    releases. I do not (yet) have a DS 9.x to play with.
 
-    I use DBI 1.59 and perl5.6.2, perl-5.8.8, or perl5.9.5, but might get
-    it to work with DBI 0.93 or higher and perl 5.005 or higher. But then
-    again, in that case you should consider an upgrade. As of DBD-Unify-0.40
-    I've made DBI-1.42 prerequisite.
+    I use DBI 1.601 and perl-5.8.8 or perl5.10.0, but might get it to work
+    with DBI 0.93 or higher and perl 5.005 or higher. But then again, in that
+    case you should consider an upgrade. As of DBD-Unify-0.40 I've made
+    DBI-1.42 prerequisite.
 
     If you plan to use DataServer 8.1 or higher database in Unicode encoding
     (UTF-8), use perl5.8.0 or up (or at least 5.7.3). See the Unicode site
@@ -24,7 +24,8 @@ REQUIREMENTS
     what to expect (http://www.unicode.org/versions/enumeratedversions.html).
 
       Perl    Unicode
-      -----   -------
+      ------  -------
+      5.10.0    5.0.0
       5.9.5     5.0.0  UCD 5.0   released 18 Jul 2006
       5.8.8     4.1.0
       5.8.7     4.1.0  UCD 4.1   released 31 Mar 2005
@@ -161,6 +162,8 @@ RESTRICTIONS:
     # Unify does not return the desired length of non-character type
       fields, but the /maximum/ PRECISION for those fields
 
+    # Unify has no VARCHAR concept
+
     # Unify only distributes static libraries, so the module might
       become rather big. Libraries on AIX are always shared, and some
       of Unify's libraries can safely be converted to shared libs,
@@ -219,7 +222,7 @@ ACKNOWLEDGEMENTS
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 1999-2007  H.Merijn Brand <h.m.brand@xs4all.nl>
+    Copyright (C) 1999-2008  H.Merijn Brand <h.m.brand@xs4all.nl>
 
     This library is free software; you can redistribute it and/or modify
     it under the same terms as Perl itself. 
