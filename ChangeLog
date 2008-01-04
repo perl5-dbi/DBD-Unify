@@ -1,10 +1,20 @@
-*** Release 0.66 - Mon 03 Sep 2007 <h.m.brand@xs4all.nl>
+*** Release 0.70 - Fri 04 Jan 2008 <h.m.brand@xs4all.nl>
 
     - Added the dTHX; calls for threaded perls
     - Moved opt_v to dbd_verbose
     - Added/Aliassed uni_verbose to dbd_verbose
     - Made the first failure notices from Makefile.PL more verbose (castaway)
     - Tested with DBI-1.59
+      ** 0.66 never made it to production due to lack of tuits
+    - Tested with DBI-1.601
+    - Prevent segfault under Linux (tazervas)
+    - Better support for SQLBINARY (tazervas) (adds t/25-binary.t)
+    - DBD::Unify now under git
+    - Upped copyright to 2008
+    - Tested with perl-5.10.0
+    - A few casts for 64bit perl
+    - Moved DBIh_SET_ERR_CHAR () to DBIc_ERR () and DBIc_ERRSTR ()
+    - Moved DBIc_TRACE_LEVEL (h) to dbis->debug where appropriate
 
 *** Release 0.65 - Mon 20 Aug 2007 <h.m.brand@xs4all.nl>
 
