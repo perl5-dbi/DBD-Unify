@@ -1,7 +1,7 @@
 \.[oc]$
 \.ec$
 \.bs$
-\.tgz$
+\.t[bg]z$
 \.tar\.gz$
 \.git
 \.xsi$
