@@ -429,6 +429,7 @@ int dbd_db_STORE_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
     if (kl == 11 && strEQ (key, "dbd_verbose")) {	/* Now also in DBD::Oracle :) */
 	dbd_verbose = SvIV (valuesv);
 	return (TRUE);
+	}
     if (kl == 10 && strEQ (key, "DBDverbose")) {	/* Depricated */
 	dbd_verbose = SvIV (valuesv);
 	return (TRUE);
