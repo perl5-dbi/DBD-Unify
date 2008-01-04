@@ -15,6 +15,7 @@
     - A few casts for 64bit perl
     - Moved DBIh_SET_ERR_CHAR () to DBIc_ERR () and DBIc_ERRSTR ()
     - Moved DBIc_TRACE_LEVEL (h) to dbis->debug where appropriate
+    - Raised minimal perl to 5.6.x, also for Test::More
 
 *** Release 0.65 - Mon 20 Aug 2007 <h.m.brand@xs4all.nl>
 
