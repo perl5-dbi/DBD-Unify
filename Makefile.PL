@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-require 5.004;
+require 5.006;
 
 use strict;
 use Cwd qw( cwd abs_path );
@@ -27,7 +27,20 @@ my %wm = (
     AUTHOR        =>   "H.Merijn Brand <h.m.brand\@xs4all.nl>",
     ABSTRACT_FROM =>   "Unify.pm",
 
-    PREREQ_PM     => { DBI      => "1.42",
+    PREREQ_PM     => { # CORE stuff
+		       "Carp"		=> 0.00,
+		       "DynaLoader"	=> 0.00,
+		       # For unstallu.pl
+		       "Config"		=> 0.00,
+		       "Cwd"		=> 0.00,
+		       "File::Find"	=> 0.00,
+		       "File::Copy"	=> 0.00,
+
+		       # Real deps
+		       "DBI"		=> 1.42,
+
+		       # Test deps
+		       "Test::More"	=> 0.00,
 		       },
 
     dist          => { COMPRESS => "gzip -9f",
@@ -60,7 +73,8 @@ my %wm = (
 		       			. "$UNITOP/bin/ucc",
 		       },
     );
-$ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
+$ExtUtils::MakeMaker::VERSION > 6.30	and $wm{LICENSE} = "perl";
+$Config{myarchname} eq "ia64-hpux"	and delete $wm{macro}{CC};
 
 my $rv = WriteMakefile (%wm);
 
