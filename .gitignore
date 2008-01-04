@@ -4,6 +4,7 @@
 *.o
 *.old
 *.tar.gz
+*.tbz
 *.tgz
 *.xsi
 blib
