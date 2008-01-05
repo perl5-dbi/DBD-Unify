@@ -14,8 +14,8 @@
     - Tested with DBI-1.59
       ** 0.66 never made it to production due to lack of tuits
     - Tested with DBI-1.601
-    - Prevent segfault under Linux (tazervas)
-    - Better support for SQLBINARY (tazervas) (adds t/25-binary.t)
+    - Prevent segfault under Linux (Todd Zervas)
+    - Better support for SQLBINARY (Todd Zervas) (adds t/25-binary.t)
     - DBD::Unify now under git
     - Upped copyright to 2008
     - Tested with perl-5.10.0
