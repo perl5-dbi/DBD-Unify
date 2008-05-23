@@ -3,6 +3,12 @@
 require 5.006;
 
 use strict;
+
+# Be kind to testers, not verbose
+if (exists $ENV{AUTOMATED_TESTING} and $ENV{AUTOMATED_TESTING}) {
+    exists $ENV{UNIFY} or exit 0;
+    }
+
 use Cwd qw( cwd abs_path );
 
 use ExtUtils::MakeMaker;
@@ -14,7 +20,7 @@ use DBI::DBD;
 print "\nConfiguring DBD::Unify ...\n\n";
 
 $^O =~ m/^(?: VMS | MsWin32 | cygwin )$/x and
-    die "OS type $^O is not (yet) supported\n";
+    die "No support for OS $^O (yet)\n";
 
 use vars qw($UNIFY $UNITOP $ULIBS $ULDOPTS);
 
@@ -104,7 +110,7 @@ sub CheckUnify
 	exit 1;
 	}
 
-    $UNIFY  = abs_path $ENV{UNIFY};
+    $UNIFY = abs_path $ENV{UNIFY};
 
     -d $UNIFY		or die "\$UNIFY is not a valid directory\n";
     -d $ENV{DBPATH}	or die "\$DBPATH is not a valid directory\n";
