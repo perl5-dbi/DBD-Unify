@@ -85,11 +85,11 @@ $Config{myarchname} eq "ia64-hpux"	and delete $wm{macro}{CC};
 my $rv = WriteMakefile (%wm);
 
 if ($rv && <ulib/*.s[lo] >) {
-    open my $mf, "<Makefile" or die "Cannot modify Makefile: $!\n";
+    open my $mf, "<Makefile" or die "Cannot read Makefile: $!\n";
     my @MF = <$mf>;
     close $mf;
     s/\bPERL_DL_NONLAZY=\d+\s+// for @MF;
-    open  $mf, ">Makefile" or die "Cannot modify Makefile: $!\n";
+    open  $mf, ">Makefile"   or die "Cannot modify Makefile: $!\n";
     print $mf @MF;
     close $mf;
     }
@@ -133,8 +133,8 @@ sub CheckUnify
 	libnwrpc.a libnwstcp.a
 	libusu.a libudsu.a
 	U2000c.a U2000u.a);
-    print "Link (L)ocal-only, (R)emote-only, or (B)oth? [L/r/b] > L\b";
-    my $localremote = scalar <STDIN>;
+    my $localremote = prompt (
+	"Link (L)ocal-only, (R)emote-only, or (B)oth? [L/r/b] >", "L");
     if    ($localremote =~ m/^\s*[Rr]/) {
 	@ulibs = map { s/([0s]u)\.a/$1r.a/; $_ } @ulibs;
 	}
@@ -151,17 +151,15 @@ sub CheckUnify
     my $try_shared = $^O eq "hpux" && $rev >= 8.2 ? 1 : 0;
     if ($try_shared) {
 	if (<ulib/*.$dlext >) {
-	    print "Build a shared lib version? [Y/n] > Y\b";
-	    my $answer = <STDIN>;
+	    my $answer = prompt ("Build a shared lib version? [Y/n] >", "Y");
 	    $answer =~ m/^\s*[Qq]/   and exit;
 	    $answer =~ m/^\s*[NnFf]/ and $try_shared = 0;
 	    }
 	elsif (-w $UNIFY) {
-	    print
-		"Building for rev $rev on HP-UX would support Shared Libraries\n",
-		" but I don't see them (yet) in your \$UNIFY.\n",
-		"Shall I try to use Shared Objects? [Y/n] > Y\b";
-	    my $answer = <STDIN>;
+	    my $answer = prompt (
+		"Building for rev $rev on HP-UX would support Shared Libraries\n".
+		" but I don't see them (yet) in your \$UNIFY.\n".
+		"Shall I try to use Shared Objects? [Y/n] >", "Y");
 	    $answer =~ m/^\s*[Qq]/ and exit;
 	    if ($answer =~ m/^\s*[NnFf]/) {
 		$try_shared = 0;
@@ -250,6 +248,12 @@ sub postamble
 	'	cover -delete',
 	'	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test',
 	'	cover',
+	'',
+	'fixmeta:	distmeta',
+	'	perl test-cases/genMETA.pl',
+	'',
+	'tgzdist:	fixmeta $(DISTVNAME).tar.gz distcheck',
+	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'';
     } # postamble
 

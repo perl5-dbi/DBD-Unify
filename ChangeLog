@@ -1,6 +1,8 @@
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 
     - Kindly tell CPAN smokers not to bother when there is no Unify
+    - Add a correct(ed) META.yml
+    - Move to EU::MM's prompt () function for the questions
 
 *** Release 0.71 - Fri 04 Jan 2008 <h.m.brand@xs4all.nl>
 
