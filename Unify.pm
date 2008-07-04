@@ -505,10 +505,30 @@ available sources, so this method will always return an empty list.
 
 =item trace
 
-The C<DBI-E<gt>trace (level)> call will promote the level to DBD-Unify, showing
-both the DBI layer debugging messages as well as the DBD-Unify debug messages.
+The C<DBI-E<gt>trace (level)> call will promote the level to DBD::Unify,
+showing both the DBI layer debugging messages as well as the DBD::Unify
+specific driver-side debug messages.
+
 It is however also possible to trace B<only> the DBD-Unify without the
-C<DBI-E<gt>trace ()> call by using the C<uni_verbose> attribute on C<connect ()>.
+C<DBI-E<gt>trace ()> call by using the C<uni_verbose> attribute on C<connect ()>
+or by setting it later to the database handle:
+
+  $dbh = DBI->connect ("DBI::Unify", "", "", { uni_verbose => 3 });
+  $dbh->{uni_verbose} = 3;
+
+As DBD::Oracle also supports this scheme since version 1.22, C<dbd_verbose>
+is a portable alias for C<uni_verbose>, which is also supported in DBD::Oracle.
+
+DBD::Unify now also allows an even finer grained debugging, by allowing
+C<dbd_verbose> on statement handles too. The default C<dbd_verbose> for
+statement handles is the global C<dbd_verbose> at creation time of the
+statement handle.
+
+  $dbh->{dbd_verbose} = 3;
+  $sth = $dbh->prepare ("select * from foo");  # sth's dbd_verbose = 3
+  $dbh->{dbd_verbose} = 1;                     # sth's dbd_verbose = 3
+  $sth->{dbd_verbose} = 5;                     # now 5
+
 Currently, the following levels are defined:
 
 =over 2
