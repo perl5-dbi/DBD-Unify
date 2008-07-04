@@ -67,6 +67,8 @@ struct imp_sth_st {
 
     imp_fld_t	*fld;		/* Add knowledge about the fields	*/
     imp_fld_t	*prm;		/* Add knowledge about the positionals	*/
+
+    int		dbd_verbose;	/* statement level verbosity		*/
     };
 
 struct imp_fld_st {

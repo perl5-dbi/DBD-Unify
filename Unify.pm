@@ -10,7 +10,7 @@ use warnings;
 
 package DBD::Unify;
 
-our $VERSION = "0.72";
+our $VERSION = "0.73";
 
 =head1 NAME
 
