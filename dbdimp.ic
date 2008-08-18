@@ -181,6 +181,20 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
     dTHX;
     char *opt;
 
+    if ((opt = getenv ("DBD_VERBOSE"))) {
+	auto int i = 0;
+	while (*opt) {
+	    if (isdigit (*opt)) {
+		i = 10 * i + *opt - '0';
+		}
+	    else {
+		i = -100;
+		}
+	    opt++;
+	    }
+	if (i >= 0 && i <= 99) dbd_verbose = i;
+	}
+
     dbg (2, "DBD::Unify::db_login: dbname: %s\n", dbname);
 
     /* CONNECT [db_name];
