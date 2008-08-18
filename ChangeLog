@@ -1,6 +1,7 @@
-*** Release 0.73 - Fri 04 Jul 2008 <h.m.brand@xs4all.nl>
+*** Release 0.73 - Fri 18 Aug 2008 <h.m.brand@xs4all.nl>
 
     - Three-level dbd_verbose and documentation
+    - $ENV{DBD_VERBOSE} sets $dbh->{dbd_verbose} on/before connect
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 
