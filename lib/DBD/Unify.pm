@@ -133,7 +133,7 @@ sub connect
 
     $user = "" unless defined $user;
     $auth = "" unless defined $auth;
-    
+
     # create a 'blank' dbh
     my $dbh = DBI::_new_dbh ($drh, {
 	Name          => $dbname,
@@ -143,6 +143,12 @@ sub connect
 
     # Connect to the database..
     DBD::Unify::db::_login ($dbh, $dbname, $user, $auth) or return;
+
+#   if ($attr) {
+#	if ($attr->{dbd_verbose}) {
+#	    $dbh->trace ("DBD");
+#	    }
+#	}
 
     $dbh;
     } # connect
@@ -155,11 +161,51 @@ sub data_sources
     "";
     } # data_sources
 
+1;
+
 ####### Database ##############################################################
 
 package DBD::Unify::db;
 
 $DBD::Unify::db::imp_data_size = 0;
+
+sub parse_trace_flag
+{
+    my ($dbh, $name) = @_;
+    return 0x7FFFFF00 if $name eq 'DBD';	# $h->trace ("DBD"); -- ALL
+  # return 0x01000000 if $name eq 'select';	# $h->trace ("SQL|select");
+  # return 0x02000000 if $name eq 'update';	# $h->trace ("1|update");
+  # return 0x04000000 if $name eq 'delete';
+  # return 0x08000000 if $name eq 'insert';
+    return $dbh->SUPER::parse_trace_flag ($name);
+    } # parse_trace_flag
+
+sub type_info_all
+{
+    my ($dbh) = @_;
+    require DBD::Unify::TypeInfo;
+    return [ @$DBD::Unify::TypeInfo::type_info_all ];
+    } # type_info_all
+
+sub get_info
+{
+    my ($dbh, $info_type) = @_;
+    require  DBD::Unify::GetInfo;
+    my $v = $DBD::Unify::GetInfo::info{int $info_type};
+    ref $v eq "CODE" and $v = $v->($dbh);
+    return $v;
+    } # get_info
+
+# Next is needed as Unify does not have CATALOGs, but tables ()
+#  will still put an empty part in front :(
+sub tables
+{
+    my @tables = DBD::_::db::tables (@_);
+    if (@tables and $tables[0] =~ m/^""\.".*"\.".*"$/) {
+	s/^""\.// for @tables;
+	}
+    @tables;
+    } # tables
 
 sub ping
 {
@@ -272,7 +318,7 @@ sub foreign_key_info
 	}
     $sth->finish;
     $sth = undef;
-    
+
     DBI->connect ("dbi:Sponge:", "", "", { RaiseError => 1 })->prepare (
 	"select link_info $where", {
 	    rows => \@fki,
@@ -411,7 +457,7 @@ local database
 It is recommended that the C<connect> call ends with the attributes
 S<{ AutoCommit => 0 }>, although it is not implemented (yet).
 
-If you dont want to check for errors after B<every> call use 
+If you dont want to check for errors after B<every> call use
 S<{ AutoCommit => 0, RaiseError => 1 }> instead. This will C<die> with
 an error message if any DBI call fails.
 
@@ -684,6 +730,6 @@ H.Merijn Brand, <h.m.brand@xs4all.nl> developed the DBD::Unify extension.
 Copyright (C) 1999-2008 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =cut

@@ -29,9 +29,9 @@ CheckUnify ();
 my %wm = (
     NAME          =>   "DBD::Unify",
     DISTNAME      =>   "DBD-Unify",
-    VERSION_FROM  =>   "Unify.pm",
+    VERSION_FROM  =>   "lib/DBD/Unify.pm",
     AUTHOR        =>   "H.Merijn Brand <h.m.brand\@xs4all.nl>",
-    ABSTRACT_FROM =>   "Unify.pm",
+    ABSTRACT_FROM =>   "lib/DBD/Unify.pm",
 
     PREREQ_PM     => { # CORE stuff
 		       "Carp"		=> 0.00,

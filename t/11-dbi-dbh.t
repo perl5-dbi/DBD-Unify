@@ -46,8 +46,10 @@ ok (!$dbh->{CompatMode},	"CompatMode");
 
 my @tables;
 ok (@tables = $dbh->tables, "tables");
+y/"//d for @tables;	# get_info (29) now returns "
 ok ((1 == grep m/^SYS\.ACCESSIBLE_TABLES$/, @tables), "SYS.ACCESSIBLE_TABLES");
 ok (@tables = $dbh->tables (undef, "SYS", "ACCESSIBLE_COLUMNS", "VIEW"), "tables (args)");
+y/"//d for @tables;	# get_info (29) now returns "
 ok (@tables == 1 && $tables[0] eq "SYS.ACCESSIBLE_COLUMNS", "got only one");
 
 # =============================================================================

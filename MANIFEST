@@ -7,8 +7,10 @@ Makefile.PL
 MANIFEST
 README
 Unify.h
-Unify.pm
 Unify.xs
+lib/DBD/Unify.pm
+lib/DBD/Unify/TypeInfo.pm
+lib/DBD/Unify/GetInfo.pm
 t/00-pod.t
 t/00-podc.t
 t/01-base.t

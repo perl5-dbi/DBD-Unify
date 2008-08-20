@@ -12,6 +12,7 @@ dbg2macro
 foreign_key.pl
 Makefile
 MANIFEST.SKIP
+Unify.pm
 pm_to_blib
 pri_key.pl
 tags
