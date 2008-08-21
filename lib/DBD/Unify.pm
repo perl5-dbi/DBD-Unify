@@ -172,6 +172,7 @@ $DBD::Unify::db::imp_data_size = 0;
 sub parse_trace_flag
 {
     my ($dbh, $name) = @_;
+  # print STDERR "# Flags: $name\n";
     return 0x7FFFFF00 if $name eq 'DBD';	# $h->trace ("DBD"); -- ALL
   # return 0x01000000 if $name eq 'select';	# $h->trace ("SQL|select");
   # return 0x02000000 if $name eq 'update';	# $h->trace ("1|update");

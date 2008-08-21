@@ -28,5 +28,6 @@ t/25-binary.t
 t/27-uni-max.t
 t/30-reconnect.t
 t/40-info.t
+t/50-trace.t
 t/99-done.t
 examples/row_counts

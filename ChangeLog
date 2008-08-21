@@ -2,6 +2,9 @@
 
     - Three-level dbd_verbose and documentation
     - $ENV{DBD_TRACE} sets $dbh->{dbd_verbose} on/before connect
+    - New tests for $h->trace (...) and $h->{dbd_verbose}
+    - Added type_info_all (), get_info (), and parse_trace_flag ()
+    - Override broken tables () (UNIFY has no CATALOGS)
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 
