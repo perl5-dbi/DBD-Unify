@@ -73,6 +73,8 @@ udate	fdDT;
 uhdate	fdHDT;
 EXEC SQL END   DECLARE SECTION;
 
+#define DBI_debug	(dbis->debug & DBIc_TRACE_LEVEL_MASK)
+
 #ifdef I_STDARG
 static void dbg (int level, char *fmt, ...)
 #endif
@@ -86,7 +88,7 @@ va_dcl
 {
     auto	va_list	args;
 
-    if (level > Max (dbd_verbose, dbis->debug))
+    if (level > Max (dbd_verbose, DBI_debug))
 	return;
 
 #ifdef I_STDARG
@@ -115,7 +117,7 @@ va_dcl
 {
     auto	va_list	args;
 
-    if (level > Max (sth->dbd_verbose, Max (dbd_verbose, dbis->debug)))
+    if (level > Max (sth->dbd_verbose, Max (dbd_verbose, DBI_debug)))
 	return;
 
 #ifdef I_STDARG
@@ -181,7 +183,7 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
     dTHX;
     char *opt;
 
-    if ((opt = getenv ("DBD_VERBOSE"))) {
+    if ((opt = getenv ("DBD_TRACE"))) {
 	auto int i = 0;
 	while (*opt) {
 	    if (isdigit (*opt)) {

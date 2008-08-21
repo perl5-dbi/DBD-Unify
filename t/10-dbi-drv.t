@@ -42,8 +42,8 @@ ok (@data_sources == 0 || !$data_sources[0], "Unify has no centralized source re
 # -- trace
 
 my ($trcfile, $rv) = ("/tmp/dbi-trace.$$");
-ok (!DBI->trace (1, $trcfile), "set trace file");
-ok (1 == DBI->trace (0, $trcfile), "reset trace file");
+ok (!DBI->trace (1, $trcfile),    "set trace file");
+is ( DBI->trace (0, $trcfile), 1, "reset trace file");
 open TRC, "< $trcfile";
 my $line = <TRC>;
 like ($line, qr{\btrace level set to (?:[O0]x0*)?/?1\b}, "trace level");

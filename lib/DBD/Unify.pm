@@ -10,7 +10,7 @@ use warnings;
 
 package DBD::Unify;
 
-our $VERSION = "0.73";
+our $VERSION = "0.75";
 
 =head1 NAME
 
@@ -558,7 +558,7 @@ specific driver-side debug messages.
 It is however also possible to trace B<only> the DBD-Unify without the
 C<DBI-E<gt>trace ()> call by using the C<uni_verbose> attribute on C<connect ()>
 or by setting it later to the database handle, the default level is set from
-the environment variable C<$DBD_VERBOSE> if defined:
+the environment variable C<$DBD_TRACE> if defined:
 
   $dbh = DBI->connect ("DBI::Unify", "", "", { uni_verbose => 3 });
   $dbh->{uni_verbose} = 3;
