@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 75;
+use Test::More tests => 91;
 
 BEGIN { use_ok ("DBI") }
 
@@ -139,9 +139,30 @@ is ($sth, undef, "link_info ([])");
 is ($DBI::errstr, undef, "link_info ([]) has no DBI error message");
 like ($@, qr{^usage: link_info \(}, "link_info ([]) error message");
 
-# UNIFY does npt support CAT
+# UNIFY does not support CAT
 eval { $sth = $dbh->table_info ("foo", undef, undef, undef) };
 is ($sth, undef, "table_info (\"foo\", undef, undef, undef)");
 is ($DBI::errstr, undef, "table_info ([]) has no DBI error message");
+
+ok   (1, "Test GetInfo functionality");
+ok   ($dbh->get_info ( 7),			"SQL_DRIVER_VERSION");
+is   ($dbh->get_info (17), "Unify DataServer",	"SQL_DBMS_NAME");
+is   ($dbh->get_info (39), "Owner",		"SQL_SCHEMA_TERM");
+like ($dbh->get_info (47), qr{^},		"SQL_USER_NAME");
+like ($dbh->get_info ( 2), qr{^dbi:Unify:},	"SQL_DATA_SOURCE_NAME");
+ok   (my $kw = $dbh->get_info (89),		"SQL_KEYWORDS");
+like ($kw, qr{,BINARY,BTREE,},			"SQL_KEYWORDS");
+
+ok   (1, "Test TypeInfo functionality");
+ok   (my $tia = $dbh->type_info_all (),		"type_info_all ()");
+is   (ref $tia,		"ARRAY",		"Array");
+is   (ref $tia->[0],	"HASH",			"Hash");
+is   (ref $tia->[1],	"ARRAY",		"Pseudo Hash");
+ok   (exists $tia->[0]{DATA_TYPE},		"DATA_TYPE");
+
+my %tia = map { $_->[0] => [ @$_ ] } @{$tia}[1 .. $#$tia];
+ok   (exists $tia{CHAR},			"CHAR");
+is   ($tia{AMOUNT}[$tia->[0]{CREATE_PARAMS}], "PRECISION",
+						"AMOUNT - PRECISION");
 
 exit 0;
