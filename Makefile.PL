@@ -248,10 +248,13 @@ sub postamble
 #	'	ccache -C',
 	'	cover -test',
 	'',
-	'fixmeta:	distmeta',
-	'	perl test-cases/genMETA.pl',
+	'checkmeta:',
+	'	perl sandbox/genMETA.pl -c',
 	'',
-	'tgzdist:	fixmeta $(DISTVNAME).tar.gz distcheck',
+	'fixmeta:	distmeta',
+	'	perl sandbox/genMETA.pl',
+	'',
+	'tgzdist:	checkmeta fixmeta $(DISTVNAME).tar.gz distcheck',
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'';
     } # postamble
