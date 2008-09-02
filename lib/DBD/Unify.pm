@@ -197,17 +197,6 @@ sub get_info
     return $v;
     } # get_info
 
-# Next is needed as Unify does not have CATALOGs, but tables ()
-#  will still put an empty part in front :(
-sub tables
-{
-    my @tables = DBD::_::db::tables (@_);
-    if (@tables and $tables[0] =~ m/^""\.".*"\.".*"$/) {
-	s/^""\.// for @tables;
-	}
-    @tables;
-    } # tables
-
 sub ping
 {
     my $dbh = shift;
@@ -280,6 +269,12 @@ sub table_info
     $sth->execute;
     $sth;
     } # table_info
+
+sub quote_identifier
+{
+    my ($dbh, @arg) = map { defined $_ && $_ ne "" ? $_ : undef } @_;
+    return $dbh->SUPER::quote_identifier (@arg);
+    } # quote_identifier
 
 # $sth = $dbh->foreign_key_info (
 #            $pk_catalog, $pk_schema, $pk_table,
