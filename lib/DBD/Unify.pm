@@ -207,10 +207,8 @@ sub ping
 sub do
 {
     my ($dbh, $statement, $attribs, @params) = @_;
-    # Next two might use base class: DBD::_::do (@_);
     Carp::carp "DBD::Unify::\$dbh->do () attribs unused\n" if $attribs;
-    Carp::carp "DBD::Unify::\$dbh->do () params unused\n"  if @params;
-    DBD::Unify::db::_do ($dbh, $statement);
+    $dbh->SUPER::do ($statement, undef, @params);
     } # do
 
 sub prepare

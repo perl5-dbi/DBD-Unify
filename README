@@ -192,7 +192,7 @@ TO DO:
 
     # Investigate and implement 3-arg versions of $sth->bind_param ()
 
-    # Investigate and implement 2- and 3-arg version of $dbh->do ()
+    # Investigate and implement 2-arg version  of $dbh->do ()
 
     # Investigate if looks_as_number () should be used in st_bind ().
       Comments are in where it should.

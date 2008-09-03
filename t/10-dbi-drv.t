@@ -62,7 +62,7 @@ my $sth;
 
 # -- err, errstr, state and rows as variables
 
-ok ($sth = $dbh->do ("update foo set baz = 1 where bar = 'Wrong'"), "do update");
+is ($dbh->do ("update foo set baz = 1 where bar = 'Wrong'"), undef, "do update");
 
 is   ($DBI::err, -2046,					"err -2046");
 is   ($DBI::errstr, "Invalid table name.",		"Invalid table name");

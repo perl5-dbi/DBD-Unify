@@ -1,11 +1,12 @@
-*** Release 0.75 - Thu 21 Aug 2008 <h.m.brand@xs4all.nl>
+*** Release 0.75 - Wed 03 Sep 2008 <h.m.brand@xs4all.nl>
 
     - Three-level dbd_verbose and documentation
     - $ENV{DBD_TRACE} sets $dbh->{dbd_verbose} on/before connect
     - New tests for $h->trace (...) and $h->{dbd_verbose}
     - Added type_info_all (), get_info (), and parse_trace_flag ()
     - Note that identifiers are now quoted
-    - Override broken tables () (UNIFY has no CATALOGS)
+    - Override quote_identifier () (UNIFY has no CATALOGS)
+    - Accept 3-arg ->do ()
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 
