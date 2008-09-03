@@ -6,7 +6,8 @@
     - Added type_info_all (), get_info (), and parse_trace_flag ()
     - Note that identifiers are now quoted
     - Override quote_identifier () (UNIFY has no CATALOGS)
-    - Accept 3-arg ->do ()
+    - Accept 2-arg and 3-arg ->do ()
+    - Accept %attr to ->prepare ()
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 

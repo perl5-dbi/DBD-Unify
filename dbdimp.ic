@@ -673,7 +673,6 @@ int dbd_prm_describe (SV *dbh, imp_sth_t *imp_sth, int num_params)
     } /* dbd_prm_describe */
 
 int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
-/* attribs unused */
 {
     dTHX;
     SV *dbh = (SV *)DBIc_PARENT_H (imp_sth);
@@ -693,7 +692,6 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
 
     unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
 	return (0);
-    st_dbg (2, imp_sth, "DBD::Unify::st_prepare %s (\"%s\")\n", u_sql_nm, statement);
 
     if (imp_sth->statement = (char *)malloc (strlen (statement) + 2))
 	(void)strcpy (imp_sth->statement, statement);
@@ -701,6 +699,15 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
     imp_sth->dbd_verbose = dbd_verbose;
     imp_sth->fld	 = (imp_fld_t *)0;
     imp_sth->prm	 = (imp_fld_t *)0;
+
+    if (attribs) {
+	SV **svp;
+	DBD_ATTRIB_GET_IV (attribs, "dbd_verbose", 11, svp, imp_sth->dbd_verbose);
+	DBD_ATTRIB_GET_IV (attribs, "uni_verbose", 11, svp, imp_sth->dbd_verbose);
+	}
+
+    st_dbg (2, imp_sth, "DBD::Unify::st_prepare %s (\"%s\")\n", u_sql_nm, statement);
+
     dbd_st_diaper (imp_dbh, imp_sth);
     DBIc_IMPSET_on (imp_sth);
 

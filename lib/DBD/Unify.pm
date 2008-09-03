@@ -30,8 +30,8 @@ DBD::Unify - DBI driver for Unify database systems
 			 });
  $dbh = DBI->connect_cached (...);                   # NYT
  $dbh->do ($statement);
- $dbh->do ($statement, \%attr);                      # NYI
- $dbh->do ($statement, \%attr, @bind);               # NYI
+ $dbh->do ($statement, \%attr);
+ $dbh->do ($statement, \%attr, @bind);
  $dbh->commit;
  $dbh->rollback;
  $dbh->disconnect;
@@ -41,6 +41,7 @@ DBD::Unify - DBI driver for Unify database systems
  $col = $dbh->selectcol_arrayref ($statement);
 
  $sth = $dbh->prepare ($statement);
+ $sth = $dbh->prepare ($statement, \%attr);
  $sth = $dbh->prepare_cached ($statement);           # NYT
  $sth->execute;
  @row = $sth->fetchrow_array;
@@ -203,13 +204,6 @@ sub ping
     $dbh->prepare ("select ORD from SYS.ORD") or return 0;
     return 1;
     } # ping
-
-sub do
-{
-    my ($dbh, $statement, $attribs, @params) = @_;
-    Carp::carp "DBD::Unify::\$dbh->do () attribs unused\n" if $attribs;
-    $dbh->SUPER::do ($statement, undef, @params);
-    } # do
 
 sub prepare
 {
@@ -451,7 +445,7 @@ local database
 It is recommended that the C<connect> call ends with the attributes
 S<{ AutoCommit => 0 }>, although it is not implemented (yet).
 
-If you dont want to check for errors after B<every> call use
+If you don't want to check for errors after B<every> call use
 S<{ AutoCommit => 0, RaiseError => 1 }> instead. This will C<die> with
 an error message if any DBI call fails.
 
@@ -477,7 +471,7 @@ explicit:
 or implicit:
 
  {   my $dbh = DBI->connect (...);
-     {   my $sth = $dbh->prepare ("...");
+     {   my $sth = $dbh->prepare (...);
          while (my @data = $sth->fetchrow_array) {
              :
              }
@@ -525,9 +519,19 @@ There is no way for Unify to tell what data sources might be available.
 There is no central files (like /etc/oratab for Oracle) that lists all
 available sources, so this method will always return an empty list.
 
-=item do
+=item quote_identifier
 
-=item prepare
+As DBI's C<quote_identifier ()> gladly accepts the empty string as a
+valid identifier, I have to override this method to translate empty
+strings to undef, so the method behaves properly. Unify does not allow
+to select C<NULL> as a constant as in:
+
+    select NULL, foo from bar;
+
+=item prepare ($statement [, \%attr])
+
+The only attribute currently supported is the C<dbd_verbose> (or its
+alias C<uni_verbose>) level. See "trace" below.
 
 =item table_info ($;$$$$)
 
