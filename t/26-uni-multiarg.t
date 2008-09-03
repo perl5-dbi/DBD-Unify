@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-#use Test::More tests => 145;
-use Test::More "no_plan";
+ use Test::More tests => 25;
+#use Test::More "no_plan";
 
 my $UNIFY  = $ENV{UNIFY};
 
@@ -51,6 +51,31 @@ ok ($dbh->do ("insert into xx values (0, 123456789, 'abcde', 1.23)"), "insert 12
 foreach my $v ( 1 .. 9 ) {
     ok ($dbh->do ("insert into xx values (?, ?, ?, ?)", undef,
 	$v, $v * 100000, "$v", .99/$v), "insert $v with 3-arg do ()");
+    }
+
+my $error;
+open my $eh, ">", \$error;
+select ((select ($eh), $| = 1)[0]);
+DBI->trace (0, $eh);
+{   my $do_st = "update xx set xl = -1 where xs = ?";
+    my $do_at = { dbd_verbose => 3 };
+    my @do_bv = (99);
+
+    my $sth;
+    ok ($sth = $dbh->prepare ($do_st, $do_at), "prepare (..., attr)");
+    like ($error, qr{update xx}, "Logging on");
+    SKIP: {
+	$sth or skip "Prepare with attributes failed", 3;
+	ok ($sth->execute (@do_bv), "execute");
+	ok ($sth->finish, "finish");
+	like ($error, qr{DBD::Unify::st_execute}, "Logging on");
+	$sth->{dbd_verbose} = 0;
+	}
+
+    ok ($dbh->do ($do_st, $do_at, @do_bv), "do (.., attr, ...)");
+    $dbh->{dbd_verbose} = 0;
+    DBI->trace (0, *STDERR);
+    close $eh;
     }
 
 ok ($dbh->commit, "commit");
