@@ -16,7 +16,6 @@ t/00-podc.t
 t/01-base.t
 t/02-connect.t
 t/03-general.t
-t/05-reauth.t
 t/10-dbi-drv.t
 t/11-dbi-dbh.t
 t/12-dbi-sth.t

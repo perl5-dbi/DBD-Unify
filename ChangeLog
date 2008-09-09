@@ -1,4 +1,4 @@
-*** Release 0.75 - Wed 03 Sep 2008 <h.m.brand@xs4all.nl>
+*** Release 0.75 - Tue 09 Sep 2008 <h.m.brand@xs4all.nl>
 
     - Three-level dbd_verbose and documentation
     - $ENV{DBD_TRACE} sets $dbh->{dbd_verbose} on/before connect
@@ -9,6 +9,7 @@
     - Accept 2-arg and 3-arg ->do ()
     - Accept %attr to ->prepare ()
     - Raised all verbose levels by 1. 1 and 2 are now DBI only
+    - Removed 05-reauth.t
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 
