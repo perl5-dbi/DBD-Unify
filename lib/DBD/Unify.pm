@@ -569,22 +569,20 @@ C<dbd_verbose> on statement handles too. The default C<dbd_verbose> for
 statement handles is the global C<dbd_verbose> at creation time of the
 statement handle.
 
-  $dbh->{dbd_verbose} = 3;
-  $sth = $dbh->prepare ("select * from foo");  # sth's dbd_verbose = 3
-  $dbh->{dbd_verbose} = 1;                     # sth's dbd_verbose = 3
+  $dbh->{dbd_verbose} = 4;
+  $sth = $dbh->prepare ("select * from foo");  # sth's dbd_verbose = 4
+  $dbh->{dbd_verbose} = 3;                     # sth's dbd_verbose = 4
   $sth->{dbd_verbose} = 5;                     # now 5
 
 Currently, the following levels are defined:
 
 =over 2
 
-=item 1
+=item 1 & 2
 
-No messages implemented (yet) at level 1
+No DBD messages implemented at level 1 and 2, as they are reserved for DBI
 
-=item 2
-
-Level 1 plus main method entry and exit points:
+=item 3
 
   DBD::Unify::dbd_db_STORE (ScanLevel = 7)
   DBD::Unify::st_prepare u_sql_00_000000 ("select * from foo")
@@ -597,9 +595,9 @@ Level 1 plus main method entry and exit points:
   DBD::Unify::db_disconnect
   DBD::Unify::db_destroy
 
-=item 3
+=item 4
 
-Level 2 plus errors and additional return codes and field types and values:
+Level 3 plus errors and additional return codes and field types and values:
 
   DBD::Unify::st_prepare u_sql_00_000000 ("select c_bar from foo where c_foo = 1")
       After allocate, sqlcode = 0
@@ -624,9 +622,9 @@ Level 2 plus errors and additional return codes and field types and values:
       After deallocO, sqlcode = 0
       After deallocU, sqlcode = 0
 
-=item 4
+=item 5
 
-Level 3 plus some content info:
+Level 4 plus some content info:
 
   DBD::Unify::st_fetch u_sql_00_000000
       Fetched         sqlcode = 0, fields = 1
@@ -634,27 +632,27 @@ Level 3 plus some content info:
        Field   1: [05 00 04 00 00] c_bar: NUMERIC  4: (6030) 6030 ==
        Fetch done
 
-=item 5
+=item 6
 
-Level 4 plus internal coding for exchanges and low(er) level return codes:
+Level 5 plus internal coding for exchanges and low(er) level return codes:
 
   DBD::Unify::fld_describe o_sql_00_000000 (1 fields)
       After get,      sqlcode = 0
        Field   1: [05 00 04 00 FFFFFFFF] c_bar
   DBD::Unify::st_prepare u_sql_00_000000 (<= 1, => 0)
 
-=item 6
+=item 7
 
-Level 5 plus destroy/cleanup states:
+Level 6 plus destroy/cleanup states:
 
   DBD::Unify::st_free u_sql_00_000000
    destroy allocc destroy alloco    After deallocO, sqlcode = 0
    destroy alloci destroy allocp    After deallocU, sqlcode = 0
    destroy stat destroy growup destroy impset
 
-=item 7
+=item 8
 
-No messages (yet) set to level 7 and up.
+No messages (yet) set to level 8 and up.
 
 =back
 

@@ -8,6 +8,7 @@
     - Override quote_identifier () (UNIFY has no CATALOGS)
     - Accept 2-arg and 3-arg ->do ()
     - Accept %attr to ->prepare ()
+    - Raised all verbose levels by 1. 1 and 2 are now DBI only
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 
