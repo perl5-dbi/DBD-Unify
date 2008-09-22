@@ -62,6 +62,7 @@ struct imp_sth_st {
     dbih_stc_t	com;		/* MUST be first element in structure	*/
 
     short	id;		/* Statement ID, for dynamic naming	*/
+    short	did;		/* DB Handle ID				*/
     short	stat;		/* Cursor open/closed			*/
     char	*statement;	/* Statement text			*/
 
@@ -79,6 +80,7 @@ struct imp_fld_st {
     int		fic;		/* Indicator	*/
     int		fsc;		/* Scale	*/
     int		fnl;		/* NULL		*/
+    SV		*val;		/* parameter	*/
     };
 
 /* These defines avoid name clashes for multiple statically linked DBD's	*/

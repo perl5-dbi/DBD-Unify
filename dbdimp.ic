@@ -704,6 +704,7 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
     imp_sth->dbd_verbose = dbd_verbose;
     imp_sth->fld	 = (imp_fld_t *)0;
     imp_sth->prm	 = (imp_fld_t *)0;
+    imp_sth->did	 = imp_dbh->id;		/* Remember */
 
     if (attribs) {
 	SV **svp;
@@ -849,6 +850,8 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
     fpr = imp_sth->prm[fix - 1].fpr;
     fsc = imp_sth->prm[fix - 1].fsc;
     fnl = imp_sth->prm[fix - 1].fnl;
+
+    imp_sth->prm[fix - 1].val = value;
 
     st_dbg (5, imp_sth, "[%02X %02X %02X %02X %02X] ",
 	(unsigned char)ftp, fln, fpr, fsc, fic);
@@ -1701,7 +1704,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
     dTHX;
     STRLEN kl;
     char   *key = SvPV (keysv, kl);
-    int    i;
+    int    i, p;
     SV     *retsv = NULL;
     int    cacheit = TRUE;
 
@@ -1712,6 +1715,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
 	return (Nullsv);
 
     i = DBIc_NUM_FIELDS (imp_sth);
+    p = DBIc_NUM_PARAMS (imp_sth);
 
     if (kl == 11 && (strEQ (key, "uni_verbose") || strEQ (key, "dbd_verbose"))) {
 	retsv = newSViv (imp_sth->dbd_verbose);
@@ -1719,28 +1723,28 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
     else
     if (kl == 4 && strEQ (key, "NAME")) {
 	AV *av = newAV ();
-	retsv = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSVpv (imp_sth->fld[i].fnm, 0));
 	}
     else
     if (kl == 4 && strEQ (key, "TYPE")) {
 	AV *av = newAV ();
-	retsv = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSViv (uni2sql_type (imp_sth->fld[i].ftp)));
 	}
     else
     if (kl == 9 && strEQ (key, "uni_types")) {
 	AV *av = newAV ();
-	retsv = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSViv (imp_sth->fld[i].ftp));
 	}
     else
     if (kl == 9 && strEQ (key, "PRECISION")) {
 	AV *av = newAV ();
-	retsv = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSViv (imp_sth->fld[i].ftp == 1
 				    ? imp_sth->fld[i].fln
@@ -1749,7 +1753,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
     else
     if (kl == 5 && strEQ (key, "SCALE")) {
 	AV *av = newAV ();
-	retsv = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSViv (imp_sth->fld[i].fsc));
 	}
@@ -1761,29 +1765,32 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
 	    av_store (av, i, newSViv (2 /* imp_sth->fld[i].fnl */));
 	}
     else
-#ifdef NOTYET	/* From Oracle DBD, seems pretty complete (and readable) */
-    if (kl == 11 && strEQ (key, "uni_lengths")) {
-	AV *av = newAV ();
-	retsv = newRV (sv_2mortal ((SV *)av));
-	while (--i >= 0)
-	    av_store (av, i, newSViv ((IV)imp_sth->fld[i].disize));
+    if (kl == 10 && strEQ (key, "CursorName")) {
+	char c_nm[16];
+	(void)sprintf (c_nm, "c_sql_%02d_%06d", imp_sth->did, imp_sth->id);
+	retsv = newSVpv (c_nm, 0);
 	}
     else
-#ifdef ORACLE
-    if (kl == 9 && strEQ (key, "uni_rowid")) {
-	/* return current _binary_ ROWID (oratype 11) uncached	*/
-	/* Use { ora_type => 11 } when binding to a placeholder	*/
-	retsv = newSVpv ((char *)&imp_sth->cda->rid, sizeof (imp_sth->cda->rid));
-	cacheit = FALSE;
+    if (kl == 11 && strEQ (key, "ParamValues")) {
+	HV *hv = newHV ();
+	retsv  = newRV (sv_2mortal ((SV *)hv));
+	while (--p >= 0) {
+	    char key[8];
+	    sprintf (key, "%d", p + 1);
+	    SV *sv = imp_sth->prm[p].val;
+	    if (SvOK (sv)) {
+		SvREFCNT_inc (sv);
+		fprintf (stderr, "ParamV ('%s' => '%s')\n",
+		    key, SvPV (sv, na));
+		}
+	    else {
+		sv = &PL_sv_undef;
+		fprintf (stderr, "ParamV ('%s' => <undef>)\n", key);
+		}
+	    hv_store (hv, key, strlen (key), sv, 0);
+	    }
 	}
     else
-    if (kl == 17 && strEQ (key, "uni_est_row_width")) {
-	retsv = newSViv (imp_sth->est_width);
-	cacheit = TRUE;
-	}
-    else
-#endif
-#endif
 	return (Nullsv);
 
     if (cacheit) { /* cache for next time (via DBI quick_FETCH)	*/

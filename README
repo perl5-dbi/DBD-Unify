@@ -183,12 +183,11 @@ RESTRICTIONS:
 
 TO DO:
 
-    # Remove as many restrictions as possible ;-)
+    # Remove as many restrictions as possible
 
     # Add more tests
 
-    # Implement all implementable handle attributes (->{CursorName} is
-      probably the easiest to start with ;-)
+    # Implement all implementable remaining handle attributes
 
     # Investigate and implement 3-arg versions of $sth->bind_param ()
 
@@ -203,7 +202,7 @@ TO DO:
       same time for parallel (or at least sequential) processing.
 
     # Try finding ways to increase performance, squeezing every last
-      nanosecond out of each handle ;-P
+      nanosecond out of each handle
 
     # If you're into Unify internals, try finding out why describing
       positional parameters in where clauses (not in selected fields)
