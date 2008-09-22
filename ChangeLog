@@ -10,6 +10,7 @@
     - Accept %attr to ->prepare ()
     - Raised all verbose levels by 1. 1 and 2 are now DBI only
     - Removed 05-reauth.t
+    - NULLABLE now always 2, as it doesn't work
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 
