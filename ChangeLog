@@ -13,6 +13,7 @@
     - NULLABLE now always 2, as it doesn't work
     - Implemented CursorName  sth attribute
     - Implemented ParamValues sth attribute
+    - Implemented ParamTypes  sth attribute
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 

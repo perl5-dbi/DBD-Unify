@@ -7,7 +7,7 @@ BEGIN {
     delete @ENV{qw( LC_ALL LANG BOOLFMT DATEFMT )};
     $ENV{DATEFMT} = "MM/DD/YY";
     }
-use Test::More tests => 156;
+use Test::More tests => 158;
 
 use DBI qw(:sql_types);
 
@@ -81,30 +81,31 @@ my %result_ok = (
     6 => "6, 1006, '6', 6.100000, 6.200000, 6.30, 1006.40, 12:40, 05/20/06, 07/21/00",
     7 => "7, 1007, '7', 7.100000, 7.200000, 7.30, 1007.40, 12:40, 05/20/06, 07/21/00",
     );
-ok ($sth = $dbh->prepare ("select * from xx where xs between ? and ? or xs = 0"), "sel prepare");
-ok ($sth->execute (4, 7), "execute");
+ok ($sth = $dbh->prepare ("select * from xx where xs between ? and ? or xc = ?"), "sel prepare");
+ok ($sth->execute (4, 7, "0"), "execute");
 ok (1, "-- Check the internals");
 {   my %attr = (
-	NAME         => [qw( xs xl xc xf xr xa xh xT xd xe )],
-	NAME_lc      => [qw( xs xl xc xf xr xa xh xt xd xe )],
-	NAME_uc      => [qw( XS XL XC XF XR XA XH XT XD XE )],
-	NAME_hash    => {qw( xs 0 xl 1 xc 2 xf 3 xr 4 xa 5 xh 6 xT 7 xd 8 xe 9 )},
-	NAME_lc_hash => {qw( xs 0 xl 1 xc 2 xf 3 xr 4 xa 5 xh 6 xt 7 xd 8 xe 9 )},
-	NAME_uc_hash => {qw( XS 0 XL 1 XC 2 XF 3 XR 4 XA 5 XH 6 XT 7 XD 8 XE 9 )},
-	uni_types    => [ 5, 2, 1, 8, 7, -4, -6, -7, -3, -11],
-	TYPE         => [ 5, 2, 1, 8, 7, 6, 7, 10, 9, 11],
-	PRECISION    => [ 4, 9, 5, 64, 32, 9, 15, 0, 0, 0],
-	SCALE        => [ 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
-#	NULLABLE     => [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], # Does not work in Unify (yet)
-	NULLABLE     => [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-	CursorName   => "c_sql_00_000001",
-#	Database     => $dbh,
-	ParamValues  => { 1 => 4, 2 => 7 },
-	ParamArrays  => undef, # NYI
-	ParamTypes   => undef, # NYI
-	RowsInCache  => undef, # NYI
+	NAME          => [qw( xs xl xc xf xr xa xh xT xd xe )],
+	NAME_lc       => [qw( xs xl xc xf xr xa xh xt xd xe )],
+	NAME_uc       => [qw( XS XL XC XF XR XA XH XT XD XE )],
+	NAME_hash     => {qw( xs 0 xl 1 xc 2 xf 3 xr 4 xa 5 xh 6 xT 7 xd 8 xe 9 )},
+	NAME_lc_hash  => {qw( xs 0 xl 1 xc 2 xf 3 xr 4 xa 5 xh 6 xt 7 xd 8 xe 9 )},
+	NAME_uc_hash  => {qw( XS 0 XL 1 XC 2 XF 3 XR 4 XA 5 XH 6 XT 7 XD 8 XE 9 )},
+	uni_types     => [ 5, 2, 1, 8, 7, -4, -6, -7, -3, -11],
+	TYPE          => [ 5, 2, 1, 8, 7, 6, 7, 10, 9, 11],
+	PRECISION     => [ 4, 9, 5, 64, 32, 9, 15, 0, 0, 0],
+	SCALE         => [ 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
+#	NULLABLE      => [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], # Does not work in Unify (yet)
+	NULLABLE      => [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+	CursorName    => "c_sql_00_000001",
+	NUM_OF_FIELDS => 10,
+	NUM_OF_PARAMS =>  3,
+	Database      => $dbh,
+	ParamValues   => { 1 => 4, 2 => 7, 3 => "0" },
+	ParamTypes    => { 1 => 5, 2 => 5, 3 => 1   },
+	ParamArrays   => undef, # NYI
+	RowsInCache   => undef, # NYI
 	);
-    use DDumper; print STDERR DDumper $sth->{ParamValues};
     foreach my $attr (sort keys %attr) {
 	#printf STDERR "\n%-20s %s\n", $attr, "@{$sth->{$attr}}";
 	my $av = exists $sth->{$attr} ? $sth->{$attr} : undef;
