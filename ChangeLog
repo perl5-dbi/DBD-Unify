@@ -1,4 +1,4 @@
-*** Release 0.75 - Mon 22 Sep 2008 <h.m.brand@xs4all.nl>
+*** Release 0.75 - Tue 23 Sep 2008 <h.m.brand@xs4all.nl>
 
     - Three-level dbd_verbose and documentation
     - $ENV{DBD_TRACE} sets $dbh->{dbd_verbose} on/before connect
@@ -14,6 +14,12 @@
     - Implemented CursorName  sth attribute
     - Implemented ParamValues sth attribute
     - Implemented ParamTypes  sth attribute
+    - Implemented RowsInCache sth attribute (always 0)
+    - Tested with Unify 6.3AB on HP-UX 10.20 with perl 5.8.8
+    - Tested with Unify 8.2BC on HP-UX 11.00 with perl 5.8.8
+    - Tested with Unify 8.3I  on HP-UX 11.23 with perl 5.10.0
+    - Tested with Unify 8.3K  on AIX 5.2.0.0 with perl 5.8.8
+      Tests will fail on older perls, as the test cases use scalarIO
 
 *** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
 

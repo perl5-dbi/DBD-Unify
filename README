@@ -9,15 +9,20 @@ See the ChangeLog file for a complete history
 REQUIREMENTS
 
     It has been ported and tested on DataServer 6.3AB, 6.3BE, 8.1CC, 8.1CE,
-    8.1DAB, 8.2AC, 8.2AD, 8.2B, 8.3E/64, 8.3F/64, and 8.3KAB/64, but this
-    does not mean it might not work on U2000 databases or other DataServer
-    releases. I do not (yet) have a DS 9.x to play with.
+    8.1DAB, 8.2AC, 8.2AD, 8.2B, 8.3E/64, 8.3F/64, 8.3I/64, and 8.3KAB/64,
+    but this does not mean it might not work on U2000 databases or other
+    DataServer releases. I do not (yet) have a DS 9.x to play with.
 
-    I use DBI 1.601 and perl-5.8.8 or perl5.10.0, but might get it to work
+    I use DBI 1.607 and perl-5.8.8 or perl5.10.0, but might get it to work
     with DBI 0.93 or higher and perl 5.005 (expect problems installing
     Test::More) or higher. But then again, in that case you should consider
     an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite. As of
     DBD-Unify-0.70, I have made perl-5.6 a prerequisite.
+
+    The test case however uses scalarIO to catch errors, so if you use a
+    perl that does not support scalarIO (e.g. perlIO enabled), you will
+    have to disable the failing tests that use it yourself and hope for
+    the best (or better, upgrade to a perl that supports scalarIO).
 
     If you plan to use DataServer 8.1 or higher database in Unicode encoding
     (UTF-8), use perl5.8.0 or up (or at least 5.7.3). See the Unicode site
@@ -144,10 +149,8 @@ RESTRICTIONS:
 
     # Some database attributes not (yet) implemented. (AutoCommit et all)
 
-    # Statement attributes not (yet) fully implemented. Those needed for
+    # Most statement attributes are now implemented. Those needed for
       $sth->fetchrow_hashref () now work, but STORE_attrib () doesn't.
-      Someone (probably me) will have to work through the list of
-      documented database- and statement handle attributes.
 
       DBD::Unify tries to return the {TYPE} attribute in ANSI/ODBC DBI
       compliant coding, and has the original Unify field type available
@@ -158,7 +161,7 @@ RESTRICTIONS:
     And deficiencies/shortcommings that come with Unify:
 
     # Unify does not supply the "NULLABLE" indicator when describing
-      fields
+      fields, the returned value is as documented always 2.
 
     # Unify does not return the desired length of non-character type
       fields, but the /maximum/ PRECISION for those fields
@@ -173,7 +176,7 @@ RESTRICTIONS:
     # At least until 8.2, Unify library pool does *NOT* allow more then
       one different database open at the same time from within the same
       process (even when the first database has correctly disconnected
-      and closed) :-((
+      and closed) :-(
 
       This problem is known  with Unify and registered in their bug
       database as 'usb100963: disconnect'. Unify Sacramento has finally
