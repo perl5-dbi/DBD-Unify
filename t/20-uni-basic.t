@@ -84,7 +84,7 @@ my %result_ok = (
 ok ($sth = $dbh->prepare ("select * from xx where xs between ? and ? or xc = ?"), "sel prepare");
 ok ($sth->execute (4, 7, "0"), "execute");
 ok (1, "-- Check the internals");
-{   my %attr = (
+{   my %attr = (	# $sth attributes as documented in DBI-1.607
 	NAME          => [qw( xs xl xc xf xr xa xh xT xd xe )],
 	NAME_lc       => [qw( xs xl xc xf xr xa xh xt xd xe )],
 	NAME_uc       => [qw( XS XL XC XF XR XA XH XT XD XE )],
@@ -104,7 +104,7 @@ ok (1, "-- Check the internals");
 	ParamValues   => { 1 => 4, 2 => 7, 3 => "0" },
 	ParamTypes    => { 1 => 5, 2 => 5, 3 => 1   },
 	ParamArrays   => undef, # NYI
-	RowsInCache   => undef, # NYI
+	RowsInCache   => 0,
 	);
     foreach my $attr (sort keys %attr) {
 	#printf STDERR "\n%-20s %s\n", $attr, "@{$sth->{$attr}}";
