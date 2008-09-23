@@ -61,12 +61,12 @@ version:           VERSION
 abstract:          DBI driver for Unify database systems
 license:           perl
 author:              
-    - H.Merijn Brand <h.merijn@xs4all.nl>
+    - H.Merijn Brand <h.m.brand@xs4all.nl>
 generated_by:      Author
 distribution_type: module
 provides:
     DBD::Unify:
-        file:      Unify.pm
+        file:      lib/DBD/Unify.pm
         version:   VERSION
 requires:     
     perl:          5.006
