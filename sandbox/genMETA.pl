@@ -68,6 +68,12 @@ provides:
     DBD::Unify:
         file:      lib/DBD/Unify.pm
         version:   VERSION
+    DBD::Unify::GetInfo:
+        file:      lib/DBD/Unify/GetInfo.pm
+        version:   0.10
+    DBD::Unify::TypeInfo:
+        file:      lib/DBD/Unify/TypeInfo.pm
+        version:   0.10
 requires:     
     perl:          5.006
     Carp:          0

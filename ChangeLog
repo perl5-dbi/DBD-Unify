@@ -1,3 +1,7 @@
+*** Release 0.76 - Fri 26 Sep 2008 <h.m.brand@xs4all.nl>
+
+    - Module does provide more than just Unify.pm now
+
 *** Release 0.75 - Tue 23 Sep 2008 <h.m.brand@xs4all.nl>
 
     - Three-level dbd_verbose and documentation
