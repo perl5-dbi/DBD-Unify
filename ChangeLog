@@ -1,6 +1,7 @@
-*** Release 0.76 - Fri 26 Sep 2008 <h.m.brand@xs4all.nl>
+*** Release 0.76 - Sun 19 Oct 2008 <h.m.brand@xs4all.nl>
 
     - Module does provide more than just Unify.pm now
+    - YAML declared 1.4 (META.yml) instead of 1.1 (YAML)
 
 *** Release 0.75 - Tue 23 Sep 2008 <h.m.brand@xs4all.nl>
 
