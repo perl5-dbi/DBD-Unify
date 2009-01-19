@@ -46,7 +46,10 @@ REQUIREMENTS
     One user has reported success with perl 5.005_03 on SunOS 5.7 with
     gcc-2.7.2.2, DBI-1.30, DBD-Unify-0.24 with DataServer-7.2.
 
-    tazervas reported 0.65 working on 9.0G on Linux 2.4.21-47.EL
+    tazervas reported working version:
+    - 0.65 working on 32bit 9.0G on Linux 2.4.21-47.EL
+    - 0.76 working on 32bit 9.0G on Linux 2.6.18-92.1.22.el5PAE
+
 
 BUILDING, TESTING AND INSTALLING:
 
