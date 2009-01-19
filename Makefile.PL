@@ -67,11 +67,11 @@ my %wm = (
 		       },
 
     dynamic_lib   => { OTHERLDFLAGS => " $ULIBS \$(COMPOBJS) " .
-					    "-L$UNIFY " .
+					    "-L$UNIFY " .(
 					    { hpux	=> "",
 					      aix	=> "-lm",
 					      dec_osf	=> "-lxnet",
-					      }->{$^O} . $ULDOPTS,
+					      }->{$^O}||"") . $ULDOPTS,
 		       },
     macro         => { EPP    => "$UNITOP/bin/EPP",
 		       EPPOPT => "",
