@@ -63,12 +63,12 @@ DBI->trace (0, $eh);
 
     my $sth;
     ok ($sth = $dbh->prepare ($do_st, $do_at), "prepare (..., attr)");
-    like ($error, qr{update xx}, "Logging on");
+    like ($error, qr{update xx}, "dbd_verbose - prepare");
     SKIP: {
 	$sth or skip "Prepare with attributes failed", 3;
 	ok ($sth->execute (@do_bv), "execute");
 	ok ($sth->finish, "finish");
-	like ($error, qr{DBD::Unify::st_execute}, "Logging on");
+	like ($error, qr{DBD::Unify::st_execute}, "dbd_verbose - execute");
 	$sth->{dbd_verbose} = 0;
 	}
 
