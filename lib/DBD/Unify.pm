@@ -1,4 +1,4 @@
-#   Copyright (c) 1999-2008 H.Merijn Brand
+#   Copyright (c) 1999-2009 H.Merijn Brand
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -723,7 +723,7 @@ H.Merijn Brand, <h.m.brand@xs4all.nl> developed the DBD::Unify extension.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1999-2008 H.Merijn Brand
+Copyright (C) 1999-2009 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

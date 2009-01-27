@@ -3,6 +3,7 @@
     - Default ld option "" for unsupported OS
     - Better diag message for t/26-uni-multiarg.t
     - Added success report in README
+    - Upped copyright to 2009
 
 *** Release 0.76 - Sun 19 Oct 2008 <h.m.brand@xs4all.nl>
 
