@@ -187,29 +187,17 @@ RESTRICTIONS:
       bug report 22960. DBD-Unify 0.25 and up have a workaround for all
       versions up to and including 8.2AD. It's fixed in 8.2B.
 
-TO DO:
+TODO:
+
+    See module documentation for specific TODO items
 
     # Remove as many restrictions as possible
-
     # Add more tests
-
-    # Implement all implementable remaining handle attributes
-
-    # Investigate and implement 3-arg versions of $sth->bind_param ()
-
-    # Investigate if looks_as_number () should be used in st_bind ().
-      Comments are in where it should.
-
     # Investigate if LIKE and SHLIKE operators in positional parameters
       indeed do not work (I've seen that, but found no time yet to look
       into this more). Currently it cores on SHLIKE. See t/21-uni-regex.t
-
-    # Try finding a way to open several different Unify databases at the
-      same time for parallel (or at least sequential) processing.
-
     # Try finding ways to increase performance, squeezing every last
       nanosecond out of each handle
-
     # If you're into Unify internals, try finding out why describing
       positional parameters in where clauses (not in selected fields)
       causes a core dump on the field name. Look in dbdimp.ic in function

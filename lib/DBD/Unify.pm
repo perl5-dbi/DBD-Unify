@@ -702,9 +702,44 @@ No messages (yet) set to level 8 and up.
 
 =back
 
-=head1 NOTES
+=head1 TODO
 
-Far from complete ...
+As this module is probably far from complete, so will the TODO list most
+likely will be far from complete. More generic (test) items are mentioned
+in the README in the module distribution.
+
+=over 4
+
+=item Handle attributes
+
+Check if all documented handle (database- and statement-) attributes are
+supported and work as expected.
+
+  local $dbh->{RaiseError}       = 0;
+  local $sth->{FetchHashKeyName} = "NAME";
+
+=item Statement attributes
+
+Allow setting and getting stement attributes. A specific example might be
+
+  $sth->{PrintError}       = 0;
+  $sth->{FetchHashKeyName} = "NAME_uc";
+
+=item 3-arg bind_param ()
+
+Investigate and implement 3-arg versions of $sth->bind_param ()
+
+=item looks_as_number ()
+
+Investigate if looks_as_number () should be used in st_bind ().
+Comments are in where it should.
+
+=item Multiple open databases
+
+Try finding a way to open several different Unify databases at the
+same time for parallel (or at least sequential) processing.
+
+=back
 
 =head1 SEE ALSO
 

@@ -1,9 +1,10 @@
-*** Release 0.77 - Mon 19 Jan 2009 <h.m.brand@xs4all.nl>
+*** Release 0.77 - Fri 15 May 2009 <h.m.brand@xs4all.nl>
 
     - Default ld option "" for unsupported OS
     - Better diag message for t/26-uni-multiarg.t
     - Added success report in README
     - Upped copyright to 2009
+    - Moved some TODO items to Unify.pm
 
 *** Release 0.76 - Sun 19 Oct 2008 <h.m.brand@xs4all.nl>
 
