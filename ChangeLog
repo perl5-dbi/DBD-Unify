@@ -5,6 +5,7 @@
     - Added success report in README
     - Upped copyright to 2009
     - Moved some TODO items to Unify.pm
+    - Row count incorrect returning from sth->execute (Todd Servas)
 
 *** Release 0.76 - Sun 19 Oct 2008 <h.m.brand@xs4all.nl>
 
