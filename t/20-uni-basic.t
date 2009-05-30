@@ -7,7 +7,7 @@ BEGIN {
     delete @ENV{qw( LC_ALL LANG BOOLFMT DATEFMT )};
     $ENV{DATEFMT} = "MM/DD/YY";
     }
-use Test::More tests => 158;
+use Test::More tests => 202;
 
 use DBI qw(:sql_types);
 
@@ -169,33 +169,89 @@ ok (1, "-- Check the bind_columns");
 ok ($sth->finish, "finish");
 
 ok (1, "-- UPDATE THE TABLE");
-ok ($dbh->do ("update xx set xf = xf + .05 where xs = 5"), "do update");
+is ($dbh->do ("update xx set xf = xf + .05 where xs = 5"), 1, "do update");
 ok ($dbh->commit, "commit");
 
 ok (1, "-- UPDATE THE TABLE, POSITIONAL");
 ok ($sth = $dbh->prepare ("update xx set xa = xa + .05 where xs = ?"), "do update positional");
-ok ($sth->execute (4), "execute");
+is ($sth->execute (4), 1, "execute");
 ok ($sth->finish, "finish");
 ok ($dbh->commit, "commit");
 
 ok (1, "-- UPDATE THE TABLE, MULTIPLE RECORDS, and COUNT");
 ok ($sth = $dbh->prepare ("update xx set xa = xa + .05 where xs = 5 or xs = 6"), "upd prepare");
-ok ($sth->execute, "execute");
+is ($sth->execute, 2, "execute");
 is ($sth->rows, 2, "rows method");
+ok ($sth->finish, "finish");
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- UPDATE THE TABLE, NO RECORDS, and COUNT");
+ok ($sth = $dbh->prepare ("update xx set xa = xa + .05 where xs = 95 or xs = 96"), "upd prepare");
+is ($sth->execute, '0E0', "execute");
+is ($sth->rows, 0, "rows method");
 ok ($sth->finish, "finish");
 ok ($dbh->rollback, "rollback");
 
 ok (1, "-- UPDATE THE TABLE, POSITIONAL TWICE");
 ok ($sth = $dbh->prepare ("update xx set xc = ? where xs = ?"), "upd prepare");
-ok ($sth->execute ("33", 3), "execute");
+is ($sth->execute ("33", 3), 1, "execute");
 ok ($sth->finish, "finish");
 ok ($dbh->commit, "commit");
 
 ok (1, "-- UPDATE THE TABLE, POSITIONAL TWICE, NON-KEY");
 ok ($sth = $dbh->prepare ("update xx set xc = ? where xf = 10.1 and xl = ?"), "upd prepare");
-ok ($sth->execute ("12345", 1010), "execute");
+is ($sth->execute ("12345", 1010), 1, "execute");
 ok ($sth->finish, "finish");
 ok ($dbh->commit, "commit");
+
+ok (1, "-- UPDATE THE TABLE, ERROR RETURN");
+ok ($sth = $dbh->prepare ("update xx set xs = null"), "upd prepare");
+{ local ( $sth->{RaiseError}, $sth->{PrintError} );
+  is ($sth->execute, undef, "execute"); }
+ok ($sth->finish, "finish");
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- UPDATE THE TABLE, ERROR RETURN");
+{ local ( $dbh->{RaiseError}, $dbh->{PrintError} );
+  is ($dbh->do ("update xx set xs = null" ), undef, "do update"); }
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- DELETE FROM TABLE, ONE RECORD");
+ok ($sth = $dbh->prepare ("delete xx where xs = 2"), "del prepare");
+is ($sth->execute, 1, "execute");
+is ($sth->rows, 1, "rows method");
+ok ($sth->finish, "finish");
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- DELETE FROM TABLE, NO RECORDS");
+ok ($sth = $dbh->prepare ("delete xx where xs = 98"), "del prepare");
+is ($sth->execute, '0E0', "execute");
+is ($sth->rows, 0, "rows method");
+ok ($sth->finish, "finish");
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- DELETE FROM TABLE");
+ok ($sth = $dbh->prepare ("delete xx"), "del prepare");
+is ($sth->execute, 19, "execute");
+is ($sth->rows, 19, "rows method");
+ok ($sth->finish, "finish");
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- DO DELETE FROM TABLE, NO ROWS");
+is ($dbh->do ("delete xx where xs = -1"), '0E0', "do delete");
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- DO DELETE FROM TABLE, ONE ROW");
+is ($dbh->do ("delete xx where xs = 1"), 1, "do delete");
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- DO DELETE FROM TABLE, TWO ROWS");
+is ($dbh->do ("delete xx where xs = 1 or xs = 0"), 2, "do delete");
+ok ($dbh->rollback, "rollback");
+
+ok (1, "-- DO DELETE FROM TABLE, ALL ROWS");
+is ($dbh->do ("delete xx"), 19, "do delete");
+ok ($dbh->rollback, "rollback");
 
 ok ($sth = $dbh->prepare ("select * from xx where xs = ?"), "sel prepare");
 ok ($sth->execute (1), "execute 1");
@@ -237,7 +293,7 @@ while (my @f = $sth->fetchrow_array ()) {
     }
 ok ($sth->finish, "finish");
 
-ok ($dbh->do ("delete xx"), "do delete");
+is ($dbh->do ("delete xx"), 19, "do delete");
 ok ($dbh->commit, "commit");
 
 ok (1, "-- DROP THE TABLE");
