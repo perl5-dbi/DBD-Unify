@@ -75,6 +75,10 @@ EXEC SQL END   DECLARE SECTION;
 
 #define DBI_debug	(dbis->debug & DBIc_TRACE_LEVEL_MASK)
 
+/* For more info about error handling, read
+ * http://search.cpan.org/dist/DBI/lib/DBI/DBD.pm#The_dbd_drv_error_method
+ */
+
 #ifdef I_STDARG
 static void dbg (int level, char *fmt, ...)
 #endif
@@ -98,6 +102,8 @@ va_dcl
     va_start (args);
 #endif
 
+    /* DBILOGFP should ideally be replaced with DBIc_LOGPIO (imp_xxh)
+     * but dbg doesn't get a handle (yet) */
     (void)PerlIO_vprintf (DBILOGFP, fmt, args);
     (void)PerlIO_flush   (DBILOGFP);
     va_end (args);
@@ -127,8 +133,8 @@ va_dcl
     va_start (args);
 #endif
 
-    (void)PerlIO_vprintf (DBILOGFP, fmt, args);
-    (void)PerlIO_flush   (DBILOGFP);
+    (void)PerlIO_vprintf (DBIc_LOGPIO (sth), fmt, args);
+    (void)PerlIO_flush   (DBIc_LOGPIO (sth));
     va_end (args);
     } /* st_dbg */
 
@@ -150,10 +156,25 @@ void dbd_init (dbistate_t *dbistate)
     /* dbis->debug = 9; */
     } /* dbd_init */
 
-static void error (SV *h, int error_num, char *text)
+/* Error */
+static void error   (SV *h, int error_num, char *text)
 {
     D_imp_xxh (h);
     DBIh_SET_ERR_CHAR (h, imp_xxh, Nullch, error_num, text, SQLSTATE, Nullch);
+    } /* error */
+
+/* Warning */
+static void warning (SV *h, int error_num, char *text)
+{
+    D_imp_xxh (h);
+    DBIh_SET_ERR_CHAR (h, imp_xxh, "0",    error_num, text, SQLSTATE, Nullch);
+    } /* error */
+
+/* Success with information */
+static void info    (SV *h, int error_num, char *text)
+{
+    D_imp_xxh (h);
+    DBIh_SET_ERR_CHAR (h, imp_xxh, "",     error_num, text, SQLSTATE, Nullch);
     } /* error */
 
 static int sqlError (SV *h)
@@ -162,8 +183,13 @@ static int sqlError (SV *h)
 
     auto	long	status;
 
-    if (SQLCODE >= 0)
+    if (SQLCODE >= 0) {
+	if (SQLWARN < 0) {
+	    dbg (4, "DBD::Unify::sqlError: SQLWARN = %d", SQLWARN);
+	    warning (h, SQLWARN, ufchmsg (SQLWARN, &status));
+	    }
 	return (1);
+	}
 
     dbg (4, "DBD::Unify::sqlError: SQLCODE = %d", SQLCODE);
 
@@ -723,7 +749,7 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
     if (SQLCODE == -2061)	/* Cannot deallocate allocated cursor, so  */
 	SQLCODE = 0;		/* re-use it (it'll be the same context)   */
     st_dbg (4, imp_sth, "    After allocate, sqlcode = %d\n", SQLCODE);
-    unless (sqlError (dbh))
+    unless (sqlError (sth))
 	return (0);
     imp_sth->stat |= ST_STAT_ALLOCC;
 
@@ -732,7 +758,7 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
 	PREPARE :u_sql_nm
 	FROM    :u_sql_st;
     st_dbg (4, imp_sth, "    After prepare,  sqlcode = %d\n", SQLCODE);
-    unless (sqlError (dbh))
+    unless (sqlError (sth))
 	return (0);
     imp_sth->stat |= ST_STAT_ALLOCP;
 
@@ -740,7 +766,7 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
 	ALLOCATE SQL DESCRIPTOR :o_sql_nm
 	WITH MAX 128;
     st_dbg (4, imp_sth, "    After allocate, sqlcode = %d\n", SQLCODE);
-    unless (sqlError (dbh))
+    unless (sqlError (sth))
 	return (0);
     imp_sth->stat |= ST_STAT_ALLOCO;
 
@@ -748,14 +774,14 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
 	DESCRIBE OUTPUT      :u_sql_nm
 	USING SQL DESCRIPTOR :o_sql_nm;
     st_dbg (4, imp_sth, "    After describe, sqlcode = %d\n", SQLCODE);
-    unless (sqlError (dbh))
+    unless (sqlError (sth))
 	return (0);
 
     EXEC SQL
 	GET   SQL DESCRIPTOR :o_sql_nm
 	:n_sql_st = COUNT;
     st_dbg (4, imp_sth, "    After count,    sqlcode = %d, count = %d\n", SQLCODE, n_sql_st);
-    unless (sqlError (dbh))
+    unless (sqlError (sth))
 	return (0);
     DBIc_NUM_FIELDS (imp_sth) = n_sql_st;
     dbd_fld_describe (dbh, imp_sth, n_sql_st);
@@ -787,7 +813,7 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
 	    ALLOCATE SQL DESCRIPTOR :i_sql_nm
 	    WITH MAX                :n_sql_st;
 	st_dbg (4, imp_sth, "    After allocate, sqlcode = %d\n", SQLCODE);
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return (0);
 	imp_sth->stat |= ST_STAT_ALLOCI;
 
@@ -795,7 +821,7 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
 	    DESCRIBE INPUT          :u_sql_nm
 	    USING    SQL DESCRIPTOR :i_sql_nm;
 	st_dbg (4, imp_sth, "    After describe, sqlcode = %d\n", SQLCODE);
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return (0);
 
 	dbd_prm_describe (dbh, imp_sth, n_sql_st);
@@ -832,7 +858,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 	EXEC SQL
 	    CLOSE :c_sql_nm;
 	st_dbg (4, imp_sth, "    After close,    sqlcode = %d\n", SQLCODE);
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return (0);
 	imp_sth->stat &= ~ST_STAT_OPEN;
 	}
@@ -864,7 +890,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 	    VALUE :fix
 		INDICATOR = -1;
 	st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return (0);
 	}
     else {
@@ -889,7 +915,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdC,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 		}
@@ -905,7 +931,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdF,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 
@@ -921,7 +947,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdD,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 
@@ -935,7 +961,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdF,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 
@@ -949,7 +975,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdD,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 
@@ -979,7 +1005,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdT,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		}
 		break;
@@ -1007,7 +1033,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdDT,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		}
 		break;
@@ -1032,7 +1058,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdHDT,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		}
 		break;
@@ -1051,7 +1077,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdB,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 		}
@@ -1070,7 +1096,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdX,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 		}
@@ -1088,7 +1114,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdL,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 
@@ -1104,7 +1130,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 			DATA      = :fdS,
 			INDICATOR = 0;
 		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (0);
 		break;
 
@@ -1136,7 +1162,7 @@ int dbd_st_execute (SV *sth, imp_sth_t *imp_sth)
 	EXEC SQL
 	    CLOSE :c_sql_nm;
 	st_dbg (4, imp_sth, "    After close,    sqlcode = %d\n", SQLCODE);
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return (0);
 	imp_sth->stat &= ~ST_STAT_OPEN;
 	}
@@ -1171,7 +1197,7 @@ int dbd_st_execute (SV *sth, imp_sth_t *imp_sth)
 	}
     st_dbg (4, imp_sth, "    After open,     sqlcode = %d (=> %d)\n",
 	SQLCODE, DBIc_NUM_PARAMS (imp_sth));
-    unless (sqlError (dbh))
+    unless (sqlError (sth))
 	return (0);
     imp_sth->stat |= ST_STAT_OPEN;
 
@@ -1218,6 +1244,9 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 	return (Nullav);
 	}
 
+    unless (sqlError (sth))
+	return (Nullav);
+
     unless (av_len (av) + 1 == num_fields) {
 	int ro = SvREADONLY (av);
 	if (ro)
@@ -1251,6 +1280,8 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 	    VALUE :fix
 		  :fic = INDICATOR;
 	st_dbg (4, imp_sth, "    After get,      sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return (Nullav);
 	f->fic = fic;
 	st_dbg (4, imp_sth, "     Field %3d: ", fix);
 	st_dbg (5, imp_sth, "[%02X %02X %02X %02X %02X] ",
@@ -1271,7 +1302,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdC = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		i = fln;
 		if (DBIc_has (imp_sth, DBIcf_ChopBlanks)) {
@@ -1290,7 +1321,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdF = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		(void)sprintf (fdC, "%.*f", fsc, fdF);
 		sv_setpvn (sv, fdC, strlen (fdC));
@@ -1306,7 +1337,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdD = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		(void)sprintf (fdC, "%lf", fdD);
 		sv_setpvn (sv, fdC, strlen (fdC));
@@ -1321,7 +1352,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdF = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		(void)sprintf (fdC, "%.*f", fsc, fdF);
 		sv_setpvn (sv, fdC, strlen (fdC));
@@ -1336,7 +1367,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdD = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		(void)sprintf (fdC, "%.*lf", fsc, fdD);
 		sv_setpvn (sv, fdC, strlen (fdC));
@@ -1353,7 +1384,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdT = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		st_dbg (4, imp_sth, "(%d) ", fdT);
 		unless (s = timetoa (fdT))
@@ -1374,7 +1405,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdDT = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		st_dbg (4, imp_sth, "(%d) ", fdDT);
 		if (ldtoa ((UINT32)fdDT, fdC))
@@ -1392,7 +1423,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdHDT = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		st_dbg (4, imp_sth, "(%ld) ", (long)fdHDT);
 		if (ldtoa (fdHDT, fdC))
@@ -1412,7 +1443,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdB = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		i = fdB.curlen;
 		s = fdB.dataptr;
@@ -1443,7 +1474,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdX = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		i = fdX.curlen;
 		s = fdX.dataptr;
@@ -1465,7 +1496,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdL = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		st_dbg (4, imp_sth, "(%ld) ", fdL);
 		sv_setiv (sv, fdL);
@@ -1479,7 +1510,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    VALUE :fix
 			  :fdS = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
-		unless (sqlError (dbh))
+		unless (sqlError (sth))
 		    return (Nullav);
 		st_dbg (4, imp_sth, "(%d) ", fdS);
 		sv_setiv (sv, (int)fdS);
@@ -1527,7 +1558,7 @@ int dbd_st_finish (SV *sth, imp_sth_t *imp_sth)
 	EXEC SQL
 	    CLOSE :c_sql_nm;
 	st_dbg (4, imp_sth, "    After close,    sqlcode = %d\n", SQLCODE);
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return (0);
 
 	imp_sth->stat &= ~ST_STAT_OPEN;
@@ -1556,7 +1587,7 @@ void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)
 	EXEC SQL
 	    CLOSE :c_sql_nm;
 	st_dbg (4, imp_sth, "    After close,    sqlcode = %d\n", SQLCODE);
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return;
 	imp_sth->stat &= ~ST_STAT_OPEN;
 	}
@@ -1567,7 +1598,7 @@ void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)
 	    DEALLOCATE PREPARE    :c_sql_nm;
 	st_dbg (4, imp_sth, "    After deallocC, sqlcode = %d\n", SQLCODE);
 	if (SQLCODE == -22) SQLCODE = 0;
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return;
 	*/
 	imp_sth->stat &= ~ST_STAT_ALLOCC;
@@ -1579,7 +1610,7 @@ void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)
 	    DEALLOCATE DESCRIPTOR :o_sql_nm;
 	st_dbg (4, imp_sth, "    After deallocO, sqlcode = %d\n", SQLCODE);
 	if (SQLCODE == -22) SQLCODE = 0;
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return;
 	imp_sth->stat &= ~ST_STAT_ALLOCO;
 	}
@@ -1591,7 +1622,7 @@ void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)
 		DEALLOCATE DESCRIPTOR :i_sql_nm;
 	    st_dbg (4, imp_sth, "    After deallocI, sqlcode = %d\n", SQLCODE);
 	    if (SQLCODE == -22) SQLCODE = 0;
-	    unless (sqlError (dbh))
+	    unless (sqlError (sth))
 		return;
 	    imp_sth->stat &= ~ST_STAT_ALLOCI;
 	    }
@@ -1604,7 +1635,7 @@ void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)
 	    DEALLOCATE PREPARE    :u_sql_nm;
 	st_dbg (4, imp_sth, "    After deallocU, sqlcode = %d\n", SQLCODE);
 	if (SQLCODE == -2124) SQLCODE = 0;
-	unless (sqlError (dbh))
+	unless (sqlError (sth))
 	    return;
 	imp_sth->stat &= ~ST_STAT_ALLOCP;
 	}
