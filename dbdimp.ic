@@ -1713,21 +1713,25 @@ static int uni2sql_type (SQLCOLTYPE t)
 	case SQLREAL:    return ( 7); /* real              SQL_REAL          */
 	case SQLHUGEAMT: return ( 7); /* huge amount       -                 */
 	case SQLDBLPREC: return ( 8); /* double precision  SQL_DOUBLE        */
+
 	case SQLDATE:    return ( 9); /* date              SQL_DATE          */
 	case SQLSMTIME:  return (10); /* time              SQL_TIME          */
 	case SQLHDATE:   return (11); /* huge date         SQL_TIMESTAMP     */
 	              /*         12                        SQL_VARCHAR       */
+	              /*         16                        SQL_BOOLEAN       */
 	case SQLTEXT:    return (-1); /* text              SQL_LONGVARCHAR   */
 	case SQLBYTE:    return (-2); /* byte              SQL_BINARY        */
 	case SQLBINARY:  return (-3); /* binary            SQL_VARBINARY     */
-	}             /*         -4                        SQL_LONGVARBINARY */
-	              /*         -5                        SQL_BIGINT        */
-	              /*         -6                        SQL_TINYINT       */
+		      /*         -4                        SQL_LONGVARBINARY */
+	case SQLINT64:   return (-5); /* huge integer      SQL_BIGINT        */
+	}             /*         -6                        SQL_TINYINT       */
 	              /*         -7                        SQL_BIT           */
-	              /*         -8                        SQL_WCHAR         */
-	              /*         -9                        SQL_WVARCHAR      */
-	              /*        -10                        SQL_WLONGVARCHAR  */
-    return (0);       /*                 -                 SQL_ALL_TYPES     */
+    dbg (4, "No ANSI support for type %d\n", t);
+    /* No support for
+     * -18 SQLAMT64  CURRENCY, GIANT AMOUNTS
+     * -17 SQLINT64  HUGE INTEGER (on 32bit systems)
+     */
+    return (0);       /*                 -                 SQL_UNKNOWN_TYPE  */
     } /* uni2sql_type */
 
 SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
