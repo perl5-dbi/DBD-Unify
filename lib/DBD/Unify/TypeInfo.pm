@@ -41,12 +41,12 @@ $type_info_all = [
 
 #     TYPE_NAME           DATA_TYPE        SIZE  PFX   SFX   PARAMS            N C S UNSIG FPS   AUTO  LOCAL MINSC MAXSC SDT   SDS   RADIX PREC
 #   [ "GIANT AMOUNT",                      undef,undef,undef,"PRECISION,SCALE",1,0,3,0,    undef,undef,undef,2,    2,    undef,undef,undef,undef, ],
-    [ "HUGE AMOUNT",      SQL_REAL,        undef,undef,undef,"PRECISION,SCALE",1,0,3,0,    undef,undef,undef,2,    2,    undef,undef,undef,undef, ],
-    [ "AMOUNT",           SQL_FLOAT,       undef,undef,undef,"PRECISION,SCALE",1,0,3,0,    undef,undef,undef,2,    2,    undef,undef,undef,undef, ],
+    [ "HUGE AMOUNT",      -207,            undef,undef,undef,"PRECISION,SCALE",1,0,3,0,    undef,undef,undef,2,    2,    undef,undef,undef,undef, ],
+    [ "AMOUNT",           -206,            undef,undef,undef,"PRECISION,SCALE",1,0,3,0,    undef,undef,undef,2,    2,    undef,undef,undef,undef, ],
     [ "BINARY",           SQL_VARBINARY,   undef,"'", ,"'",  undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
     [ "BYTE",             SQL_BINARY,      undef,undef,undef,undef,            1,0,3,0,    undef,undef,undef,0,    undef,undef,undef,undef,undef, ],
     [ "CHAR",             SQL_CHAR,        undef,undef,undef,"PRECISION",      1,0,3,0,    undef,undef,undef,0,    undef,undef,undef,undef,undef, ],
-#   [ "CURRENCY",                          undef,undef,undef,"PRECISION,SCALE",1,0,3,0,    2,    undef,undef,0,    8,    undef,undef,undef,undef, ],
+    [ "CURRENCY",         -218,            undef,undef,undef,"PRECISION,SCALE",1,0,3,0,    2,    undef,undef,0,    8,    undef,undef,undef,undef, ],
     [ "HUGE DATE",        SQL_TIMESTAMP,   undef,undef,undef,undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
     [ "DATE",             SQL_DATE,        undef,undef,undef,undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
     [ "DECIMAL",          SQL_DECIMAL,     undef,undef,undef,"PRECISION",      1,0,3,0,    undef,undef,undef,0,    undef,undef,undef,undef,undef, ],

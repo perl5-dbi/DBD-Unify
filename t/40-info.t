@@ -116,6 +116,7 @@ ok ($sth->finish,	"finish");
 ok ($sth = $dbh->foreign_key_info (undef, $ENV{USCHEMA}||"PUBLIC", "foo",
 				   undef, $ENV{USCHEMA}||"PUBLIC", "foo"),
 			"foreign_key_info (SCHEMA.foo, SCHEMA.foo)");
+
 ok ($sth->finish,	"finish");
 
 ok ($dbh->rollback,	"rollback");
@@ -172,9 +173,9 @@ is   ($ti->{TYPE_NAME}, "NUMERIC",		"NUMERIC");
 ok   ($ti = $dbh->type_info ( 5),		"type_info ( 5)");
 is   ($ti->{TYPE_NAME}, "SMALLINT",		"SMALLINT");
 ok   ($ti = $dbh->type_info ( 6),		"type_info ( 6)");
-is   ($ti->{TYPE_NAME}, "AMOUNT",		"AMOUNT");
+is   ($ti->{TYPE_NAME}, "FLOAT",		"FLOAT");
 ok   ($ti = $dbh->type_info ( 7),		"type_info ( 7)");
-is   ($ti->{TYPE_NAME}, "HUGE AMOUNT",		"HUGE AMOUNT");
+is   ($ti->{TYPE_NAME}, "REAL",			"REAL");
 ok   ($ti = $dbh->type_info ( 8),		"type_info ( 8)");
 is   ($ti->{TYPE_NAME}, "DOUBLE PRECISION",	"DOUBLE PRECISION");
 ok   ($ti = $dbh->type_info ( 9),		"type_info ( 9)");
