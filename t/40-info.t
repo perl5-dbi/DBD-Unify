@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 91;
+use Test::More tests => 115;
 
 BEGIN { use_ok ("DBI") }
 
@@ -162,7 +162,33 @@ ok   (exists $tia->[0]{DATA_TYPE},		"DATA_TYPE");
 
 my %tia = map { $_->[0] => [ @$_ ] } @{$tia}[1 .. $#$tia];
 ok   (exists $tia{CHAR},			"CHAR");
-is   ($tia{AMOUNT}[$tia->[0]{CREATE_PARAMS}], "PRECISION",
+is   ($tia{AMOUNT}[$tia->[0]{CREATE_PARAMS}], "PRECISION,SCALE",
 						"AMOUNT - PRECISION");
+my $ti;
+ok   ($ti = $dbh->type_info ( 1),		"type_info ( 1)");
+is   ($ti->{TYPE_NAME}, "CHAR",			"CHAR");
+ok   ($ti = $dbh->type_info ( 2),		"type_info ( 2)");
+is   ($ti->{TYPE_NAME}, "NUMERIC",		"NUMERIC");
+ok   ($ti = $dbh->type_info ( 5),		"type_info ( 5)");
+is   ($ti->{TYPE_NAME}, "SMALLINT",		"SMALLINT");
+ok   ($ti = $dbh->type_info ( 6),		"type_info ( 6)");
+is   ($ti->{TYPE_NAME}, "AMOUNT",		"AMOUNT");
+ok   ($ti = $dbh->type_info ( 7),		"type_info ( 7)");
+is   ($ti->{TYPE_NAME}, "HUGE AMOUNT",		"HUGE AMOUNT");
+ok   ($ti = $dbh->type_info ( 8),		"type_info ( 8)");
+is   ($ti->{TYPE_NAME}, "DOUBLE PRECISION",	"DOUBLE PRECISION");
+ok   ($ti = $dbh->type_info ( 9),		"type_info ( 9)");
+is   ($ti->{TYPE_NAME}, "DATE",			"DATE");
+ok   ($ti = $dbh->type_info (10),		"type_info (10)");
+is   ($ti->{TYPE_NAME}, "TIME",			"TIME");
+ok   ($ti = $dbh->type_info (11),		"type_info (11)");
+is   ($ti->{TYPE_NAME}, "HUGE DATE",		"HUGE DATE");
+
+ok   ($ti = $dbh->type_info (-1),		"type_info (-1)");
+is   ($ti->{TYPE_NAME}, "TEXT",			"TEXT");
+ok   ($ti = $dbh->type_info (-2),		"type_info (-2)");
+is   ($ti->{TYPE_NAME}, "BYTE",			"BYTE");
+ok   ($ti = $dbh->type_info (-5),		"type_info (-5)");
+is   ($ti->{TYPE_NAME}, "HUGE INTEGER",		"HUGE INTEGER");
 
 exit 0;
