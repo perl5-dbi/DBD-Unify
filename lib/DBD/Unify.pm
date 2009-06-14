@@ -305,7 +305,7 @@ sub foreign_key_info
 	    ];
 	}
     $sth->finish;
-    $sth = undef;
+    undef $sth;
 
     DBI->connect ("dbi:Sponge:", "", "", { RaiseError => 1 })->prepare (
 	"select link_info $where", {
