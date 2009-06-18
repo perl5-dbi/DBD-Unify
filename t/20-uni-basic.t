@@ -3,11 +3,13 @@
 use strict;
 use warnings;
 
+use File::Spec;
+
 BEGIN {
     delete @ENV{qw( LC_ALL LANG BOOLFMT DATEFMT )};
     $ENV{DATEFMT} = "MM/DD/YY";
     }
-use Test::More tests => 202;
+use Test::More tests => 203;
 
 use DBI qw(:sql_types);
 
@@ -34,6 +36,9 @@ unless ($dbh) {
     BAIL_OUT ("Unable to connect to Unify ($DBI::errstr)\n");
     exit 0;
     }
+
+my $pgm = (File::Spec->splitpath (__FILE__))[2];
+like (qx{env DBPATH=$ENV{DBPATH} lmshow -Oprocess=$$}, qr{$pgm}, "message log init");
 
 ok (1, "-- CREATE THE TABLE");
 ok ($dbh->do (join " " =>

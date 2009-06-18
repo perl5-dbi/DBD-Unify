@@ -208,6 +208,9 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
     EXEC SQL END   DECLARE SECTION;
     dTHX;
     char *opt;
+    char *progname;
+    STRLEN l;
+    USTATUS ustatus;
 
     if ((opt = getenv ("DBD_TRACE"))) {
 	auto int i = 0;
@@ -227,6 +230,10 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
 	}
 
     dbg (3, "DBD::Unify::db_login: dbname: %s\n", dbname);
+
+    progname = SvPV (get_sv ("0", 0), l);
+    (void)uinimsg (basename (progname), &ustatus);
+    dbg (4, "    After uinimsg ('%s'), status = %ld\n", progname, ustatus);
 
     /* CONNECT [db_name];
      *

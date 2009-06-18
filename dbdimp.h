@@ -29,7 +29,9 @@ char *timetoa (short time);		/* returns pointer to static buf;
 					 * silently converts bad times to
 					 * strings, e.g., 2910 -> 29:10 */
 
-char *ufchmsg (USTATUS errnum, USTATUS *status);
+char *ufchmsg (USTATUS errnum,    USTATUS *status);
+int   uinimsg (char *programname, USTATUS *status); /* assigns program name
+						     * to logging system */
 
 USTATUS	SQLCODE;
 

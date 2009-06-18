@@ -10,6 +10,7 @@
       including the promotion of SQLWARN were appropriate
     - The generated TypeInfo was very wrong. Corrected.
     - Documentation in t/15-uni-fail.t about BUG 108243 (Todd Zervas)
+    - Register program with Unify logging system (Todd Zervas)
 
 *** Release 0.76 - Sun 19 Oct 2008 <h.m.brand@xs4all.nl>
 
