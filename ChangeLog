@@ -1,14 +1,15 @@
-*** Release 0.77 - Mon 08 Jun 2009 <h.m.brand@xs4all.nl>
+*** Release 0.77 - Thu 18 Jun 2009 <h.m.brand@xs4all.nl>
 
     - Default ld option "" for unsupported OS
     - Better diag message for t/26-uni-multiarg.t
     - Added success report in README
     - Upped copyright to 2009
     - Moved some TODO items to Unify.pm
-    - Row count incorrect returning from sth->execute (Todd Servas)
+    - Row count incorrect returning from sth->execute (Todd Zervas)
     - Several updates regarding error reporting
       including the promotion of SQLWARN were appropriate
     - The generated TypeInfo was very wrong. Corrected.
+    - Documentation in t/15-uni-fail.t about BUG 108243 (Todd Zervas)
 
 *** Release 0.76 - Sun 19 Oct 2008 <h.m.brand@xs4all.nl>
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 9;
 
 BEGIN { use_ok ("DBI") };
 
@@ -25,8 +25,6 @@ $dbh->disconnect;	# Should auto-destroy $sth;
 ok (!$dbh->ping,	"disconnected");
 
 {   local $SIG{__WARN__} = sub {};
-    delete $ENV{UNIFY};
-    ok (!DBI->connect ("dbi:Unify:", "", $schema), "Connect \$UNIFY unset");
     $ENV{UNIFY} = undef;
     ok (!DBI->connect ("dbi:Unify:", "", $schema), "Connect \$UNIFY undef");
     $ENV{UNIFY} = "";
