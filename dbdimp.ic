@@ -44,7 +44,7 @@ DBISTATE_DECLARE;
 #include <sqle_usr.h>
 #include <dbtypes.h>
 
-extern char *basename (char *path);
+extern char *basename (const char *path);
 
 #define MAX_SQL_LEN	4096
 #define Max(a,b)	((a)>=(b)?(a):(b))
