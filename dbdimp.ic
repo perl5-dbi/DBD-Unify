@@ -273,6 +273,14 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
 	(void)sprintf (statement, "DBPATH=%s", dbname);
 	(void)putenv (statement);
 	}
+
+    {	/* Register program to monitor system, must be done BEFORE connect */
+	char   *pgm = basename (SvPV (get_sv ("0", 0), na));
+	USTATUS ustatus;
+	(void)uinimsg (pgm, &ustatus);
+	dbg (4, "    After uinimsg ('%s'), status = %ld\n", pgm, ustatus);
+	}
+
     EXEC SQL
 	CONNECT;
     dbg (4, "    After connect,    sqlcode = %d\n", SQLCODE);
@@ -308,13 +316,6 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
     unless (sth_id_on || (sth_id_on = (byte *)calloc (n_sth_id, 8))) {
 	error (dbh, errno, "Cannot allocate space for STH's");
 	return (0);
-	}
-
-    {	/* Register program to monitor system */
-	char   *pgm = basename (SvPV (get_sv ("0", 0), na));
-	USTATUS ustatus;
-	(void)uinimsg (pgm, &ustatus);
-	dbg (4, "    After uinimsg ('%s'), status = %ld\n", pgm, ustatus);
 	}
 
     return (1);

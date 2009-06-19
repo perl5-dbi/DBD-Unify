@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use File::Spec;
-
 BEGIN {
     delete @ENV{qw( LC_ALL LANG BOOLFMT DATEFMT )};
     $ENV{DATEFMT} = "MM/DD/YY";
@@ -37,8 +35,8 @@ unless ($dbh) {
     exit 0;
     }
 
-my $pgm = (File::Spec->splitpath (__FILE__))[2];
-like (qx{env DBPATH=$ENV{DBPATH} lmshow -Oprocess=$$}, qr{$pgm}, "message log init");
+like (qx{env DBPATH=$ENV{DBPATH} lmshow -Oprocess=$$},
+      qr{20-uni-basic.t}i, "message log init");
 
 ok (1, "-- CREATE THE TABLE");
 ok ($dbh->do (join " " =>
