@@ -569,6 +569,9 @@ C<dbd_verbose> on statement handles too. The default C<dbd_verbose> for
 statement handles is the global C<dbd_verbose> at creation time of the
 statement handle.
 
+The environment variable C<DBD_VERBOSE> is used if defined and overrules
+C<$DBD_TRACE>.
+
   $dbh->{dbd_verbose} = 4;
   $sth = $dbh->prepare ("select * from foo");  # sth's dbd_verbose = 4
   $dbh->{dbd_verbose} = 3;                     # sth's dbd_verbose = 4
@@ -751,10 +754,11 @@ comp.lang.perl.modules newsgroup and the dbi-users mailing list
 
 =head1 AUTHORS
 
-DBI/DBD was developed by Tim Bunce, <Tim.Bunce@ig.co.uk>, who also
-developed the DBD::Oracle.
+DBI/DBD was developed by Tim Bunce, who also developed the DBD::Oracle.
 
-H.Merijn Brand, <h.m.brand@xs4all.nl> developed the DBD::Unify extension.
+H.Merijn Brand developed the DBD::Unify extension.
+
+Todd Zervas has given a lot of feedback and patches.
 
 =head1 COPYRIGHT AND LICENSE
 
