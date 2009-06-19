@@ -227,6 +227,19 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
 	    dbg (2, "Set DBD_VERBOSE = %d\n", dbd_verbose);
 	    }
 	}
+    if ((opt = getenv ("DBD_VERBOSE"))) {
+	auto int i = 0;
+	while (*opt) {
+	    unless (isdigit (*opt))
+		break;
+	    i = 10 * i + *opt - '0';
+	    opt++;
+	    }
+	if (!*opt && i >= 0 && i <= 99) {
+	    dbd_verbose = i;
+	    dbg (2, "Set DBD_VERBOSE = %d\n", dbd_verbose);
+	    }
+	}
 
     dbg (3, "DBD::Unify::db_login: dbname: %s\n", dbname);
 
