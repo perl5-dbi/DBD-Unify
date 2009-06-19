@@ -12,6 +12,7 @@
     - Documentation in t/15-uni-fail.t about BUG 108243 (Todd Zervas)
     - Register program with Unify logging system (Todd Zervas)
     - $DBD_VERBOSE can overrule $DBD_TRACE
+    - Improved support for SQLSTATE and added tests
 
 *** Release 0.76 - Sun 19 Oct 2008 <h.m.brand@xs4all.nl>
 
