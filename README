@@ -13,7 +13,7 @@ REQUIREMENTS
     but this does not mean it might not work on U2000 databases or other
     DataServer releases. I do not (yet) have a DS 9.x to play with.
 
-    I use DBI 1.607 and perl-5.8.8 or perl5.10.0, but might get it to work
+    I use DBI 1.609 and perl-5.8.8 or perl5.10.0, but might get it to work
     with DBI 0.93 or higher and perl 5.005 (expect problems installing
     Test::More) or higher. But then again, in that case you should consider
     an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite. As of
@@ -46,10 +46,11 @@ REQUIREMENTS
     One user has reported success with perl 5.005_03 on SunOS 5.7 with
     gcc-2.7.2.2, DBI-1.30, DBD-Unify-0.24 with DataServer-7.2.
 
-    tazervas reported working version:
+    Todd Zervas reported working versions:
     - 0.65 working on 32bit 9.0G on Linux 2.4.21-47.EL
     - 0.76 working on 32bit 9.0G on Linux 2.6.18-92.1.22.el5PAE
-
+    - 0.77 working on 32bit 9.0G on Linux 2.6.18-128.1.14.el5PAE
+                    with GNU g++ 4.1.2, perl-5.8.8, and DBI-1.609
 
 BUILDING, TESTING AND INSTALLING:
 
@@ -222,8 +223,8 @@ ACKNOWLEDGEMENTS
     the speed in the early development and help in adding the missing
     features in the earlier stages of this DBD interface.
 
-    Thanks to tazervas@earthlink.net for digging in the binary issues
-    on DS 9.0.
+    Thanks to Todd Zervas <tazervas@earthlink.net> for digging in the
+    binary issues on DS 9.0.
 
 COPYRIGHT AND LICENSE
 
