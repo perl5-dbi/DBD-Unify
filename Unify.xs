@@ -16,7 +16,7 @@ INCLUDE: Unify.xsi
 MODULE = DBD::Unify    PACKAGE = DBD::Unify::db
 
 void
-_do (dbh, statement, attribs="", params=Nullsv)
+_do (dbh, statement, attribs = "", params = NULL)
     SV *        dbh
     char *      statement
     char *      attribs

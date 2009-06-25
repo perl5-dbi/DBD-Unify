@@ -162,21 +162,21 @@ void dbd_init (dbistate_t *dbistate)
 static void error   (SV *h, int error_num, char *text)
 {
     D_imp_xxh (h);
-    DBIh_SET_ERR_CHAR (h, imp_xxh, Nullch, error_num, text, SQLSTATE, Nullch);
+    DBIh_SET_ERR_CHAR (h, imp_xxh, NULL, error_num, text, SQLSTATE, NULL);
     } /* error */
 
 /* Warning */
 static void warning (SV *h, int error_num, char *text)
 {
     D_imp_xxh (h);
-    DBIh_SET_ERR_CHAR (h, imp_xxh, "0",    error_num, text, SQLSTATE, Nullch);
+    DBIh_SET_ERR_CHAR (h, imp_xxh, "0",    error_num, text, SQLSTATE, NULL);
     } /* error */
 
 /* Success with information */
 static void info    (SV *h, int error_num, char *text)
 {
     D_imp_xxh (h);
-    DBIh_SET_ERR_CHAR (h, imp_xxh, "",     error_num, text, SQLSTATE, Nullch);
+    DBIh_SET_ERR_CHAR (h, imp_xxh, "",     error_num, text, SQLSTATE, NULL);
     } /* error */
 
 static int sqlError (SV *h)
@@ -569,7 +569,7 @@ SV *dbd_db_FETCH_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
     if (kl == 10 && strEQ (key, "AutoCommit"))
 	return (newSVsv (boolSV (0)));
 
-    return (Nullsv);
+    return (NULL);
     } /* dbd_db_FETCH_attrib */
 
 /* ##### Unify ST stuff #################################################### */
@@ -1239,12 +1239,12 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
     D_imp_dbh_from_sth;
 
     unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
-	return (Nullav);
+	return (NULL);
     st_dbg (3, imp_sth, "DBD::Unify::st_fetch %s\n", u_sql_nm);
 
     unless (DBIc_ACTIVE (imp_sth)) {
 	error (sth, -7, "fetch without open cursor");
-	return (Nullav);
+	return (NULL);
 	}
 
     /* In the next E/SQL a statement like
@@ -1265,11 +1265,11 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
     if (SQLCODE == UEEOSCN || SQLCODE == -UEEOSCN) {
 	st_dbg (4, imp_sth, "     Fetch done (end of scan)\n");
 	(void)dbd_st_finish (sth, imp_sth);
-	return (Nullav);
+	return (NULL);
 	}
 
     unless (sqlError (sth))
-	return (Nullav);
+	return (NULL);
 
     unless (av_len (av) + 1 == num_fields) {
 	int ro = SvREADONLY (av);
@@ -1283,7 +1283,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 
     unless (imp_sth->fld || dbd_fld_describe (dbh, imp_sth, num_fields)) {
 	croak ("Describe failed during %s->FETCH ()", SvPV_nolen (sth));
-	return (Nullav);
+	return (NULL);
 	}
 
     for (fix = 1; fix <= num_fields; fix++) {
@@ -1305,7 +1305,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		  :fic = INDICATOR;
 	st_dbg (4, imp_sth, "    After get,      sqlcode = %d\n", SQLCODE);
 	unless (sqlError (sth))
-	    return (Nullav);
+	    return (NULL);
 	f->fic = fic;
 	st_dbg (4, imp_sth, "     Field %3d: ", fix);
 	st_dbg (5, imp_sth, "[%02X %02X %02X %02X %02X] ",
@@ -1327,7 +1327,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdC = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		i = fln;
 		if (DBIc_has (imp_sth, DBIcf_ChopBlanks)) {
 		    while (i && (!fdC[i - 1] || fdC[i - 1] == ' '))
@@ -1346,7 +1346,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdF = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		(void)sprintf (fdC, "%.*f", fsc, fdF);
 		sv_setpvn (sv, fdC, strlen (fdC));
 	     /* sv_setnv (sv, (double)fdF); */
@@ -1362,7 +1362,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdD = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		(void)sprintf (fdC, "%lf", fdD);
 		sv_setpvn (sv, fdC, strlen (fdC));
 	     /* sv_setnv  (sv, fdD); */
@@ -1377,7 +1377,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdF = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		(void)sprintf (fdC, "%.*f", fsc, fdF);
 		sv_setpvn (sv, fdC, strlen (fdC));
 	     /* sv_setnv  (sv, (double)fdF); */
@@ -1392,7 +1392,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdD = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		(void)sprintf (fdC, "%.*lf", fsc, fdD);
 		sv_setpvn (sv, fdC, strlen (fdC));
 	     /* sv_setnv (sv, fdD); */
@@ -1409,7 +1409,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdT = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		st_dbg (4, imp_sth, "(%d) ", fdT);
 		unless (s = timetoa (fdT))
 		    croak ("DBD::Unify::st_fetch: timetoa (%d) failed", fdT);
@@ -1430,7 +1430,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdDT = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		st_dbg (4, imp_sth, "(%d) ", fdDT);
 		if (ldtoa ((UINT32)fdDT, fdC))
 		    croak ("DBD::Unify::st_fetch: ldtoa (%d) failed", fdDT);
@@ -1448,7 +1448,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdHDT = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		st_dbg (4, imp_sth, "(%ld) ", (long)fdHDT);
 		if (ldtoa (fdHDT, fdC))
 		    croak ("DBD::Unify::st_fetch: ldtoa (%d) failed", fdHDT);
@@ -1468,7 +1468,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdB = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		i = fdB.curlen;
 		s = fdB.dataptr;
 		if (i && s) {
@@ -1499,7 +1499,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdX = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		i = fdX.curlen;
 		s = fdX.dataptr;
 		unless (i && s) {
@@ -1521,7 +1521,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdL = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		st_dbg (4, imp_sth, "(%ld) ", fdL);
 		sv_setiv (sv, fdL);
 		st_dbg (4, imp_sth, "%ld", SvIV (sv));
@@ -1535,7 +1535,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			  :fdS = DATA;
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
-		    return (Nullav);
+		    return (NULL);
 		st_dbg (4, imp_sth, "(%d) ", fdS);
 		sv_setiv (sv, (int)fdS);
 		st_dbg (4, imp_sth, "%ld", SvIV (sv));
@@ -1768,10 +1768,10 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
     int    cacheit = TRUE;
 
     if (kl == 13 && strEQ (key, "NUM_OF_PARAMS"))	/* handled by DBI */
-	return (Nullsv);
+	return (NULL);
 
     unless (imp_sth->fld)
-	return (Nullsv);
+	return (NULL);
 
     i = DBIc_NUM_FIELDS (imp_sth);
     p = DBIc_NUM_PARAMS (imp_sth);
@@ -1860,7 +1860,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
 	    }
 	}
     else
-	return (Nullsv);
+	return (NULL);
 
     if (cacheit) { /* cache for next time (via DBI quick_FETCH)	*/
 	SV **svp = hv_fetch ((HV *)SvRV (sth), key, kl, 1);
