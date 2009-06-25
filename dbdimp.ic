@@ -275,7 +275,7 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
 	}
 
     {	/* Register program to monitor system, must be done BEFORE connect */
-	char   *pgm = basename (SvPV (get_sv ("0", 0), na));
+	char   *pgm = basename (SvPV_nolen (get_sv ("0", 0)));
 	USTATUS ustatus;
 	(void)uinimsg (pgm, &ustatus);
 	dbg (4, "    After uinimsg ('%s'), status = %ld\n", pgm, ustatus);
@@ -391,7 +391,7 @@ int dbd_db_commit (SV *dbh, imp_dbh_t *imp_dbh)
      */
     if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !dirty) {
 	warn ("DBD::Unify::db_commit (%s) invalidates %d active cursor(s)",
-	    SvPV (dbh, na), (int)DBIc_ACTIVE_KIDS (imp_dbh));
+	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
 	}
 
     EXEC SQL
@@ -414,7 +414,7 @@ int dbd_db_rollback (SV *dbh, imp_dbh_t *imp_dbh)
      */
     if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !dirty) {
 	warn ("DBD::Unify::db_rollback (%s) invalidates %d active cursor(s)",
-	    SvPV (dbh, na), (int)DBIc_ACTIVE_KIDS (imp_dbh));
+	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
 	}
 
     EXEC SQL
@@ -467,7 +467,7 @@ int dbd_db_disconnect (SV *dbh, imp_dbh_t *imp_dbh)
 
     if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !dirty) {
 	warn ("DBD::Unify::db_disconnect (%s) invalidates %d active cursor(s)",
-	    SvPV (dbh, na), (int)DBIc_ACTIVE_KIDS (imp_dbh));
+	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
 	}
     DBIc_ACTIVE_off (imp_dbh);
 
@@ -888,7 +888,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 	}
 
     unless (imp_sth->prm || dbd_prm_describe (dbh, imp_sth, DBIc_NUM_PARAMS (imp_sth))) {
-	croak ("Describe failed during %s->BIND ()", SvPV (sth, na));
+	croak ("Describe failed during %s->BIND ()", SvPV_nolen (sth));
 	return (0);
 	}
 
@@ -1282,7 +1282,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 	}
 
     unless (imp_sth->fld || dbd_fld_describe (dbh, imp_sth, num_fields)) {
-	croak ("Describe failed during %s->FETCH ()", SvPV (sth, na));
+	croak ("Describe failed during %s->FETCH ()", SvPV_nolen (sth));
 	return (Nullav);
 	}
 
