@@ -286,13 +286,13 @@ sub primary_key
     $type   and push @where, "TABLE_TYPE like '$type'";
     local $" = " and ";
     if (my $sth = $dbh->prepare (
-	    "select OWNR, TABLE_NAME, COLUMN_NAME ".
+	    "select COLUMN_NAME ".
 	    "from   SYS.ACCESSIBLE_COLUMNS ".
 	    "where  @where")) {
 	my @key;
 	$sth->execute;
 	while (my @row = $sth->fetchrow_array) {
-	    push @key, "$row[1].$row[2]";
+	    push @key, $row[0];
 	    }
 	return @key;
 	}

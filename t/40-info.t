@@ -121,7 +121,7 @@ ok ($sth->finish,	"finish");
 
 ok (1, "-- primary_key");
 is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "DIRS") ],
-			    [ "DIRS.DIRID" ], "keys");
+			    [ "DIRID" ], "keys");
 
 ok ($dbh->rollback,	"rollback");
 ok ($dbh->disconnect,	"disconnect");
