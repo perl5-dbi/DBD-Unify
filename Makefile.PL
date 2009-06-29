@@ -79,7 +79,8 @@ my %wm = (
 		       			. "$UNITOP/bin/ucc",
 		       },
     );
-$ExtUtils::MakeMaker::VERSION > 6.30	and $wm{LICENSE} = "perl";
+my $eummv = eval $ExtUtils::MakeMaker::VERSION;
+$eummv > 6.30				and $wm{LICENSE} = "perl";
 $Config{myarchname} eq "ia64-hpux"	and delete $wm{macro}{CC};
 
 my $rv = WriteMakefile (%wm);
