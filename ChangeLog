@@ -1,6 +1,7 @@
-*** Release 0.78 - Thu 24 Jun 2009 <h.m.brand@xs4all.nl>
+*** Release 0.78 - Mon 29 Jun 2009 <h.m.brand@xs4all.nl>
 
     - Small speedup by using different XS code
+    - Added primary_key () info method
 
 *** Release 0.77 - Fri 19 Jun 2009 <h.m.brand@xs4all.nl>
 

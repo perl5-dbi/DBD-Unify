@@ -262,6 +262,43 @@ sub table_info
     $sth;
     } # table_info
 
+sub primary_key
+{
+    my $dbh = shift;
+    my ($catalog, $schema, $table, $type, $attr);
+    ref $_[0] or ($catalog, $schema, $table, $type) = splice @_, 0, 4;
+    if ($attr = shift) {
+	ref ($attr) eq "HASH" or
+	    Carp::croak qq{usage: table_info ({ TABLE_NAME => "foo", ... })};
+	exists $attr->{TABLE_SCHEM} and $schema = $attr->{TABLE_SCHEM};
+	exists $attr->{TABLE_NAME}  and $table  = $attr->{TABLE_NAME};
+	exists $attr->{TABLE_TYPE}  and $type   = $attr->{TABLE_TYPE};
+	}
+    if ($catalog) {
+	$dbh->{Warn} and
+	    Carp::carp "Unify does not support catalogs in table_info\n";
+	return;
+	}
+    my @where = ("PRIMRY = 'Y'");
+    $schema and push @where, "OWNR       like '$schema'";
+    $table  and push @where, "TABLE_NAME like '$table'";
+    $type   and $type = uc substr $type, 0, 1;
+    $type   and push @where, "TABLE_TYPE like '$type'";
+    local $" = " and ";
+    if (my $sth = $dbh->prepare (
+	    "select OWNR, TABLE_NAME, COLUMN_NAME ".
+	    "from   SYS.ACCESSIBLE_COLUMNS ".
+	    "where  @where")) {
+	my @key;
+	$sth->execute;
+	while (my @row = $sth->fetchrow_array) {
+	    push @key, "$row[1].$row[2]";
+	    }
+	return @key;
+	}
+    return;
+    } # primary_key
+
 sub quote_identifier
 {
     my ($dbh, @arg) = map { defined $_ && $_ ne "" ? $_ : undef } @_;

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 115;
+use Test::More tests => 117;
 
 BEGIN { use_ok ("DBI") }
 
@@ -118,6 +118,10 @@ ok ($sth = $dbh->foreign_key_info (undef, $ENV{USCHEMA}||"PUBLIC", "foo",
 			"foreign_key_info (SCHEMA.foo, SCHEMA.foo)");
 
 ok ($sth->finish,	"finish");
+
+ok (1, "-- primary_key");
+is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "DIRS") ],
+			    [ "DIRS.DIRID" ], "keys");
 
 ok ($dbh->rollback,	"rollback");
 ok ($dbh->disconnect,	"disconnect");
