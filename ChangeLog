@@ -2,6 +2,7 @@
 
     - Small speedup by using different XS code
     - Added primary_key () info method
+    - SElinux relocation fix (Todd Zervas)
 
 *** Release 0.77 - Fri 19 Jun 2009 <h.m.brand@xs4all.nl>
 

@@ -77,6 +77,7 @@ my %wm = (
 		       EPPOPT => "",
 		       CC     => ($^O eq "aix" ? "env UPPNAME='cc -E' " : "")
 		       			. "$UNITOP/bin/ucc",
+		       SELINUXENABLED => "/usr/sbin/selinuxenabled",
 		       },
     );
 my $eummv = eval $ExtUtils::MakeMaker::VERSION;
@@ -260,6 +261,12 @@ sub postamble
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	'',
+	'linkext::',
+	'	if [ -x $(SELINUXENABLED) ] && $(SELINUXENABLED); then chcon -t textrel_shlib_t $(INST_ARCHLIB)/auto/$(FULLEXT)/$(DLBASE).so; fi',
+	'',
+	'install::',
+	'	if [ -x $(SELINUXENABLED) ] && $(SELINUXENABLED); then chcon -t textrel_shlib_t $(INSTALLSITEARCH)/auto/$(FULLEXT)/$(DLBASE).so; fi',
 	'';
     } # postamble
 
