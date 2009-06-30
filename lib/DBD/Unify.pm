@@ -229,6 +229,12 @@ sub prepare
     $sth;
     } # prepare
 
+sub _is_or_like
+{
+    my ($fld, $val) = @_;
+    $val =~ m/[_%]/ ? "$fld like '$val'" : "$fld = '$val'";
+    } # _is_or_like
+
 sub table_info
 {
     my $dbh = shift;
@@ -246,11 +252,12 @@ sub table_info
 	    Carp::carp "Unify does not support catalogs in table_info\n";
 	return;
 	}
+
     my @where;
-    $schema and push @where, "OWNR       like '$schema'";
-    $table  and push @where, "TABLE_NAME like '$table'";
+    $schema and push @where, _is_or_like ("OWNR",       $schema);
+    $table  and push @where, _is_or_like ("TABLE_NAME", $table);
     $type   and $type = uc substr $type, 0, 1;
-    $type   and push @where, "TABLE_TYPE like '$type'";
+    $type   and push @where, _is_or_like ("TABLE_TYPE", $type);
     local $" = " and ";
     my $where = @where ? " where @where" : "";
     my $sth = $dbh->prepare (
@@ -262,41 +269,41 @@ sub table_info
     $sth;
     } # table_info
 
+my $info_cache;
+
 sub primary_key
 {
     my $dbh = shift;
-    my ($catalog, $schema, $table, $type, $attr);
-    ref $_[0] or ($catalog, $schema, $table, $type) = splice @_, 0, 4;
-    if ($attr = shift) {
-	ref ($attr) eq "HASH" or
-	    Carp::croak qq{usage: table_info ({ TABLE_NAME => "foo", ... })};
-	exists $attr->{TABLE_SCHEM} and $schema = $attr->{TABLE_SCHEM};
-	exists $attr->{TABLE_NAME}  and $table  = $attr->{TABLE_NAME};
-	exists $attr->{TABLE_TYPE}  and $type   = $attr->{TABLE_TYPE};
-	}
+    my ($catalog, $schema, $table) = @_;
     if ($catalog) {
 	$dbh->{Warn} and
 	    Carp::carp "Unify does not support catalogs in table_info\n";
 	return;
 	}
-    my @where = ("PRIMRY = 'Y'");
-    $schema and push @where, "OWNR       like '$schema'";
-    $table  and push @where, "TABLE_NAME like '$table'";
-    $type   and $type = uc substr $type, 0, 1;
-    $type   and push @where, "TABLE_TYPE like '$type'";
-    local $" = " and ";
-    if (my $sth = $dbh->prepare (
-	    "select COLUMN_NAME ".
-	    "from   SYS.ACCESSIBLE_COLUMNS ".
-	    "where  @where")) {
-	my @key;
-	$sth->execute;
-	while (my @row = $sth->fetchrow_array) {
-	    push @key, $row[0];
+
+    unless ($info_cache) {
+	my $sth = $dbh->prepare (
+	    "select COLUMN_NAME, PRIMRY, OWNR, TABLE_NAME ".
+	    "from   SYS.ACCESSIBLE_COLUMNS") or return;
+	$sth->execute or return;
+
+	$sth->bind_columns (\my ($fld, $key, $sch, $tbl));
+	while ($sth->fetch) {
+	    $key eq "Y" or next;
+	    push @{$info_cache->{key}{$sch}{$tbl}}, $fld;
 	    }
-	return @key;
 	}
-    return;
+    $info_cache && $info_cache->{key} or return;
+
+    my @key;
+    foreach my $sch (sort keys %{$info_cache->{key}}) {
+	defined $schema && $sch ne $schema and next;
+	foreach my $tbl (sort keys %{$info_cache->{key}{$sch}}) {
+	    defined $table && $tbl ne $table and next;
+	    push @key, @{$info_cache->{key}{$sch}{$tbl}};
+	    }
+	}
+    return @key;
     } # primary_key
 
 sub quote_identifier
@@ -575,6 +582,17 @@ alias C<uni_verbose>) level. See "trace" below.
 =item foreign_key_info ($$$$$$;$)
 
 =item link_info ($;$$$$)
+
+=item primary_key ($$$)
+
+Note that these four get their info by accessing the C<SYS> schema which
+is relatively extremely slow. e.g. Getting all the primary keys might well
+run into seconds, rather than milli-seconds.
+
+This is work-in-progress, and we hope to find faster ways to get to this
+information. Also note that in order to keep it fast accross multiple calls,
+the information is cached, so when you alter the data dictionary after a
+call to one of these, that information cached is not updated.
 
 =item ping
 
