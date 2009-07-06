@@ -201,7 +201,7 @@ sub get_info
 sub ping
 {
     my $dbh = shift;
-    $dbh->prepare ("select ORD from SYS.ORD") or return 0;
+    $dbh->prepare ("select USER_NAME from SYS.DATABASE_USERS") or return 0;
     return 1;
     } # ping
 
@@ -592,7 +592,7 @@ run into seconds, rather than milli-seconds.
 This is work-in-progress, and we hope to find faster ways to get to this
 information. Also note that in order to keep it fast accross multiple calls,
 the information is cached, so when you alter the data dictionary after a
-call to one of these, that information cached is not updated.
+call to one of these, that cached information is not updated.
 
 =item ping
 
