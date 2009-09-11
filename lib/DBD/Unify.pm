@@ -265,6 +265,7 @@ sub table_info
 	"from   SYS.ACCESSIBLE_TABLES ".
 	$where);
     $sth or return;
+    $sth->{ChopBlanks} = 1;
     $sth->execute;
     $sth;
     } # table_info
@@ -285,6 +286,7 @@ sub primary_key
 	my $sth = $dbh->prepare (
 	    "select COLUMN_NAME, PRIMRY, OWNR, TABLE_NAME ".
 	    "from   SYS.ACCESSIBLE_COLUMNS") or return;
+	$sth->{ChopBlanks} = 1;
 	$sth->execute or return;
 
 	$sth->bind_columns (\my ($fld, $key, $sch, $tbl));
@@ -337,7 +339,8 @@ sub foreign_key_info
 	"from   SYS.LINK_INDEXES",
 	$where);
     $sth or return;
-    $sth->execute;
+    $sth->{ChopBlanks} = 1;
+    $sth->execute or return;
     my @fki;
     while (my @sli = $sth->fetchrow_array) {
 	push @fki, [
@@ -351,7 +354,10 @@ sub foreign_key_info
     $sth->finish;
     undef $sth;
 
-    DBI->connect ("dbi:Sponge:", "", "", { RaiseError => 1 })->prepare (
+    DBI->connect ("dbi:Sponge:", "", "", {
+	    RaiseError => 1,
+	    ChopBlanks => 1,
+	    })->prepare (
 	"select link_info $where", {
 	    rows => \@fki,
 	    NAME => [qw(
@@ -399,6 +405,7 @@ sub link_info
 	"from   SYS.LINK_INDEXES",
 	$where);
     $sth or return;
+    $sth->{ChopBlanks} = 1;
     $sth->execute;
     $sth;
     } # link_info
