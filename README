@@ -13,8 +13,8 @@ REQUIREMENTS
     but this does not mean it might not work on U2000 databases or other
     DataServer releases. I do not (yet) have a DS 9.x to play with.
 
-    I use DBI 1.609 and perl-5.8.8 or perl5.10.0, but might get it to work
-    with DBI 0.93 or higher and perl 5.005 (expect problems installing
+    I use DBI 1.609 and perl-5.8.7 through perl5.10.1, but might get it to
+    work with DBI 0.93 or higher and perl 5.005 (expect problems installing
     Test::More) or higher. But then again, in that case you should consider
     an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite. As of
     DBD-Unify-0.70, I have made perl-5.6 a prerequisite.
@@ -27,21 +27,23 @@ REQUIREMENTS
     If you plan to use DataServer 8.1 or higher database in Unicode encoding
     (UTF-8), use perl5.8.0 or up (or at least 5.7.3). See the Unicode site
     for the differences between the Unicode standards if you want to know
-    what to expect (http://www.unicode.org/versions/enumeratedversions.html).
+    what to expect (http://www.unicode.org/versions/enumeratedversions.html)
+    an http://www.unicode.org/history/publicationdates.html for their age.
 
       Perl    Unicode
       ------  -------
+      5.10.1    5.1.0  UCD 5.1.0 released 04 Apr 2008
       5.10.0    5.0.0
-      5.9.5     5.0.0  UCD 5.0   released 18 Jul 2006
+      5.9.5     5.0.0  UCD 5.0.0 released 14 Jul 2006
       5.8.8     4.1.0
-      5.8.7     4.1.0  UCD 4.1   released 31 Mar 2005
-      5.8.5     4.0.1
+      5.8.7     4.1.0  UCD 4.1.0 released 31 Mar 2005
+      5.8.5     4.0.1  UCD 4.0.1 released    Mar 2004
       5.8.3     4.0.0
-      5.8.1     4.0.0  UCD 4.0   released 24 Apr 2003
-      5.8.0     3.2.0  UCD 3.2   reseased 02 Apr 2002
-      5.7.x     3.1.1
-                3.0.x  UCD 3.0   re;eased 29 Feb 2000
-                       UCD 1.0  draft was planned spring 1991 :)
+      5.8.1     4.0.0  UCD 4.0.0 released 24 Apr 2003
+      5.8.0     3.2.0  UCD 3.2.0 released 02 Apr 2002
+      5.7.x     3.1.1  UCD 3.1.1 released    Aug 2001
+                3.0.x  UCD 3.0.0 released    Sep 1999
+                       UCD 1.0.0 draft was planned spring 1991 :)
 
     One user has reported success with perl 5.005_03 on SunOS 5.7 with
     gcc-2.7.2.2, DBI-1.30, DBD-Unify-0.24 with DataServer-7.2.

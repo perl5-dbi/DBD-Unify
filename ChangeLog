@@ -5,6 +5,7 @@
     - SElinux relocation fix (Todd Zervas)
     - Force ChopBlanks on internals
     - Tested with perl-5.10.1
+    - Updated Unicode reference
 
 *** Release 0.77 - Fri 19 Jun 2009 <h.m.brand@xs4all.nl>
 
