@@ -1047,7 +1047,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		    croak ("DBD::Unify::st_bind: atold (): bad date: %s", s);
 		if (fdHDT & 0xFFFF0000)
 		    croak ("DBD::Unify::st_bind: atold (): short date overflow: %s", s);
-		fdDT = (short)fdHDT;
+		fdDT = (UTP_DATE)fdHDT;
 		/*fdDT = (short)SvIV (value);*/
 		st_dbg (4, imp_sth, "atold (): (%d) '%s' => %8d", strlen (s), s, fdDT);
 
@@ -1432,7 +1432,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		unless (sqlError (sth))
 		    return (NULL);
 		st_dbg (4, imp_sth, "(%d) ", fdDT);
-		if (ldtoa ((UINT32)fdDT, fdC))
+		if (ldtoa ((UTP_HDTE)fdDT, fdC))
 		    croak ("DBD::Unify::st_fetch: ldtoa (%d) failed", fdDT);
 		sv_setpvn (sv, fdC, strlen (fdC));
 		st_dbg (4, imp_sth, "(%d) '%s'", strlen (fdC), SvPVX (sv));

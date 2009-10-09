@@ -1,3 +1,7 @@
+*** Release 0.79 - Fri 09 Oct 2009 <h.m.brand@xs4all.nl>
+
+    - Use correct typedefs for date columns instead of generic UINTxx (Todd)
+
 *** Release 0.78 - Fri 11 Sep 2009 <h.m.brand@xs4all.nl>
 
     - Small speedup by using different XS code

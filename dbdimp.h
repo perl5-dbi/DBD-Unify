@@ -17,10 +17,10 @@ typedef	unsigned char	byte;
 
 /* Unify API calls used */
 
-char *atold (char *buf, UINT32 *ldate);	/* returns null on error or pointer
+char *atold (char *buf, UTP_HDTE *ldate);/* returns null on error or pointer
 					 * to location just past last character */
 
-int   ldtoa (UINT32 ldate, char *buf);	/* returns zero on success */
+int   ldtoa (UTP_HDTE ldate, char *buf);	/* returns zero on success */
 
 char *atotime (char *buf, short *time);	/* returns null on error or pointer
 					 * to location just past last character */
