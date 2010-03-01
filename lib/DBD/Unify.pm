@@ -418,21 +418,23 @@ sub foreign_key_info
     $sth->finish;
     undef $sth;
 
-    DBI->connect ("dbi:Sponge:", "", "", {
-	    RaiseError => 1,
-	    ChopBlanks => 1,
-	    })->prepare (
-	"select link_info $where", {
-	    rows => \@fki,
-	    NAME => [qw(
-		uk_table_cat uk_table_schem uk_table_name uk_column_name
-		fk_table_cat fk_table_schem fk_table_name fk_column_name
-		ordinal_position
+    my @col_name = qw(
+	UK_TABLE_CAT UK_TABLE_SCHEM UK_TABLE_NAME UK_COLUMN_NAME
+	FK_TABLE_CAT FK_TABLE_SCHEM FK_TABLE_NAME FK_COLUMN_NAME
+	ORDINAL_POSITION
 
-		update_rule delete_rule
-		fk_name uk_name
-		deferability unique_or_primary
-		)],
+	UPDATE_RULE DELETE_RULE
+	FK_NAME UK_NAME
+	DEFERABILITY UNIQUE_OR_PRIMARY );
+    if (($dbh->{FetchHashKeyName} || "NAME") =~ m/_lc$/) {
+	$_ = lc $_ for @col_name;
+	}
+    DBI->connect ("dbi:Sponge:", "", "", {
+	RaiseError => 1,
+	ChopBlanks => 1,
+	})->prepare ("select link_info $where", {
+	    rows => \@fki,
+	    NAME => \@col_name,
 	    });
     } # foreign_key_info
 
