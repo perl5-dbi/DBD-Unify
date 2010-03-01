@@ -270,6 +270,70 @@ sub table_info
     $sth;
     } # table_info
 
+sub column_info
+{
+    my $dbh = shift;
+    my ($catalog, $schema, $table, $column);
+    ref $_[0] or ($catalog, $schema, $table, $column) = splice @_, 0, 4;
+    if ($catalog) {
+	$dbh->{Warn} and
+	    Carp::carp "Unify does not support catalogs in column_info\n";
+	return;
+	}
+    my @where;
+    $schema and push @where, "OWNR        like '$schema'";
+    $table  and push @where, "TABLE_NAME  like '$table'";
+    $column and push @where, "COLUMN_NAME like '$column'";
+    local $" = " and ";
+    my $where = @where ? " where @where" : "";
+    my $sth = $dbh->prepare (
+	"select OWNR, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH, DATA_SCALE, DISPLAY_LENGTH, DISPLAY_SCALE, NULLABLE, RDNLY, PRIMRY, UNIQ, LOGGED, ORDERED ".
+	"from   SYS.ACCESSIBLE_COLUMNS ".
+	$where);
+    $sth or return;
+    $sth->execute;
+    my @fki;
+    require DBD::Unify::TypeInfo;
+    while (my @sli = $sth->fetchrow_array) {
+	push @fki, [
+	    # TABLE_CAT, TABLE_SCHEM, TABLE_NAME, COLUMN_NAME,
+	    undef, @sli[0..2],
+	    # DATA_TYPE, TYPE_NAME,
+	    DBD::Unify::TypeInfo::type_name2data_type ($sli[3]), $sli[3],
+	    # COLUMN_SIZE, BUFFER_LENGTH, DECIMAL_DIGITS, NUM_PREC_RADIX,
+	    $sli[4], undef, $sli[5], undef,
+	    # NULLABLE,
+	    $sli[8] eq "N" ? 0 : $sli[8] eq "Y" ? 1 : 2,
+	    # REMARKS, COLUMN_DEF,
+	    undef, undef,
+
+	    # DISPLAY_LENGTH, DISPLAY_SCALE, RDONLY, PRIMRY,
+	    # UNIQ, LOGGED, ORDERED
+	    @sli[6,7,9..13]
+	    ];
+	}
+    $sth->finish;
+    $sth = undef;
+
+    my @col_name = qw(
+	TABLE_CAT TABLE_SCHEM TABLE_NAME
+	COLUMN_NAME DATA_TYPE TYPE_NAME COLUMN_SIZE BUFFER_LENGTH
+	DECIMAL_DIGITS NUM_PREC_RADIX NULLABLE REMARKS COLUMN_DEF
+
+	DISPLAY_LENGTH DISPLAY_SCALE RDONLY PRIMRY
+	UNIQ LOGGED ORDERED );
+    if (($dbh->{FetchHashKeyName} || "NAME") =~ m/_lc$/) {
+	$_ = lc $_ for @col_name;
+	}
+    DBI->connect ("dbi:Sponge:", "", "", {
+	RaiseError => 1,
+	ChopBlanks => 1,
+	})->prepare ("select column_info $where", {
+	    rows => \@fki,
+	    NAME => \@col_name,
+	    });
+    } # column_info
+
 my $info_cache;
 
 sub primary_key
@@ -586,20 +650,26 @@ alias C<uni_verbose>) level. See "trace" below.
 
 =item table_info ($;$$$$)
 
+=item columne_info ($$$$)
+
 =item foreign_key_info ($$$$$$;$)
 
 =item link_info ($;$$$$)
 
 =item primary_key ($$$)
 
-Note that these four get their info by accessing the C<SYS> schema which
+Note that these five get their info by accessing the C<SYS> schema which
 is relatively extremely slow. e.g. Getting all the primary keys might well
 run into seconds, rather than milli-seconds.
 
 This is work-in-progress, and we hope to find faster ways to get to this
 information. Also note that in order to keep it fast accross multiple calls,
-the information is cached, so when you alter the data dictionary after a
+some information is cached, so when you alter the data dictionary after a
 call to one of these, that cached information is not updated.
+
+For C<column_info ()>, the returned C<DATA_TYPE> is deduced from the
+C<TYPE_NAME> returned from C<SYS.ACCESSIBLE_COLUMNS>. The type is in
+the same range as returned from C<type_info_all ()>.
 
 =item ping
 

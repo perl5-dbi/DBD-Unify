@@ -1,6 +1,7 @@
-*** Release 0.79 - Fri 09 Oct 2009 <h.m.brand@xs4all.nl>
+*** Release 0.79 - Mon 01 Mar 2010 <h.m.brand@xs4all.nl>
 
     - Use correct typedefs for date columns instead of generic UINTxx (Todd)
+    - Implement column_info ()
 
 *** Release 0.78 - Fri 11 Sep 2009 <h.m.brand@xs4all.nl>
 

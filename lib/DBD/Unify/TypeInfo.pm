@@ -61,6 +61,17 @@ $type_info_all = [
     [ "TIME",             SQL_TIME,        undef,undef,undef,undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
     ];
 
+my %_data_type = map {
+    $type_info_all->[$_][0] => $type_info_all->[$_][1];
+    } 1 .. $#$type_info_all;
+$_data_type{CHARACTER} = $_data_type{CHAR};
+
+sub type_name2data_type
+{
+    my $type = shift or return undef;
+    return $_data_type{uc $type} || undef;
+    } # data_type_code
+
 1;
 
 __END__
