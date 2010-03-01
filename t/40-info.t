@@ -127,9 +127,9 @@ ok (1, "-- column_info");
 ok ($sth = $dbh->column_info (undef, "DBUTIL", "DIRS", "DIRID"), "column_info (foo)");
 is_deeply ($sth->fetchrow_arrayref, [
 	undef, "DBUTIL", "DIRS",
-	"DIRID", undef, "NUMERIC", 9, undef,
-	undef, undef, "N", undef, undef,
-	0, 10, 0, "N", "Y", "Y", "Y", "N" ], "fetch + content");
+	"DIRID", 2, "NUMERIC", 9, undef,
+	0, undef, 0, undef, undef,
+	10, 0, "N", "Y", "Y", "Y", "N" ], "fetch + content");
 ok ($sth->finish,	"finish");
 
 ok ($dbh->rollback,	"rollback");
