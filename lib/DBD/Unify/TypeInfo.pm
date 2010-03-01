@@ -65,6 +65,7 @@ my %_data_type = map {
     $type_info_all->[$_][0] => $type_info_all->[$_][1];
     } 1 .. $#$type_info_all;
 $_data_type{CHARACTER} = $_data_type{CHAR};
+$_data_type{DOUBLE}    = $_data_type{"DOUBLE PRECISION"};
 
 sub type_name2data_type
 {

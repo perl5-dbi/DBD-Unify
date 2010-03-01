@@ -662,16 +662,49 @@ alias C<uni_verbose>) level. See "trace" below.
 
 Note that these five get their info by accessing the C<SYS> schema which
 is relatively extremely slow. e.g. Getting all the primary keys might well
-run into seconds, rather than milli-seconds.
+run into seconds, rather than milliseconds.
 
 This is work-in-progress, and we hope to find faster ways to get to this
-information. Also note that in order to keep it fast accross multiple calls,
+information. Also note that in order to keep it fast across multiple calls,
 some information is cached, so when you alter the data dictionary after a
 call to one of these, that cached information is not updated.
 
 For C<column_info ()>, the returned C<DATA_TYPE> is deduced from the
 C<TYPE_NAME> returned from C<SYS.ACCESSIBLE_COLUMNS>. The type is in
-the same range as returned from C<type_info_all ()>.
+the same range as returned from C<type_info_all ()>. As a side note,
+the returned values from C<column_info ()> might not be the same as those
+returned in the attributes of a statement handle. The comparison:
+
+  created as           attributes           column_info ()
+  -------------------  -------------------  ---------------------
+  amount               FLOAT             6  AMOUNT           -206
+  amount (5, 2)        FLOAT             6  AMOUNT           -206
+  huge amount          REAL              7  HUGE AMOUNT      -207
+  huge amount (5, 2)   REAL              7  HUGE AMOUNT      -207
+  huge amount (15, 2)  REAL              7  HUGE AMOUNT      -207
+  byte                 BYTE             -2  BYTE               -2
+  byte (512)           BYTE             -2  BYTE               -2
+  char                 CHAR              1  CHARACTER           1
+  char (12)            CHAR              1  CHARACTER           1
+  currency             HUGE AMOUNT       0  -
+  currency (9)         HUGE AMOUNT       0  -
+  currency (7,2)       HUGE AMOUNT       0  -
+  date                 DATE              9  DATE                9
+  huge date            HUGE DATE        11  HUGE DATE          11
+  decimal              NUMERIC           2  NUMERIC             2
+  decimal (2)          NUMERIC           2  NUMERIC             2
+  decimal (8)          NUMERIC           2  NUMERIC             2
+  double precision     DOUBLE PRECISION  8  DOUBLE              8
+  float                DOUBLE PRECISION  8  FLOAT               6
+  huge integer         HUGE INTEGER     -5  -
+  integer              NUMERIC           2  NUMERIC             2
+  numeric              NUMERIC           2  NUMERIC             2
+  numeric (2)          SMALLINT          5  NUMERIC             2
+  numeric (6)          NUMERIC           2  NUMERIC             2
+  real                 REAL              7  REAL                7
+  smallint             SMALLINT          5  NUMERIC             2
+  text                 TEXT             -1  TEXT               -1
+  time                 TIME             10  TIME               10
 
 =item ping
 
