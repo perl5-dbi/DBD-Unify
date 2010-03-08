@@ -74,13 +74,13 @@ ok (1, "-- Check the internals");
 {   local $" = ":";
     my %attr = (
 	NAME      => "xs:xb",
-	uni_types => "5:-10",
+	uni_type  => "5:-10",
 	TYPE      => "5:-3",
 	PRECISION => "4:0",
 	SCALE     => "0:0",
 	NULLABLE  => "0:1",	# Does not work in Unify (yet)
 	);
-    foreach my $attr (qw(NAME uni_types TYPE PRECISION SCALE)) {
+    foreach my $attr (qw(NAME uni_type TYPE PRECISION SCALE)) {
 	#printf STDERR "\n%-20s %s\n", $attr, "@{$sth->{$attr}}";
 	is ("@{$sth->{$attr}}", $attr{$attr}, "attr $attr");
 	}

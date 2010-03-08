@@ -11,6 +11,12 @@ DBISTATE_DECLARE;
 
 MODULE = DBD::Unify    PACKAGE = DBD::Unify
 
+void
+_uni2sql_type (x)
+    IV		x
+    CODE:
+	XST_mIV (0, uni2sql_type (x));
+
 INCLUDE: Unify.xsi
 
 MODULE = DBD::Unify    PACKAGE = DBD::Unify::db

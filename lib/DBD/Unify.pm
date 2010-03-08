@@ -295,21 +295,41 @@ sub column_info
     my @fki;
     require DBD::Unify::TypeInfo;
     while (my @sli = $sth->fetchrow_array) {
+	my $uni_type_name = $sli[3];
+	   $uni_type_name =~ s/^CHARACTER$/CHAR/;
+	   $uni_type_name =~ s/^DOUBLE$/DOUBLE PRECISION/;
+	my $uni_type = DBD::Unify::TypeInfo::uni_type ($uni_type_name);
+	use Data::Peek;
+	my $odbc_type = (
+	    $uni_type_name eq "NUMERIC" && $sli[4] <= 4 ? 5 : # SMALLINT
+	    DBD::Unify::_uni2sql_type ($uni_type) ) || 0;
 	push @fki, [
 	    # TABLE_CAT, TABLE_SCHEM, TABLE_NAME, COLUMN_NAME,
 	    undef, @sli[0..2],
 	    # DATA_TYPE, TYPE_NAME,
-	    DBD::Unify::TypeInfo::type_name2data_type ($sli[3]), $sli[3],
+	    $odbc_type, DBD::Unify::TypeInfo::odbc_type ($odbc_type),
 	    # COLUMN_SIZE, BUFFER_LENGTH, DECIMAL_DIGITS, NUM_PREC_RADIX,
 	    $sli[4], undef, $sli[5], undef,
 	    # NULLABLE,
 	    $sli[8] eq "N" ? 0 : $sli[8] eq "Y" ? 1 : 2,
-	    # REMARKS, COLUMN_DEF,
-	    undef, undef,
+	    # REMARKS, COLUMN_DEF, SQL_DATA_TYPE, SQL_DATETIME_SUB,
+	    undef, undef, undef, undef,
+	    # CHAR_OCTET_LENGTH, ORDINAL_POSITION, IS_NULLABLE
+	    undef, undef, undef,
 
-	    # DISPLAY_LENGTH, DISPLAY_SCALE, RDONLY, PRIMRY,
-	    # UNIQ, LOGGED, ORDERED
-	    @sli[6,7,9..13]
+	    # CHAR_SET_CAT, CHAR_SET_SCHEM, CHAR_SET_NAME, COLLATION_CAT,
+	    # COLLATION_SCHEM, COLLATION_NAME, UDT_CAT, UDT_SCHEM, UDT_NAME,
+	    # DOMAIN_CAT, DOMAIN_SCHEM, DOMAIN_NAME, SCOPE_CAT, SCOPE_SCHEM,
+	    # SCOPE_NAME, MAX_CARDINALITY, DTD_IDENTIFIER, IS_SELF_REF,
+	    undef, undef, undef, undef, undef, undef, undef, undef, undef,
+	    undef, undef, undef, undef, undef, undef, undef, undef, undef,
+
+	    # uni_type, uni_type_name
+	    $uni_type, $uni_type_name,
+
+	    # uni_display_length, uni_display_scale, uni_rdonly, uni_primry,
+	    # uni_uniq, uni_logged, uni_ordered
+	    @sli[6,7,9..13],
 	    ];
 	}
     $sth->finish;
@@ -318,10 +338,21 @@ sub column_info
     my @col_name = qw(
 	TABLE_CAT TABLE_SCHEM TABLE_NAME
 	COLUMN_NAME DATA_TYPE TYPE_NAME COLUMN_SIZE BUFFER_LENGTH
-	DECIMAL_DIGITS NUM_PREC_RADIX NULLABLE REMARKS COLUMN_DEF
+	DECIMAL_DIGITS NUM_PREC_RADIX NULLABLE
 
-	DISPLAY_LENGTH DISPLAY_SCALE RDONLY PRIMRY
-	UNIQ LOGGED ORDERED );
+	REMARKS COLUMN_DEF SQL_DATA_TYPE SQL_DATETIME_SUB CHAR_OCTET_LENGTH
+	ORDINAL_POSITION IS_NULLABLE
+
+	CHAR_SET_CAT CHAR_SET_SCHEM CHAR_SET_NAME COLLATION_CAT COLLATION_SCHEM
+        COLLATION_NAME UDT_CAT UDT_SCHEM UDT_NAME DOMAIN_CAT DOMAIN_SCHEM
+        DOMAIN_NAME SCOPE_CAT SCOPE_SCHEM SCOPE_NAME MAX_CARDINALITY
+        DTD_IDENTIFIER IS_SELF_REF
+
+	uni_type uni_type_name
+
+	uni_display_length uni_display_scale uni_rdonly uni_primry
+	uni_uniq uni_logged uni_ordered
+	);
     if (($dbh->{FetchHashKeyName} || "NAME") =~ m/_lc$/) {
 	$_ = lc $_ for @col_name;
 	}
@@ -671,40 +702,41 @@ call to one of these, that cached information is not updated.
 
 For C<column_info ()>, the returned C<DATA_TYPE> is deduced from the
 C<TYPE_NAME> returned from C<SYS.ACCESSIBLE_COLUMNS>. The type is in
-the same range as returned from C<type_info_all ()>. As a side note,
-the returned values from C<column_info ()> might not be the same as those
-returned in the attributes of a statement handle. The comparison:
+the ODBC range and the original Unify type and type_name are returned
+in the additional fields C<uni_type> and C<uni_type_name>. Somehow
+selecting from that table does not return valid statement handles for
+types C<currency> and C<huge integer>.
 
-  created as           attributes           column_info ()
-  -------------------  -------------------  ---------------------
-  amount               FLOAT             6  AMOUNT           -206
-  amount (5, 2)        FLOAT             6  AMOUNT           -206
-  huge amount          REAL              7  HUGE AMOUNT      -207
-  huge amount (5, 2)   REAL              7  HUGE AMOUNT      -207
-  huge amount (15, 2)  REAL              7  HUGE AMOUNT      -207
-  byte                 BYTE             -2  BYTE               -2
-  byte (512)           BYTE             -2  BYTE               -2
-  char                 CHAR              1  CHARACTER           1
-  char (12)            CHAR              1  CHARACTER           1
-  currency             HUGE AMOUNT       0  -
-  currency (9)         HUGE AMOUNT       0  -
-  currency (7,2)       HUGE AMOUNT       0  -
-  date                 DATE              9  DATE                9
-  huge date            HUGE DATE        11  HUGE DATE          11
-  decimal              NUMERIC           2  NUMERIC             2
-  decimal (2)          NUMERIC           2  NUMERIC             2
-  decimal (8)          NUMERIC           2  NUMERIC             2
-  double precision     DOUBLE PRECISION  8  DOUBLE              8
-  float                DOUBLE PRECISION  8  FLOAT               6
-  huge integer         HUGE INTEGER     -5  -
-  integer              NUMERIC           2  NUMERIC             2
-  numeric              NUMERIC           2  NUMERIC             2
-  numeric (2)          SMALLINT          5  NUMERIC             2
-  numeric (6)          NUMERIC           2  NUMERIC             2
-  real                 REAL              7  REAL                7
-  smallint             SMALLINT          5  NUMERIC             2
-  text                 TEXT             -1  TEXT               -1
-  time                 TIME             10  TIME               10
+  Create as           sth attributes       uni_type/uni_type_name
+  ------------------- -------------------  -------------------------
+  amount              FLOAT             6   -4 AMOUNT (9, 2)
+  amount (5, 2)       FLOAT             6   -4 AMOUNT (5, 2)
+  huge amount         REAL              7   -6 HUGE AMOUNT (15, 2)
+  huge amount (5, 2)  REAL              7   -6 HUGE AMOUNT (5, 2)
+  huge amount (15, 2) REAL              7   -6 HUGE AMOUNT (15, 2)
+  byte                BINARY           -2  -12 BYTE (1)
+  byte (512)          BINARY           -2  -12 BYTE (512)
+  char                CHAR              1    1 CHAR (1)
+  char (12)           CHAR              1    1 CHAR (12)
+  currency            DECIMAL           3    - ?
+  currency (9)        DECIMAL           3    - ?
+  currency (7,2)      DECIMAL           3    - ?
+  date                DATE              9   -3 DATE
+  huge date           TIMESTAMP        11  -11 HUGE DATE
+  decimal             NUMERIC           2    2 NUMERIC (9)
+  decimal (2)         NUMERIC           2    2 NUMERIC (2)
+  decimal (8)         NUMERIC           2    2 NUMERIC (8)
+  double precision    DOUBLE PRECISION  8    8 DOUBLE PRECISION (64)
+  float               DOUBLE PRECISION  8    6 FLOAT (64)
+  huge integer        HUGE INTEGER     -5    - ?
+  integer             NUMERIC           2    2 NUMERIC (9)
+  numeric             NUMERIC           2    2 NUMERIC (9)
+  numeric (2)         SMALLINT          5    2 NUMERIC (2)
+  numeric (6)         NUMERIC           2    2 NUMERIC (6)
+  real                REAL              7    7 REAL (32)
+  smallint            SMALLINT          5    2 NUMERIC (4)
+  text                TEXT             -1   -9 TEXT
+  time                TIME             10   -7 TIME
 
 =item ping
 

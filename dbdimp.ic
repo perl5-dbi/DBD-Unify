@@ -43,6 +43,9 @@ DBISTATE_DECLARE;
 
 #include <sqle_usr.h>
 #include <dbtypes.h>
+#ifndef SQLCURRENCY
+#  define SQLCURRENCY	-18
+#  endif
 
 extern char *basename (const char *path);
 
@@ -666,6 +669,10 @@ int dbd_fld_describe (SV *dbh, imp_sth_t *imp_sth, int num_fields)
 	    i--;
 	fnm[i] = (char)0;
 	(void)strncpy (f->fnm, fnm, sizeof (fnm));
+
+	if (ftp == SQLNUMERIC && fln > 0 && fln <= 4)
+	    ftp = SQLSMINT;
+
 	f->ftp = ftp;
 	f->fln = fln;
 	f->fpr = fpr;
@@ -713,6 +720,10 @@ int dbd_prm_describe (SV *dbh, imp_sth_t *imp_sth, int num_params)
 	    i--;
 	fnm[i] = (char)0;
 	(void)strncpy (f->fnm, fnm, sizeof (fnm));
+
+	if (ftp == SQLNUMERIC && fln > 0 && fln <= 4)
+	    ftp = SQLSMINT;
+
 	f->ftp = ftp;
 	f->fln = fln;
 	f->fpr = fpr;
@@ -959,6 +970,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		    return (0);
 		break;
 
+	    case SQLCURRENCY:
 	    case SQLREAL:
 	    case SQLDBLPREC:
 		st_dbg (4, imp_sth, "DOUBL %1d.%2d: ", fln, fpr);
@@ -1353,7 +1365,8 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		st_dbg (4, imp_sth, "%lf", SvNV (sv));
 		break;
 
-	    case SQLREAL:		/* fpr = 32	*/
+	    case SQLCURRENCY:
+	    case SQLREAL:	/* fpr = 32	*/
 	    case SQLDBLPREC:	/* fpr = 64	*/
 		st_dbg (4, imp_sth, "DOUBL %1d.%2d: ", fln, fpr);
 		EXEC SQL
@@ -1724,12 +1737,16 @@ int dbd_st_STORE_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv)
     return (FALSE); /* no values to store */
     } /* dbd_st_STORE_attrib */
 
-static int uni2sql_type (SQLCOLTYPE t)
+int uni2sql_type (SQLCOLTYPE t)
 {
+    /* see also perl5/site_perl/5.10.1/x86_64-linux/auto/DBI/dbi_sql.h
+     * and $UNIFY/../include/sqle_usr.h */
     switch (t) {      /*      ANSI/ODBC  Column type       DBI               */
+	case SQLNOTYPE:  return ( 0); /* -                                   */
 	case SQLCHAR:    return ( 1); /* character, char   SQL_CHAR          */
 	case SQLNUMERIC: return ( 2); /* numeric           SQL_NUMERIC       */
 	case SQLDECIMAL: return ( 3); /* decimal, dec      SQL_DECIMAL       */
+	case SQLCURRENCY:return ( 3); /* currency          SQL_DECIMAL       */
 	case SQLINTEGER: return ( 4); /* integer, int      SQL_INTEGER       */
 	case SQLSMINT:   return ( 5); /* smallint          SQL_SMALLINT      */
 	case SQLFLOAT:   return ( 6); /* float             SQL_FLOAT         */
@@ -1748,10 +1765,11 @@ static int uni2sql_type (SQLCOLTYPE t)
 	case SQLBINARY:  return (-3); /* binary            SQL_VARBINARY     */
 		      /*         -4                        SQL_LONGVARBINARY */
 	case SQLINT64:   return (-5); /* huge integer      SQL_BIGINT        */
-	}             /*         -6                        SQL_TINYINT       */
+		      /*         -6                        SQL_TINYINT       */
 	              /*         -7                        SQL_BIT           */
+	}
     dbg (4, "No ANSI support for type %d\n", t);
-    /* No support for
+    /* No (official) support for
      * -18 SQLAMT64  CURRENCY, GIANT AMOUNTS
      * -17 SQLINT64  HUGE INTEGER (on 32bit systems)
      */
@@ -1794,7 +1812,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
 	    av_store (av, i, newSViv (uni2sql_type (imp_sth->fld[i].ftp)));
 	}
     else
-    if (kl == 9 && strEQ (key, "uni_types")) {
+    if (kl == 8 && strEQ (key, "uni_type")) {
 	AV *av = newAV ();
 	retsv  = newRV (sv_2mortal ((SV *)av));
 	while (--i >= 0)

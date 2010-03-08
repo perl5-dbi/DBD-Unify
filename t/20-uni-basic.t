@@ -105,7 +105,7 @@ ok (1, "-- Check the internals");
 	NAME_hash     => {qw( xs 0 xl 1 xc 2 xf 3 xr 4 xa 5 xh 6 xT 7 xd 8 xe 9 )},
 	NAME_lc_hash  => {qw( xs 0 xl 1 xc 2 xf 3 xr 4 xa 5 xh 6 xt 7 xd 8 xe 9 )},
 	NAME_uc_hash  => {qw( XS 0 XL 1 XC 2 XF 3 XR 4 XA 5 XH 6 XT 7 XD 8 XE 9 )},
-	uni_types     => [ 5, 2, 1, 8, 7, -4, -6, -7, -3, -11],
+	uni_type      => [ 5, 2, 1, 8, 7, -4, -6, -7, -3, -11],
 	TYPE          => [ 5, 2, 1, 8, 7, 6, 7, 10, 9, 11],
 	PRECISION     => [ 4, 9, 5, 64, 32, 9, 15, 0, 0, 0],
 	SCALE         => [ 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
