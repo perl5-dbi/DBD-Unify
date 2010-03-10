@@ -353,12 +353,11 @@ sub column_info
 	uni_display_length uni_display_scale uni_rdonly uni_primry
 	uni_uniq uni_logged uni_ordered
 	);
-    if (($dbh->{FetchHashKeyName} || "NAME") =~ m/_lc$/) {
-	$_ = lc $_ for @col_name;
-	}
     DBI->connect ("dbi:Sponge:", "", "", {
-	RaiseError => 1,
-	ChopBlanks => 1,
+	RaiseError       => $sth->{RaiseError},
+	PrintError       => $sth->{PrintError},
+	ChopBlanks       => 1,
+	FetchHashKeyName => $sth->{FetchHashKeyName} || "NAME",
 	})->prepare ("select column_info $where", {
 	    rows => \@fki,
 	    NAME => \@col_name,
@@ -457,12 +456,11 @@ sub foreign_key_info
 	UPDATE_RULE DELETE_RULE
 	FK_NAME UK_NAME
 	DEFERABILITY UNIQUE_OR_PRIMARY );
-    if (($dbh->{FetchHashKeyName} || "NAME") =~ m/_lc$/) {
-	$_ = lc $_ for @col_name;
-	}
     DBI->connect ("dbi:Sponge:", "", "", {
-	RaiseError => 1,
-	ChopBlanks => 1,
+	RaiseError       => $sth->{RaiseError},
+	PrintError       => $sth->{PrintError},
+	ChopBlanks       => 1,
+	FetchHashKeyName => $sth->{FetchHashKeyName} || "NAME",
 	})->prepare ("select link_info $where", {
 	    rows => \@fki,
 	    NAME => \@col_name,
