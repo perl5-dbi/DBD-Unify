@@ -529,11 +529,6 @@ int dbd_db_STORE_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
 	dbg (2, "Set DBD_VERBOSE = %d\n", dbd_verbose);
 	return (TRUE);
 	}
-    if (kl == 10 && strEQ (key, "DBDverbose")) {	/* Depricated */
-	dbd_verbose = SvIV (valuesv);
-	dbg (2, "Set DBD_VERBOSE = %d\n", dbd_verbose);
-	return (TRUE);
-	}
     if (kl == 10 && strEQ (key, "AutoCommit")) {
 	DBIc_set (imp_dbh, DBIcf_AutoCommit, 0);	/* Allways off	*/
 	return (TRUE);
@@ -566,8 +561,6 @@ SV *dbd_db_FETCH_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
 	return (NULL);
 
     if (kl == 11 && (strEQ (key, "uni_verbose") || strEQ (key, "dbd_verbose")))
-	return (newSViv (dbd_verbose));
-    if (kl == 10 && strEQ (key, "DBDverbose"))	/* Depricated */
 	return (newSViv (dbd_verbose));
     if (kl == 10 && strEQ (key, "AutoCommit"))
 	return (newSVsv (boolSV (0)));

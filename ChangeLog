@@ -1,8 +1,8 @@
-*** Release 0.79 - Mon 01 Mar 2010 <h.m.brand@xs4all.nl>
+*** Release 0.79 - Mon 10 Mar 2010 <h.m.brand@xs4all.nl>
 
     - Use correct typedefs for date columns instead of generic UINTxx (Todd)
-    - Implement column_info ()
     - Upped copyright to 2010
+    - permanently removed DBDverbose (use dbd_verbose or uni_verbose instead)
 
 *** Release 0.78 - Fri 11 Sep 2009 <h.m.brand@xs4all.nl>
 
