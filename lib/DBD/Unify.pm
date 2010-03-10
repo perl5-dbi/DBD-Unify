@@ -524,9 +524,6 @@ package DBD::Unify::st;
 sub private_attribute_info
 {
     return { 
-	dbd_verbose	=> undef,
-
-	uni_verbose	=> undef,
 	uni_type	=> undef,
 	};
     } # private_attribute_info
