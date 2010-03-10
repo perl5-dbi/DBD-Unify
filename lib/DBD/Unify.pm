@@ -198,6 +198,15 @@ sub get_info
     return $v;
     } # get_info
 
+sub private_attribute_info
+{
+    return { 
+	dbd_verbose	=> undef,
+
+	uni_verbose	=> undef,
+	};
+    } # private_attribute_info
+
 sub ping
 {
     my $dbh = shift;
@@ -363,6 +372,16 @@ sub column_info
 	    NAME => \@col_name,
 	    });
     } # column_info
+
+sub private_attribute_info
+{
+    return { 
+	dbd_verbose	=> undef,
+
+	uni_verbose	=> undef,
+	uni_type	=> undef,
+	};
+    } # private_attribute_info
 
 my $info_cache;
 
