@@ -308,7 +308,6 @@ sub column_info
 	   $uni_type_name =~ s/^CHARACTER$/CHAR/;
 	   $uni_type_name =~ s/^DOUBLE$/DOUBLE PRECISION/;
 	my $uni_type = DBD::Unify::TypeInfo::uni_type ($uni_type_name);
-	use Data::Peek;
 	my $odbc_type = (
 	    $uni_type_name eq "NUMERIC" && $sli[4] <= 4 ? 5 : # SMALLINT
 	    DBD::Unify::_uni2sql_type ($uni_type) ) || 0;
