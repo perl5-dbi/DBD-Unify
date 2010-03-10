@@ -372,16 +372,6 @@ sub column_info
 	    });
     } # column_info
 
-sub private_attribute_info
-{
-    return { 
-	dbd_verbose	=> undef,
-
-	uni_verbose	=> undef,
-	uni_type	=> undef,
-	};
-    } # private_attribute_info
-
 my $info_cache;
 
 sub primary_key
@@ -530,6 +520,16 @@ sub link_info
 ####### Statement #############################################################
 
 package DBD::Unify::st;
+
+sub private_attribute_info
+{
+    return { 
+	dbd_verbose	=> undef,
+
+	uni_verbose	=> undef,
+	uni_type	=> undef,
+	};
+    } # private_attribute_info
 
 1;
 
