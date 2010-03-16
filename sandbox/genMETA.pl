@@ -55,7 +55,7 @@ else {
     }
 
 __END__
---- #YAML:1.1
+--- #YAML:1.0
 name:                    DBD-Unify
 version:                 VERSION
 abstract:                DBI driver for Unify database systems

@@ -36,7 +36,6 @@ for (@DATA) {
     #$dbh->commit;
 
     my $info = (describe ("xbb"))[0];
-    die DDumper $info;
     my $s = join "," => grep { $info->{$_} } qw( PRECISION SCALE );
     $s = $s ? qq{"$s"} : "undef";
     my $ti = $dbh->type_info ($info->{TYPE}) // {};

@@ -1,10 +1,11 @@
-*** Release 0.79 - Mon 10 Mar 2010 <h.m.brand@xs4all.nl>
+*** Release 0.79 - Tue 16 Mar 2010 <h.m.brand@xs4all.nl>
 
     - Use correct typedefs for date columns instead of generic UINTxx (Todd)
     - Upped copyright to 2010
     - Implement column_info ()
     - Permanently removed DBDverbose (use dbd_verbose or uni_verbose instead)
     - Implement private_attribute_info () methods
+    - Dropped YAML spec to 1.0
 
 *** Release 0.78 - Fri 11 Sep 2009 <h.m.brand@xs4all.nl>
 
