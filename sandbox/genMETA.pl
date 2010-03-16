@@ -48,7 +48,7 @@ elsif ($opt_v) {
     }
 else {
     my @my = glob <*/META.yml>;
-    @my == 1 && open my $my, ">", $my[0] or die "Cannot update META.yml|n";
+    @my == 1 && open my $my, ">", $my[0] or die "Cannot update META.yml\n";
     print $my @yml;
     close $my;
     chmod 0644, $my[0];
@@ -93,8 +93,8 @@ build_requires:
     Test::Harness:       0
     Test::More:          0
 recommends:
-    perl:                5.8.8
-    DBI:                 1.607
+    perl:                5.010001
+    DBI:                 1.609
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          http://repo.or.cz/w/DBD-Unify.git
