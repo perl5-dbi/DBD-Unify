@@ -570,14 +570,14 @@ Unify represents midnight with 00:00, not 24:00.
 
     connect ("DBI:Unify:dbname[;options]" [, user [, auth [, attr]]]);
 
-Options to the connection are passed in the datasource
+Options to the connection are passed in the data-source
 argument. This argument should contain the database
 name possibly followed by a semicolon and the database options
 which are ignored.
 
 Since Unify database authorization is done using grant's using the
-user name, the I<user> argument me be empty or undef. The auth
-field will be used as a default schema. If the auth field is empty
+user name, the I<user> argument me be empty or undef. The I<auth>
+field will be used as a default schema. If the I<auth> field is empty
 or undefined connect will check for the environment variable $USCHEMA
 to use as a default schema. If neither exists, you will end up in your
 default schema, or if none is assigned, in the schema PUBLIC.
@@ -935,14 +935,14 @@ supported and work as expected.
 
 =item Statement attributes
 
-Allow setting and getting stement attributes. A specific example might be
+Allow setting and getting statement attributes. A specific example might be
 
   $sth->{PrintError}       = 0;
   $sth->{FetchHashKeyName} = "NAME_uc";
 
-=item 3-arg bind_param ()
+=item 3-argument bind_param ()
 
-Investigate and implement 3-arg versions of $sth->bind_param ()
+Investigate and implement 3-argument versions of $sth->bind_param ()
 
 =item looks_as_number ()
 
