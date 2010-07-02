@@ -92,7 +92,7 @@ use vars qw($err $errstr $state $drh);
 $err    = 0;		# holds error code   for DBI::err
 $errstr = "";		# holds error string for DBI::errstr
 $state  = "";		# holds SQL state    for DBI::state
-$drh    = undef;	# holds driver handle once initialised
+$drh    = undef;	# holds driver handle once initialized
 
 sub driver
 {
@@ -535,8 +535,8 @@ sub private_attribute_info
 =head1 DESCRIPTION
 
 DBD::Unify is an extension to Perl which allows access to Unify
-databases. It is built on top of the standard DBI extension an
-implements the methods that DBI require.
+databases. It is built on top of the standard DBI extension and
+implements the methods that DBI requires.
 
 This document describes the differences between the "generic" DBD
 and DBD::Unify.
@@ -576,7 +576,7 @@ name possibly followed by a semicolon and the database options
 which are ignored.
 
 Since Unify database authorization is done using grant's using the
-user name, the I<user> argument me be empty or undef. The I<auth>
+user name, the I<user> argument may be empty or undef. The I<auth>
 field will be used as a default schema. If the I<auth> field is empty
 or undefined connect will check for the environment variable $USCHEMA
 to use as a default schema. If neither exists, you will end up in your
