@@ -392,7 +392,7 @@ int dbd_db_commit (SV *dbh, imp_dbh_t *imp_dbh)
     /* Check for commit () being called whilst refs to cursors
      * still exists. This needs some more thought.
      */
-    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !dirty) {
+    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !PL_dirty) {
 	warn ("DBD::Unify::db_commit (%s) invalidates %d active cursor(s)",
 	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
 	}
@@ -415,7 +415,7 @@ int dbd_db_rollback (SV *dbh, imp_dbh_t *imp_dbh)
     /* Check for rollback () being called whilst refs to cursors
      * still exists. See dbd_db_commit ()
      */
-    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !dirty) {
+    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !PL_dirty) {
 	warn ("DBD::Unify::db_rollback (%s) invalidates %d active cursor(s)",
 	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
 	}
@@ -468,7 +468,7 @@ int dbd_db_disconnect (SV *dbh, imp_dbh_t *imp_dbh)
 	imp_dbh->nchildren = 0;
 	}
 
-    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !dirty) {
+    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !PL_dirty) {
 	warn ("DBD::Unify::db_disconnect (%s) invalidates %d active cursor(s)",
 	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
 	}
@@ -488,14 +488,14 @@ int dbd_db_disconnect (SV *dbh, imp_dbh_t *imp_dbh)
 int dbd_discon_all (SV *drh, imp_drh_t *imp_drh)
 {
     dTHX;
-    if (!dirty && !SvTRUE (perl_get_sv ("DBI::PERL_ENDING", 0))) {
+    if (!PL_dirty && !SvTRUE (perl_get_sv ("DBI::PERL_ENDING", 0))) {
 	sv_setiv (DBIc_ERR (imp_drh), (IV)1);
 	sv_setpv (DBIc_ERRSTR (imp_drh), "disconnect_all not implemented");
 	DBIh_EVENT2 (drh, ERROR_event, DBIc_ERR (imp_drh), DBIc_ERRSTR (imp_drh));
 	return (FALSE);
 	}
-    if (perl_destruct_level)
-	perl_destruct_level = 0;
+    if (PL_perl_destruct_level)
+	PL_perl_destruct_level = 0;
     return (FALSE);
     } /* dbd_discon_all */
 
