@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More;
 
 BEGIN { use_ok ("DBI") };
 
@@ -11,10 +11,7 @@ my ($schema, $dbh) = ("DBUTIL");
 
 ok ($dbh = DBI->connect ("dbi:Unify:", "", $schema), "Connect");
 
-unless ($dbh) {
-    BAIL_OUT ("Unable to connect to Unify ($DBI::errstr)\n");
-    exit 0;
-    }
+$dbh or BAIL_OUT ("Unable to connect to Unify ($DBI::errstr)\n");
 
 my $sth = $dbh->prepare ("select * from DIRS");
 ok ($sth->execute,	"execute");
@@ -33,4 +30,4 @@ ok (!$dbh->ping,	"disconnected");
     ok (!DBI->connect ("dbi:Unify:", "", $schema), "Connect \$UNIFY '/dev/null'");
     }
 
-exit 0;
+done_testing;

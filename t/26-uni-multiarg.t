@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
- use Test::More tests => 25;
-#use Test::More "no_plan";
+use Test::More;
 
 my $UNIFY  = $ENV{UNIFY};
 
@@ -85,4 +84,4 @@ ok ($dbh->commit, "commit");
 
 ok ($dbh->disconnect, "disconnect");
 
-exit 0;
+done_testing;

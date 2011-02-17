@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More;
 
 # Test if all of the documented DBI API is implemented and working OK
 
@@ -45,4 +45,4 @@ ok (!$sth->{CompatMode},	"CompatMode");
 
 ok ( $dbh->disconnect,		"disconnect");
 
-exit 0;
+done_testing;

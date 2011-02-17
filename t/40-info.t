@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 121;
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 
@@ -208,4 +208,4 @@ is   ($ti->{TYPE_NAME}, "BINARY",		"BINARY");
 ok   ($ti = $dbh->type_info (-5),		"type_info (-5)");
 is   ($ti->{TYPE_NAME}, "HUGE INTEGER",		"HUGE INTEGER");
 
-exit 0;
+done_testing;

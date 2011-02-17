@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 
 ok (1, "Done");
+
+done_testing;

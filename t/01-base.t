@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More;
 
 # Base DBD Driver Test
 
@@ -30,4 +30,4 @@ if ($@) {
 
 ok ($drh->{Version},	"Driver version");
 
-exit 0;
+done_testing;

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More;
 
 use DBI qw(:sql_types);
 
@@ -80,4 +80,4 @@ SKIP: {
 
 ok ($dbh->disconnect,	"disconnect");
 
-exit 0;
+done_testing;

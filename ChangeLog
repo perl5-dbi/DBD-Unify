@@ -1,3 +1,7 @@
+--- Release 0.81 - Thu 17 Feb 2011 <h.m.brand@xs4all.nl>
+
+    - Convert to Test::More::done_testing
+
 *** Release 0.80 - Mon 30 Aug 2010 <h.m.brand@xs4all.nl>
 
     - Spelling changes

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More;
 
 # Test if all of the documented DBI API is implemented and working OK
 
@@ -80,4 +80,4 @@ ok ($dbh->disconnect,	"disconnect");
 ok (!$dbh->{Active},	"!Active");
 ok (!$dbh->ping,	"!ping");
 
-exit 0;
+done_testing;

@@ -103,10 +103,10 @@ build_requires:
     File::Copy:          0
     File::Find:          0
     Test::Harness:       0
-    Test::More:          0
+    Test::More:          0.90
 recommends:
-    perl:                5.012001
-    DBI:                 1.613
+    perl:                5.012003
+    DBI:                 1.616
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          http://repo.or.cz/w/DBD-Unify.git

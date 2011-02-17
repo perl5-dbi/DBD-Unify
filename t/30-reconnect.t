@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 
@@ -41,4 +41,4 @@ BEGIN { use_ok ("DBI") }
 	}
     }
 
-exit 0;
+done_testing;

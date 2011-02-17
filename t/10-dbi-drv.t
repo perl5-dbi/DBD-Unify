@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More;
 
 # Test if all of the documented DBI API is implemented and working OK
 
@@ -96,4 +96,4 @@ undef $dbh;
 close TRC;
 ok ((unlink $trcfile), "unlink");
 
-exit 0;
+done_testing;

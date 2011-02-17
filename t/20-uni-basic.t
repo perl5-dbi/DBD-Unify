@@ -7,7 +7,7 @@ BEGIN {
     delete @ENV{qw( LC_ALL LANG BOOLFMT DATEFMT )};
     $ENV{DATEFMT} = "MM/DD/YY";
     }
-use Test::More tests => 366;
+use Test::More;
 
 use DBI qw(:sql_types);
 
@@ -434,4 +434,4 @@ is ($dbh->state, "", "state method");
 
 ok ($dbh->disconnect, "disconnect");
 
-exit 0;
+done_testing;

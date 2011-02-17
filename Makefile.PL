@@ -46,7 +46,7 @@ my %wm = (
 		       "DBI"		=> 1.42,
 
 		       # Test deps
-		       "Test::More"	=> 0.00,
+		       "Test::More"	=> 0.90,
 		       },
 
     dist          => { COMPRESS => "gzip -9f",

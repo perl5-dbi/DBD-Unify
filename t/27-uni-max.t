@@ -18,11 +18,9 @@ BEGIN {
 
     if (exists $ENV{DBD_UNIFY_SKIP_27}) {
 	plan skip_all => "Skip max tests on user request";
+	done_testing;
 	}
-    else {
-	plan tests => $tests;
-	print STDERR "# To disable future max tests: setenv DBD_UNIFY_SKIP_27 1\n";
-	}
+    print STDERR "# To disable future max tests: setenv DBD_UNIFY_SKIP_27 1\n";
 
     use_ok ("DBI");
     }
@@ -78,4 +76,4 @@ ok ($dbh->commit, "commit");
 ok ($dbh->disconnect, "disconnect");
 ok (!$dbh->ping, "!ping");
 
-exit 0;
+done_testing;

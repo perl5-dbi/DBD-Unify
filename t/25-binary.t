@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 96;
+use Test::More;
 
 use DBI qw(:sql_types);
 
@@ -138,4 +138,4 @@ ok ($dbh->commit, "commit");
 
 ok ($dbh->disconnect, "disconnect");
 
-exit 0;
+done_testing;

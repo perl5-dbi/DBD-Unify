@@ -3,18 +3,14 @@
 use strict;
 use warnings;
 
- use Test::More tests => 423;
-#use Test::More "no_plan";
+use Test::More;
 
 BEGIN { use_ok ("DBI") }
 
 my $dbh;
 ok ($dbh = DBI->connect ("dbi:Unify:", "", ""), "connect");
 
-unless ($dbh) {
-    BAIL_OUT ("Unable to connect to Unify ($DBI::errstr)\n");
-    exit 0;
-    }
+$dbh or BAIL_OUT ("Unable to connect to Unify ($DBI::errstr)\n");
 
 # Hmm with perlIO I can use
 # open my $trace_handle, ">", \$trace;
@@ -26,7 +22,6 @@ my $trace;
 
 sub stoptrace
 {
-    ok (1, "Stop trace");
     $dbh->trace (0);
 
     $trace = "";
@@ -121,6 +116,7 @@ sub testtrace
     ok ($sth->fetch,  "fetch");
     ok ($sth->finish, "finish");
 
+    ok (1, "Stop trace");
     stoptrace ();
 
     ok (1, "$dbdv - trace = " . length $trace);
@@ -149,3 +145,7 @@ foreach     my $v_dbi (0 .. 4) {
 	unlike ($trace, $pat{dbd}[$v_nxt],	"DBD trace doesn't match $v_nxt");
 	}
     }
+
+ok (1, "Stop trace");
+stoptrace (0);
+done_testing;
