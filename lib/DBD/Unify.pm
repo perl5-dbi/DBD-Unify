@@ -1,4 +1,4 @@
-#   Copyright (c) 1999-2010 H.Merijn Brand
+#   Copyright (c) 1999-2011 H.Merijn Brand
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -974,7 +974,7 @@ Todd Zervas has given a lot of feedback and patches.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1999-2010 H.Merijn Brand
+Copyright (C) 1999-2011 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
