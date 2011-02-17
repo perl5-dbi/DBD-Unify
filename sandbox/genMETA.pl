@@ -89,19 +89,18 @@ provides:
 requires:     
     perl:                5.006
     Carp:                0
-    Cwd:                 0
     DBI:                 1.42
     DynaLoader:          0
 configure_requires:
     ExtUtils::MakeMaker: 0
     Config:              0
     Cwd:                 0
-    DBI:                 1.42
     DBI::DBD:            0
 build_requires:
     Config:              0
     File::Copy:          0
     File::Find:          0
+test_requires:
     Test::Harness:       0
     Test::More:          0.90
 recommends:
