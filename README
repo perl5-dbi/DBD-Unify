@@ -32,18 +32,20 @@ REQUIREMENTS
 
       Perl    Unicode
       ------  -------
+      5.14.0    6.0.0  UCD 6.0.0 released 11 Oct 2010
+      5.12.0    5.2.0  UCD 5.2.0 released 01 Oct 2009
       5.10.1    5.1.0  UCD 5.1.0 released 04 Apr 2008
-      5.10.0    5.0.0
-      5.9.5     5.0.0  UCD 5.0.0 released 14 Jul 2006
-      5.8.8     4.1.0
+      5.10.0    5.0.0  UCD 5.0.0 released 14 Jul 2006
       5.8.7     4.1.0  UCD 4.1.0 released 31 Mar 2005
       5.8.5     4.0.1  UCD 4.0.1 released    Mar 2004
-      5.8.3     4.0.0
       5.8.1     4.0.0  UCD 4.0.0 released 24 Apr 2003
       5.8.0     3.2.0  UCD 3.2.0 released 02 Apr 2002
       5.7.x     3.1.1  UCD 3.1.1 released    Aug 2001
                 3.0.x  UCD 3.0.0 released    Sep 1999
                        UCD 1.0.0 draft was planned spring 1991 :)
+
+    Use 'corelist -a Unicode' to see the complete list of what version of
+    Unicode is shipped with what version of perl.
 
     One user has reported success with perl 5.005_03 on SunOS 5.7 with
     gcc-2.7.2.2, DBI-1.30, DBD-Unify-0.24 with DataServer-7.2.
