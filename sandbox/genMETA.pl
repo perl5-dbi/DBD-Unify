@@ -104,7 +104,7 @@ test_requires:
     Test::Harness:       0
     Test::More:          0.90
 recommends:
-    perl:                5.012003
+    perl:                5.014001
     DBI:                 1.616
 resources:
     license:             http://dev.perl.org/licenses/
