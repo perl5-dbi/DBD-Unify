@@ -27,20 +27,20 @@ use vars qw($UNIFY $UNITOP $ULIBS $ULDOPTS);
 CheckUnify ();
 
 my %wm = (
-    NAME          =>   "DBD::Unify",
+    NAME          =>   "DBD-Unify",
     DISTNAME      =>   "DBD-Unify",
     VERSION_FROM  =>   "lib/DBD/Unify.pm",
     AUTHOR        =>   "H.Merijn Brand <h.m.brand\@xs4all.nl>",
     ABSTRACT_FROM =>   "lib/DBD/Unify.pm",
 
     PREREQ_PM     => { # CORE stuff
-		       "Carp"		=> 0.00,
-		       "DynaLoader"	=> 0.00,
+		       "Carp"		=> 0,
+		       "DynaLoader"	=> 0,
 		       # For unstallu.pl
-		       "Config"		=> 0.00,
-		       "Cwd"		=> 0.00,
-		       "File::Find"	=> 0.00,
-		       "File::Copy"	=> 0.00,
+		       "Config"		=> 0,
+		       "Cwd"		=> 0,
+		       "File::Find"	=> 0,
+		       "File::Copy"	=> 0,
 
 		       # Real deps
 		       "DBI"		=> 1.42,
