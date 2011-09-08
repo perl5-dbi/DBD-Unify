@@ -27,7 +27,7 @@ use vars qw($UNIFY $UNITOP $ULIBS $ULDOPTS);
 CheckUnify ();
 
 my %wm = (
-    NAME          =>   "DBD-Unify",
+    NAME          =>   "DBD::Unify",
     DISTNAME      =>   "DBD-Unify",
     VERSION_FROM  =>   "lib/DBD/Unify.pm",
     AUTHOR        =>   "H.Merijn Brand <h.m.brand\@xs4all.nl>",

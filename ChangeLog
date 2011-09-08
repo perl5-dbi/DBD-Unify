@@ -2,6 +2,7 @@
 
     - Convert to Test::More::done_testing
     - Up copyright to 2011
+    - NAME / DISTNAME in Makefile.PL
 
 *** Release 0.80 - Mon 30 Aug 2010 <h.m.brand@xs4all.nl>
 
