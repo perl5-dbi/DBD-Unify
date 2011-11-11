@@ -3,12 +3,22 @@
 use strict;
 use warnings;
 
+my ($pid, $p_in, $p_out);
 BEGIN {
     delete @ENV{qw( LC_ALL LANG BOOLFMT DATEFMT )};
     $ENV{DATEFMT} = "MM/DD/YY";
-    }
-use Test::More;
 
+    pipe ($p_in, $p_out);
+    unless ($pid = fork ()) {
+	close $p_out;
+	scalar <$p_in>;
+	close $p_in;
+	qx{echo "xlock xx; !sleep 5;" | env UNIFY=$ENV{UNIFY} DBPATH=$ENV{DBPATH} SQL -q >/dev/null 2>&1};
+	exit;
+	}
+    }
+
+use Test::More;
 use DBI qw(:sql_types);
 
 my $UNIFY  = $ENV{UNIFY};
@@ -394,11 +404,8 @@ ok ($sth->finish, "finish");
 
 ok (1, "-- SELECT WITH WARNINGS");
 ok ($dbh->disconnect, "disconnect");
-my $pid;
-unless ($pid = fork ()) {
-    qx{echo "xlock xx; !sleep 5;" | env UNIFY=$ENV{UNIFY} DBPATH=$ENV{DBPATH} SQL -q >/dev/null 2>&1};
-    exit;
-    }
+print $p_out "LOCK!\n";
+close $p_out;
 sleep 2;
 ok ($dbh = DBI->connect ($dbname, undef, "", {
 	RaiseError    => 1,
