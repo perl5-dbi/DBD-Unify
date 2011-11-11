@@ -35,7 +35,7 @@ else {
 
 __END__
 --- #YAML:1.0
-name:                    DBD-Unify
+name:                    DBD::Unify
 version:                 VERSION
 abstract:                DBI driver for Unify database systems
 license:                 perl
@@ -54,7 +54,7 @@ provides:
         file:            lib/DBD/Unify/TypeInfo.pm
         version:         0.10
 requires:     
-    perl:                5.006
+    perl:                5.008004
     Carp:                0
     DBI:                 1.42
     DynaLoader:          0
@@ -71,7 +71,7 @@ test_requires:
     Test::Harness:       0
     Test::More:          0.90
 recommends:
-    perl:                5.014001
+    perl:                5.014002
     DBI:                 1.616
 test_recommends:
     Test::More:          0.98

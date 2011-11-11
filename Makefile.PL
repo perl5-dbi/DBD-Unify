@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-require 5.006;
+require 5.008004;
 
 use strict;
 
@@ -208,15 +208,15 @@ sub CheckUnify
 	my $f = shift;
 	-r "$UNITOP/$f" && -s _ && (-x _ || $f !~ m/^bin/) and return;
 	die "I can't find $f\n".
-	    "Is your Unify set up correctly??\n";
+	    "Is your Unify ($UNITOP) set up correctly??\n";
 	} # Check
     Check ("bin/SQL");
     Check ("bin/EPP");
     if ($try_shared) {
-	map { Check ("lib/lib${_}.$dlext") } @ulibs;
+	Check ("lib/lib${_}.$dlext") for @ulibs;
 	}
     else {
-	map { Check ($_) } split m/ u/ => $ULIBS;
+	Check ($_) for split m/ u/ => $ULIBS;
 	}
 
     splice @sqlv, -2, 2;
