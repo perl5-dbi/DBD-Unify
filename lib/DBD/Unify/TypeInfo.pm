@@ -61,6 +61,8 @@ $type_info_all = [
     [ "TEXT",             SQL_LONGVARCHAR, undef,"'", ,"'",  undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
     [ "TIME",             SQL_TIME,        undef,undef,undef,undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
     ];
+# Copy DATA_TYPE to SQL_DATA_TYPE
+$type_info_all->[$_][15] = $type_info_all->[$_][1] for 1 .. $#$type_info_all;
 
 my %odbc_types = map { ( $_->[0] => $_->[1], $_->[1] => $_->[0] ) }
     [  -5  => "BIGINT"		], # SQL_BIGINT
