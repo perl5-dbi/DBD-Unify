@@ -1,7 +1,9 @@
 /* Relentlessly copied from DBD-Oracle (one has to start somewhere ...) */
 
-#if defined(get_no_modify) && !defined(no_modify)
-# define no_modify PL_no_modify
+#include "ppport.h"
+
+#if defined(get_no_modify) && !defined(PL_no_modify)
+# define PL_no_modify PL_no_modify
 # endif
 
 /* I really like this one in perl ... */

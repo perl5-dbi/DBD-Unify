@@ -254,6 +254,7 @@ sub postamble
 	'	pod-spell-check --aspell',
 	'',
 	'checkmeta:	spellcheck',
+	'	perl sandbox/genPPPort_h.pl',
 	'	perl sandbox/genMETA.pl -c',
 	'',
 	'fixmeta:	distmeta',

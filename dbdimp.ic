@@ -35,6 +35,7 @@
 #include <config.h>	/* perl's config, I hope */
 #include <dbd_xsh.h>
 
+#define NEED_sv_2pv_flags
 #include "dbdimp.h"
 
 DBISTATE_DECLARE;
@@ -42,10 +43,38 @@ DBISTATE_DECLARE;
 /* Unify stuff off here */
 
 #include <sqle_usr.h>
+#include <sqlerr.h>
 #include <dbtypes.h>
 #ifndef SQLCURRENCY
 #  define SQLCURRENCY	-18
 #  endif
+
+extern int      rangchk (int, int);
+extern int      sqlalcr (char    *, SQLCRCB *,                   SQLDBGST *);
+extern int      sqlald2 (SQLDACB *, int, int,                    SQLDBGST *);
+extern int      sqlcldb (                                        SQLDBGST *);
+extern int      sqlcls  (CRSCB   *,                              SQLDBGST *);
+extern SQLCRCB *sqlcrnm (char    *, int,                         SQLDBGST *);
+extern SQLDACB *sqldanm (char    *, int,                         SQLDBGST *);
+extern int      sqldcls (SQLCRCB *,                              SQLDBGST *);
+extern int      sqldesc (SQLDSCRB, SQLSTCB *, SQLDACB *,         SQLDBGST *);
+extern int      sqldlda (SQLDACB *,                              SQLDBGST *);
+extern int      sqldfch (SQLCRCB *, int, HVDS *, SQLFCHDIR, int, SQLDBGST *);
+extern int      sqldlst (SQLSTCB *,                              SQLDBGST *);
+extern int      sqldopn (SQLCRCB *, int, HVDS *, int,            SQLDBGST *);
+extern int      sqldxec (SQLSTCB *, int, HVDS *, int, HVDS *,    SQLDBGST *);
+extern int      sqlfch  (CRSCB   *,              SQLFCHDIR, int, SQLDBGST *);
+extern int      sqlgtd2 (SQLDACB *, int, int, int, long, int *,
+				    void *, int,                 SQLDBGST *);
+extern int      sqlopdb (char    *,                              SQLDBGST *);
+extern int      sqlopn  (CRSCB   *,                              SQLDBGST *);
+extern int      sqlprep (char    *, SQLSTCB  *,                  SQLDBGST *);
+extern int      sqlstcd (int);
+extern int      sqlstd2 (SQLDACB *, int, int, SQLDA_FIELD *,
+				    HVDS *, int,                 SQLDBGST *);
+extern SQLSTCB *sqlstnm (char    *, int,                         SQLDBGST *);
+extern int      sqltxop (int, int,                               SQLDBGST *);
+extern int      sqlxec  (CRSCB   *,                              SQLDBGST *);
 
 extern char *basename (const char *path);
 
@@ -55,6 +84,10 @@ extern char *basename (const char *path);
 static	byte		*sth_id_on;
 static	short		n_sth_id = 4;	/* Start with max 32 $sth's */
 static	int		dbd_verbose = 0;
+
+/* forward references */
+int	dbd_st_finish	(SV *, imp_sth_t *);
+int	dbd_st_rows	(SV *, imp_sth_t *);
 
 EXEC SQL BEGIN DECLARE SECTION;
 char	u_sql_do[4096];
@@ -186,7 +219,7 @@ static int sqlError (SV *h)
 {
     D_imp_xxh (h);
 
-    auto	long	status;
+    auto	USTATUS	status;
 
     if (SQLCODE >= 0) {
 	if (SQLWARN < 0) {
@@ -491,7 +524,7 @@ int dbd_discon_all (SV *drh, imp_drh_t *imp_drh)
     if (!PL_dirty && !SvTRUE (perl_get_sv ("DBI::PERL_ENDING", 0))) {
 	sv_setiv (DBIc_ERR (imp_drh), (IV)1);
 	sv_setpv (DBIc_ERRSTR (imp_drh), "disconnect_all not implemented");
-	DBIh_EVENT2 (drh, ERROR_event, DBIc_ERR (imp_drh), DBIc_ERRSTR (imp_drh));
+	(void)DBIh_EVENT2 (drh, ERROR_event, DBIc_ERR (imp_drh), DBIc_ERRSTR (imp_drh));
 	return (FALSE);
 	}
     if (PL_perl_destruct_level)
@@ -932,7 +965,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		s = SvPV (value, l);
 		if (l > fln)
 		    croak ("DBD::Unify::st_bind: index %d: "
-			"string too long (%d > %d)", fix, l, fln);
+			"string too long (%d > %d)", fix, (int)l, fln);
 
 		st_dbg (4, imp_sth, "(%d) '%s'", strlen (s), s);
 		(void)memset (fdC, 0x20202020, sizeof (fdC));
@@ -1016,7 +1049,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		s = SvPV (value, l);
 		if (strchr (s, ':')) {
 		    if (l > HRLEN)
-			croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, l, HRLEN, s);
+			croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, (int)l, HRLEN, s);
 		    unless (atotime (s, &fdT))
 			croak ("DBD::Unify::st_bind: atotime ('%s') failed", s);
 		    st_dbg (4, imp_sth, "atotime (): (%d) '%s' => %8d", strlen (s), s, fdT);
@@ -1047,7 +1080,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		/* trim any surrounding whitespace? */
 		s = SvPV (value, l);
 		if (l > LDATELEN)
-		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, l, LDATELEN, s);
+		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, (int)l, LDATELEN, s);
 		unless (atold (s, &fdHDT))
 		    croak ("DBD::Unify::st_bind: atold (): bad date: %s", s);
 		if (fdHDT & 0xFFFF0000)
@@ -1075,7 +1108,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		/* trim any surrounding whitespace? */
 		s = SvPV (value, l);
 		if (l > LDATELEN)
-		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, l, LDATELEN, s);
+		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, (int)l, LDATELEN, s);
 		unless (atold (s, &fdHDT))
 		    croak ("DBD::Unify::st_bind: atold (): bad date: %s", s);
 		/*fdHDT = (long)SvIV (value);*/
@@ -1793,28 +1826,28 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
     else
     if (kl == 4 && strEQ (key, "NAME")) {
 	AV *av = newAV ();
-	retsv  = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV_inc (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSVpv (imp_sth->fld[i].fnm, 0));
 	}
     else
     if (kl == 4 && strEQ (key, "TYPE")) {
 	AV *av = newAV ();
-	retsv  = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV_inc (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSViv (uni2sql_type (imp_sth->fld[i].ftp)));
 	}
     else
     if (kl == 8 && strEQ (key, "uni_type")) {
 	AV *av = newAV ();
-	retsv  = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV_inc (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSViv (imp_sth->fld[i].ftp));
 	}
     else
     if (kl == 9 && strEQ (key, "PRECISION")) {
 	AV *av = newAV ();
-	retsv  = newRV (sv_2mortal ((SV *)av));
+	retsv  = newRV_inc (sv_2mortal ((SV *)av));
 	while (--i >= 0)
 	    av_store (av, i, newSViv (imp_sth->fld[i].ftp == 1
 				    ? imp_sth->fld[i].fln
