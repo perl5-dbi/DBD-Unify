@@ -52,5 +52,5 @@ foreach my $f (sort @{$tar{arch}}) {
 	}
     print STDERR "arch  cp arch/$f\n";
     copy ("$src/blib/arch/$f", "$dst/$f");
-    $f =~ m/\.(sl|al|pm|bs)$/ and chmod 0755, "$dst/$f";
+    $f =~ m/\.(sl|so|al|pm|bs)$/ and chmod 0755, "$dst/$f";
     }
