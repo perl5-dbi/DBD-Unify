@@ -23,11 +23,12 @@ DBD::Unify - DBI driver for Unify database systems
  # man DBI for explanation of each method (there's more than listed here)
 
  $dbh = DBI->connect ("DBI:Unify:[\$dbname]", "", $schema, {
-			 AutoCommit    => 0,
-			 ChopBlanks    => 1,
-			 uni_verbose   => 0,
-			 uni_scanlevel => 2,
-			 });
+                         AutoCommit    => 0,
+                         ChopBlanks    => 1,
+                         uni_unicode   => 0,
+                         uni_verbose   => 0,
+                         uni_scanlevel => 2,
+                         });
  $dbh = DBI->connect_cached (...);                   # NYT
  $dbh->do ($statement);
  $dbh->do ($statement, \%attr);
@@ -204,6 +205,7 @@ sub private_attribute_info
 	dbd_verbose	=> undef,
 
 	uni_verbose	=> undef,
+	uni_unicode	=> undef,
 	};
     } # private_attribute_info
 
@@ -609,6 +611,20 @@ S<{ AutoCommit => 0 }>, although it is not implemented (yet).
 If you don't want to check for errors after B<every> call use
 S<{ AutoCommit => 0, RaiseError => 1 }> instead. This will C<die> with
 an error message if any DBI call fails.
+
+=item Unicode
+
+By default, this driver is completely Unicode unaware: what you put into
+the database will be returned to you without the encoding applied.
+
+To enable automatic decoding of UTF-8 when fetching from the database,
+set the C<uni_unicode> attribute to a true value for the database handle
+(statement handles will inherit) or to the statement handle.
+
+  $dbh->{uni_unicode} = 1;
+
+When CHAR or TEXT fields are retrieved and the content fetched is valid
+UTF-8, the value will be marked as such.
 
 =item re-connect
 

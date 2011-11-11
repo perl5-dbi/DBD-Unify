@@ -23,6 +23,7 @@ t/12-dbi-sth.t
 t/15-uni-fail.t		Test that should fail to connect
 t/20-uni-basic.t
 t/21-uni-regex.t
+t/22-uni-utf8.t
 t/24-text.t
 t/25-binary.t
 t/26-uni-multiarg.t

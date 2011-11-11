@@ -4,6 +4,7 @@
     - Up copyright to 2011
     - NAME / DISTNAME in Makefile.PL
     - Require perl-5.8.4 (prepare for Unicode support)
+    - Implement uni_unicode (slightly experimental)
 
 *** Release 0.80 - Mon 30 Aug 2010 <h.m.brand@xs4all.nl>
 

@@ -52,6 +52,7 @@ struct imp_dbh_st {
     dbih_dbc_t	com;		/* MUST be first element in structure	*/
 
     short	id;		/* DB Handle ID for dynamic naming	*/
+    int		unicode;	/* Decode unicode on fetch		*/
     int		nchildren;
     imp_sth_t	**children;	/* Keep track of prepared statements	*/
     };
@@ -73,6 +74,7 @@ struct imp_sth_st {
     imp_fld_t	*prm;		/* Add knowledge about the positionals	*/
 
     int		dbd_verbose;	/* statement level verbosity		*/
+    int		unicode;	/* Decode unicode on fetch		*/
     };
 
 struct imp_fld_st {
