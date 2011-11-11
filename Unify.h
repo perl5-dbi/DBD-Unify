@@ -8,6 +8,10 @@
 
 #include <dbd_xsh.h>		/* installed by the DBI module	*/
 
+#include <sqle_usr.h>
+#include <sqlerr.h>
+#include <dbtypes.h>
+
 #ifdef yxyxyxyx_uni
 /* These prototypes are for dbdimp.c funcs used in the XS file          */
 /* These names are #defined to driver specific names in dbdimp.h        */
@@ -45,3 +49,6 @@ int  dbd_bind_ph          _((SV *sth, imp_sth_t *imp_sth,
 				      SV *attribs, int is_inout, IV maxlen));
 
 #endif
+
+int dbd_db_do		_((SV *, char *));
+int uni2sql_type	_((SQLCOLTYPE));
