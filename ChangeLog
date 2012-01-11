@@ -1,4 +1,8 @@
---- Release 0.81 - Thu 10 Nov 2011 <h.m.brand@xs4all.nl>
+--- Release 0.82 - 11 Jan 2012 <h.m.brand@xs4all.nl>
+
+    - Up copyright to 2012
+
+--- Release 0.81 - 10 Nov 2011 <h.m.brand@xs4all.nl>
 
     - Convert to Test::More::done_testing
     - Up copyright to 2011
@@ -6,12 +10,12 @@
     - Require perl-5.8.4 (prepare for Unicode support)
     - Implement uni_unicode (slightly experimental)
 
-*** Release 0.80 - Mon 30 Aug 2010 <h.m.brand@xs4all.nl>
+*** Release 0.80 - 30 Aug 2010 <h.m.brand@xs4all.nl>
 
     - Spelling changes
     - Remove the need for PERL_POLLUTE
 
-*** Release 0.79 - Mon 07 Jun 2010 <h.m.brand@xs4all.nl>
+*** Release 0.79 - 07 Jun 2010 <h.m.brand@xs4all.nl>
 
     - Use correct typedefs for date columns instead of generic UINTxx (Todd)
     - Upped copyright to 2010
@@ -20,7 +24,7 @@
     - Implement private_attribute_info () methods
     - Dropped YAML spec to 1.0
 
-*** Release 0.78 - Fri 11 Sep 2009 <h.m.brand@xs4all.nl>
+*** Release 0.78 - 11 Sep 2009 <h.m.brand@xs4all.nl>
 
     - Small speedup by using different XS code
     - Added primary_key () info method
@@ -29,7 +33,7 @@
     - Tested with perl-5.10.1
     - Updated Unicode reference
 
-*** Release 0.77 - Fri 19 Jun 2009 <h.m.brand@xs4all.nl>
+*** Release 0.77 - 19 Jun 2009 <h.m.brand@xs4all.nl>
 
     - Default ld option "" for unsupported OS
     - Better diag message for t/26-uni-multiarg.t
@@ -45,12 +49,12 @@
     - $DBD_VERBOSE can overrule $DBD_TRACE
     - Improved support for SQLSTATE and added tests
 
-*** Release 0.76 - Sun 19 Oct 2008 <h.m.brand@xs4all.nl>
+*** Release 0.76 - 19 Oct 2008 <h.m.brand@xs4all.nl>
 
     - Module does provide more than just Unify.pm now
     - YAML declared 1.4 (META.yml) instead of 1.1 (YAML)
 
-*** Release 0.75 - Tue 23 Sep 2008 <h.m.brand@xs4all.nl>
+*** Release 0.75 - 23 Sep 2008 <h.m.brand@xs4all.nl>
 
     - Three-level dbd_verbose and documentation
     - $ENV{DBD_TRACE} sets $dbh->{dbd_verbose} on/before connect
@@ -73,20 +77,20 @@
     - Tested with Unify 8.3K  on AIX 5.2.0.0 with perl 5.8.8
       Tests will fail on older perls, as the test cases use scalarIO
 
-*** Release 0.72 - Fri 23 Apr 2008 <h.m.brand@xs4all.nl>
+*** Release 0.72 - 23 Apr 2008 <h.m.brand@xs4all.nl>
 
     - Kindly tell CPAN smokers not to bother when there is no Unify
     - Add a correct(ed) META.yml
     - Move to EU::MM's prompt () function for the questions
 
-*** Release 0.71 - Fri 04 Jan 2008 <h.m.brand@xs4all.nl>
+*** Release 0.71 - 04 Jan 2008 <h.m.brand@xs4all.nl>
 
     - Small change in Makefile.PL for HP-UX 11.23 ia64
     - Refactor the date stuff in t/20-uni-basic
       we need more tests for %ENV variable setting like
       $LC_ALL, $DATEFMT etc
 
-*** Release 0.70 - Fri 04 Jan 2008 <h.m.brand@xs4all.nl>
+*** Release 0.70 - 04 Jan 2008 <h.m.brand@xs4all.nl>
 
     - Added the dTHX; calls for threaded perls
     - Moved opt_v to dbd_verbose
@@ -105,7 +109,7 @@
     - Moved DBIc_TRACE_LEVEL (h) to dbis->debug where appropriate
     - Raised minimal perl to 5.6.x, also for Test::More
 
-*** Release 0.65 - Mon 20 Aug 2007 <h.m.brand@xs4all.nl>
+*** Release 0.65 - 20 Aug 2007 <h.m.brand@xs4all.nl>
 
     - perlcritic OK
     - BAILOUT -> BAIL_OUT
@@ -114,13 +118,13 @@
     - Split TEXT/BINARY for DS 9 (tazervas@earthlink.net) + test
     - Added an example to show record count(s)
 
-*** Release 0.64 - Mon 14 May 2007 <h.m.brand@xs4all.nl>
+*** Release 0.64 - 14 May 2007 <h.m.brand@xs4all.nl>
 
     - Tested under DBI-1.56. Make sure to rebuild the DBD
     - Added t/15-uni-fail.t
     - Differentiate between carp (warnings) and croak (errors) better
 
-*** Release 0.62 - Wed 09 May 2007 <h.m.brand@xs4all.nl>
+*** Release 0.62 - 09 May 2007 <h.m.brand@xs4all.nl>
 
     - Extended Copyright's to 2007
     - Fixed more typo's in the doc's
@@ -131,7 +135,7 @@
     - Added cover target
     - Added some very basic foreign_key_info () tests
 
-*** Release 0.61 - Fri 27 Apr 2007 <h.m.brand@xs4all.nl>
+*** Release 0.61 - 27 Apr 2007 <h.m.brand@xs4all.nl>
 
     - Small README changes. Typo fixes.
     - Swapped libusu and libudsu (Ron Kuris)
@@ -141,37 +145,37 @@
       of DBIS->get_fbav (imp_sth);
       . All three of the above should also speed up the DBD
 
-*** Release 0.60 - Thu 09 Feb 2006 <h.m.brand@xs4all.nl>
+*** Release 0.60 - 09 Feb 2006 <h.m.brand@xs4all.nl>
 
     - TEXT/BINARY support
 
-*** Release 0.51 - Mon 16 Jan 2006 <h.m.brand@xs4all.nl>
+*** Release 0.51 - 16 Jan 2006 <h.m.brand@xs4all.nl>
 
     - Extended link options from Makefile.PL (Ron Kuris)
     - Faster ping (Ron Kuris)
     - Dynamic extension for shared libs from %Config
     - Changed ok ($a eq $b, "name") tests to is ($a, $b, "name")
 
-*** Release 0.50 - Fri 30 Sep 2005 <h.m.brand@xs4all.nl>
+*** Release 0.50 - 30 Sep 2005 <h.m.brand@xs4all.nl>
 
     - Major changes to Makefile.PL to enable 8.3E and up
       8.3E and up uses different library names, and might
       require libgcc
 
-*** Release 0.43 - Sun 18 Sep 2005 <h.m.brand@xs4all.nl>
+*** Release 0.43 - 18 Sep 2005 <h.m.brand@xs4all.nl>
 
     - Added t/00-pod.t  for Test::Pod
     - Added t/00-podc.t for Test::Pod::Coverage
 
-*** Release 0.42 - Wed 17 Aug 2005 <h.m.brand@xs4all.nl>
+*** Release 0.42 - 17 Aug 2005 <h.m.brand@xs4all.nl>
 
     - implemented foreign_key_info ()
 
-*** Release 0.41 - Mon 24 May 2004 <h.m.brand@hccnet.nl>
+*** Release 0.41 - 24 May 2004 <h.m.brand@hccnet.nl>
 
     - t/21-uni-regex.t now skips on uvsn < 8.2
 
-*** Release 0.40 - Thu 29 Apr 2004 <h.m.brand@hccnet.nl>
+*** Release 0.40 - 29 Apr 2004 <h.m.brand@hccnet.nl>
 
     - Made DBI-1.42 prerequisite
     - All tests now under Test::More
@@ -179,20 +183,20 @@
     - Added t/40-info.t
     - Return error on table_info (catalog); # Unify has no catalogs
 
-*** Release 0.31 - Thu 22 Apr 2004 <h.m.brand@hccnet.nl>
+*** Release 0.31 - 22 Apr 2004 <h.m.brand@hccnet.nl>
 
     - Tested against DBI-1.41 through 1.42
     - ScanLevel to uni_scanlevel
     - Support for dynamic loading
 
-*** Release 0.30 - Tue 02 Mar 2004 <h.m.brand@hccnet.nl>
+*** Release 0.30 - 02 Mar 2004 <h.m.brand@hccnet.nl>
 
     - Tested against DBI-1.39 through 1.40
     - Support for shared builds on HP-UX (Unify/DS 8.2B and up)
     - Fix for $dbh attributes from 0.27 was not as good as it
       should have been
 
-*** Release 0.27 - Fri 29 Aug 2003 <h.m.brand@hccnet.nl>
+*** Release 0.27 - 29 Aug 2003 <h.m.brand@hccnet.nl>
 
     - DBDverbose to uni_verbose
     - Tested against DBI-1.36 through 1.38
@@ -200,11 +204,11 @@
     - Makefile.PL to return the status of WriteMakefile ()
     - Fixed a buglet in assigning dbh attributes
 
-*** Release 0.26 - Mon 17 Mar 2003 <h.m.brand@hccnet.nl>
+*** Release 0.26 - 17 Mar 2003 <h.m.brand@hccnet.nl>
 
     - Fixed forgotten (essential) updates to ChangeLog and README
 
-*** Release 0.25 - Fri 14 Mar 2003 <h.m.brand@hccnet.nl>
+*** Release 0.25 - 14 Mar 2003 <h.m.brand@hccnet.nl>
 
     - Many README additions and updates
     - Tested against DBI-1.32 through 1.35
@@ -212,7 +216,7 @@
       same database fails in DS 8.2 and below
     - Allowed state S1000 in 10-dbi-drv for DS 8.2B
 
-*** Release 0.24 - Mon 28 May 2002 <h.m.brand@hccnet.nl>
+*** Release 0.24 - 28 May 2002 <h.m.brand@hccnet.nl>
 
     - Minor adjustments for perl-5.7.3 / DBI-1.21
     - Disable networked databases by default
@@ -221,14 +225,14 @@
     - README changes for 8.1 (UTF-8, network support, install)
     - Tested against DBI-1.21 through 1.23
 
-*** Release 0.23 - Mon 27 Aug 2001 <h.m.brand@hccnet.nl>
+*** Release 0.23 - 27 Aug 2001 <h.m.brand@hccnet.nl>
 
     - README tweaks and additions
     - Unify => SQL types (->{TYPE} attribute is now ANSI/ODBC)
       see README section RESTRICTIONS
     - Tested against DBI-1.20
 
-*** Release 0.22 - Tue 24 Jul 2001 <h.m.brand@hccnet.nl>
+*** Release 0.22 - 24 Jul 2001 <h.m.brand@hccnet.nl>
 
     - Basic support for DATE/TIME (Tom Poage)
     - Extended test suite for testing DATE/TIME
@@ -246,7 +250,7 @@
     - Minor adjustments for DBI-1.19 and table_info change
     - Added link_info (experimental)
 
-*** Release 0.21 - Wed 28 Mar 2001 <h.m.brand@hccnet.nl>
+*** Release 0.21 - 28 Mar 2001 <h.m.brand@hccnet.nl>
 
     - Some changes to README
     - Reorganization of test suite; Signaling of not (yet) implemented
@@ -254,12 +258,12 @@
     - prototypes (Tom Poage)
     - varargs/stdarg from perl config
 
-*** Release 0.20 - Mon 26 Feb 2001 <h.m.brand@hccnet.nl>
+*** Release 0.20 - 26 Feb 2001 <h.m.brand@hccnet.nl>
 
     - Illegal memory access in debugging statement (oops)
     - Internet references (requested by Tim)
 
-*** Release 0.12 - Wed 10 Jan 2001 <h.m.brand@hccnet.nl>
+*** Release 0.12 - 10 Jan 2001 <h.m.brand@hccnet.nl>
 
     - AIX nurse was killing the kids. Simplified nursing.
     - Removed dTHR calls
@@ -267,13 +271,13 @@
       more destroy safe)
     - Small tweaks to Unify.pm pod
 
-*** Release 0.11 - Mon 11 Dec 2000 <h.m.brand@hccnet.nl>
+*** Release 0.11 - 11 Dec 2000 <h.m.brand@hccnet.nl>
 
     - Nursed the orphans myself :-))
       (Destructable statement handles are now destroyed on commit,
        rollback and disconnect)
 
-*** Release 0.10 - Fri 17 Nov 2000 <h.m.brand@hccnet.nl>
+*** Release 0.10 - 17 Nov 2000 <h.m.brand@hccnet.nl>
 
     - Added test for bind_columns (marked as tested in pod)
     - Moved prepare destruction from finish to DESTROY
@@ -285,7 +289,7 @@
     - Stripped SQL comments
     - Implemented $sth->rows method + test
 
-*** Release 0.09 - Tue 02 Aug 2000 <h.m.brand@hccnet.nl>
+*** Release 0.09 - 02 Aug 2000 <h.m.brand@hccnet.nl>
 
     - Added doc for use of stdarg in README
     - Added tests for statement handle attributes
@@ -294,7 +298,7 @@
     - table_info () now returns the fields in the expected order
     - Corrected small typo's in pod
 
-*** Release 0.08 - Mon 19 May 2000 <h.m.brand@hccnet.nl>
+*** Release 0.08 - 19 May 2000 <h.m.brand@hccnet.nl>
 
     - Described output (DBIc_NUM_FIELDS (imp_sth)) and input
       (DBIc_NUM_PARAMS (imp_sth)) separately, so the {NAME} attribute
@@ -302,7 +306,7 @@
     - Repaired ID allocation if exceeded default maximum of 32
     - Added test for ID allocation
 
-*** Release 0.07 - Wed 03 May 2000 <h.m.brand@hccnet.nl>
+*** Release 0.07 - 03 May 2000 <h.m.brand@hccnet.nl>
 
     - Added imp_dbh.id to allow multiple DB handles on same DB preventing
       conflicts with dynamic naming.
@@ -312,7 +316,7 @@
       preserving the numeric context (it's an SvNV alright).
     - Updated pod sections in Unify.pm
 
-*** Release 0.06 - Wed 05 Apr 2000 <h.m.brand@hccnet.nl>
+*** Release 0.06 - 05 Apr 2000 <h.m.brand@hccnet.nl>
 
     - Saved field descriptor data to implement correct return values of
       $sth->fetchrow_hashref () calls
@@ -320,7 +324,7 @@
       would recognize as succeeded test output. I still rely on RaiseError
       to crash the test on DB failures.
 
-*** Release 0.05 - Thu 23 Mar 2000 <h.m.brand@hccnet.nl>
+*** Release 0.05 - 23 Mar 2000 <h.m.brand@hccnet.nl>
 
     - Recognize strings w/ negative numbers in bind where !SvIOK (value)
       In fact drop the SvIOK () check altogether and let SvIV () do the
@@ -328,7 +332,7 @@
       value BEFORE the warning, but we'll see ...
     - Index display in bind failure
 
-*** Release 0.04 - Wed 15 Feb 2000 <h.m.brand@hccnet.nl>
+*** Release 0.04 - 15 Feb 2000 <h.m.brand@hccnet.nl>
 
     - Oops, forgot to close open cursor on re-execute
     - Full implementation of positional parameters includes
@@ -337,13 +341,13 @@
     - Test includes updates and positional updates
     - Added $dbh->{DBDverbose} (see pod)
 
-*** Release 0.03 - Wed 09 Feb 2000 <h.m.brand@hccnet.nl>
+*** Release 0.03 - 09 Feb 2000 <h.m.brand@hccnet.nl>
 
     - Changes to Makefile.PL to support AIX
     - Forced prefer varargs over stdarg in dbdimp.ic :-(
     - Implemented positional parameters :-)
 
-*** Release 0.02 - Thu 03 Feb 2000 <h.m.brand@hccnet.nl>
+*** Release 0.02 - 03 Feb 2000 <h.m.brand@hccnet.nl>
 
     - Support for SCANLEVEL
     - connect () destroyed $DBPATH :-(
@@ -355,6 +359,6 @@
       I found out I used outdated books :-(
     - dbdimp.h cleanup started
 
-*** Release 0.01 - Tue 18 Jan 2000 <h.m.brand@hccnet.nl>
+*** Release 0.01 - 18 Jan 2000 <h.m.brand@hccnet.nl>
 
     - First public port
