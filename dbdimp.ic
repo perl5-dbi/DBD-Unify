@@ -375,7 +375,8 @@ static void change_offspring (SV *dbh, imp_dbh_t *imp_dbh)
 
     for (i = 0; i < n; i++) {
 	imp_sth_t *imp_sth = children[i];
-	if (!imp_sth || imp_sth->stat & ST_STAT_OPEN) continue;
+	if (!imp_sth || imp_sth->stat > ST_STAT_OPEN
+		     || imp_sth->stat & ST_STAT_OPEN) continue;
 	if (2 > DBIc_TRACE_LEVEL (imp_sth) && 2 > dbd_verbose) {
 	    dbg (3, "-- %03d/%03d 0x%08X %02X",
 		i + 1, n, imp_sth, imp_sth ? imp_sth->stat : 0);

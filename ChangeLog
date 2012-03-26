@@ -1,6 +1,7 @@
---- Release 0.82 - 11 Jan 2012 <h.m.brand@xs4all.nl>
+--- Release 0.82 - 26 Mar 2012 <h.m.brand@xs4all.nl>
 
     - Up copyright to 2012
+    - Fix two core dumps (Todd Zervas)
 
 --- Release 0.81 - 10 Nov 2011 <h.m.brand@xs4all.nl>
 
