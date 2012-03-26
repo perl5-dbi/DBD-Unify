@@ -247,6 +247,8 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
     dTHX;
     char *opt;
 
+    PL_use_safe_putenv = 1;
+
     if ((opt = getenv ("DBD_TRACE"))) {
 	auto int i = 0;
 	while (*opt) {
