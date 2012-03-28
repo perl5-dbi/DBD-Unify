@@ -109,6 +109,7 @@ double	fdD;
 utime	fdT;
 udate	fdDT;
 uhdate	fdHDT;
+char	fdDTTM[24];
 EXEC SQL END   DECLARE SECTION;
 
 #define DBI_debug	(dbis->debug & DBIc_TRACE_LEVEL_MASK)
@@ -1136,6 +1137,30 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		}
 		break;
 
+	    case SQLDATETIME: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "DATETIME %2d: ", fpr);
+
+		/* trim any surrounding whitespace? */
+		s = SvPV (value, l);
+		if (l > UDL_DATETIME)
+		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, l, UDL_DATETIME, s);
+		st_dbg (4, imp_sth, "(%d) '%s'", strlen (s), s);
+		(void)memset (fdDTTM, 0x20202020, sizeof (fdDTTM));
+		(void)memcpy (fdDTTM, s, l); fdDTTM[UDL_DATETIME] = (char)0;
+
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdDTTM,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		}
+		break;
+
 	    case SQLTEXT: {
 		auto	char	*s;
 
@@ -1512,6 +1537,19 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		/*st_dbg (4, imp_sth, "%ld", SvIV (sv));*/
 		break;
 
+	    case SQLDATETIME:
+		st_dbg (4, imp_sth, "DATETIME %2d: ", fpr);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdDTTM = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		sv_setpvn (sv, fdDTTM, strlen(fdDTTM));
+		st_dbg (4, imp_sth, "(%d) '%s'", strlen(fdDTTM), SvPVX (sv));
+		break;
+
 	    case SQLTEXT: {
 		auto	char	*s;
 
@@ -1805,8 +1843,9 @@ int uni2sql_type (SQLCOLTYPE t)
 	case SQLDBLPREC: return ( 8); /* double precision  SQL_DOUBLE        */
 
 	case SQLDATE:    return ( 9); /* date              SQL_DATE          */
+	case SQLHDATE:   return ( 9); /* huge date         SQL_DATE          */
 	case SQLSMTIME:  return (10); /* time              SQL_TIME          */
-	case SQLHDATE:   return (11); /* huge date         SQL_TIMESTAMP     */
+	case SQLDATETIME:return (11); /* datetime          SQL_TIMESTAMP     */
 	              /*         12                        SQL_VARCHAR       */
 	              /*         16                        SQL_BOOLEAN       */
 	case SQLTEXT:    return (-1); /* text              SQL_LONGVARCHAR   */

@@ -60,6 +60,7 @@ $type_info_all = [
     [ "SMALLINT",         SQL_SMALLINT,    undef,undef,undef,"PRECISION",      1,0,3,0,    undef,undef,undef,0,    0,    undef,undef,undef,undef, ],
     [ "TEXT",             SQL_LONGVARCHAR, undef,"'", ,"'",  undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
     [ "TIME",             SQL_TIME,        undef,undef,undef,undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
+    [ "TIMESTAMP",        SQL_TIMESTAMP,   undef,undef,undef,undef,            1,0,3,undef,undef,undef,undef,undef,undef,undef,undef,undef,undef, ],
     ];
 # Copy DATA_TYPE to SQL_DATA_TYPE
 $type_info_all->[$_][15] = $type_info_all->[$_][1] for 1 .. $#$type_info_all;
@@ -91,6 +92,7 @@ my %odbc_types = map { ( $_->[0] => $_->[1], $_->[1] => $_->[0] ) }
 $odbc_types{DOUBLE}  = $odbc_types{"DOUBLE PRECISION"};
 
 my %uni_types = map { ( $_->[0] => $_->[1], $_->[1] => $_->[0] ) }
+    [ -19  => "DATETIME"	], # SQLDATETIME
     [ -18  => "CURRENCY"	], # SQLAMT64
     [ -17  => "HUGE INTEGER"	], # SQLINT64
     [ -12  => "BYTE"		], # SQLBYTE
@@ -141,6 +143,7 @@ Interactive SQL/A supports the following column data types:
     - CHAR[ACTER] [(integer)]
     - CURRENCY [(integer[,integer])]
     - [HUGE] DATE
+    - DATETIME
     - DEC[IMAL] [(integer)]
     - DOUBLE PRECISION
     - FLOAT
@@ -171,4 +174,5 @@ Interactive SQL/A supports the following column data types:
 #   define SQLBYTE	((SQLCOLTYPE)(-(U_BYT)))
 #   define SQLINT64	((SQLCOLTYPE)(-(U_GINT)))
 #   define SQLAMT64	((SQLCOLTYPE)(-(U_GAMT)))
+#   define SQLDATETIME	((SQLCOLTYPE)(-(U_DATETIME)))
 
