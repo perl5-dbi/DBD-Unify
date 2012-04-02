@@ -28,6 +28,7 @@ t/24-text.t
 t/25-binary.t
 t/26-uni-multiarg.t
 t/27-uni-max.t
+t/28-datetime.t
 t/30-reconnect.t
 t/40-info.t
 t/50-trace.t
