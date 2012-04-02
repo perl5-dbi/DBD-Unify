@@ -35,7 +35,7 @@ else {
 
 __END__
 --- #YAML:1.0
-name:                    DBD::Unify
+name:                    DBD-Unify
 version:                 VERSION
 abstract:                DBI driver for Unify database systems
 license:                 perl
