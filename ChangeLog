@@ -4,7 +4,7 @@
     - Fix two core dumps (Todd Zervas)
     - Added DATETIME support for 9.1 and up (Todd Zervas)
 
---- Release 0.81 - 10 Nov 2011 <h.m.brand@xs4all.nl>
+--- Release 0.81 - 10 Nov 2011 <h.m.brand@xs4all.nl> was never released
 
     - Convert to Test::More::done_testing
     - Up copyright to 2011

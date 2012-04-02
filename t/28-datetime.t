@@ -97,7 +97,7 @@ while (my ($xs, $xdt) = $sth->fetchrow_array ()) {
 ok ($sth->finish, "finish");
 
 ok (1, "-- SELECT FROM THE TABLE, POSITIONAL");
-ok ($sth = $dbh->prepare ("select xt from xx where xs = ?"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xdt from xx where xs = ?"), "sel prepare");
 foreach my $xs (1 .. 10) {
     ok ($sth->execute ($xs), "execute $xs");
     my ($xdt) = $sth->fetchrow_array;
