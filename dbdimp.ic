@@ -224,8 +224,6 @@ static void info    (SV *h, int error_num, char *text)
 
 static int sqlError (SV *h)
 {
-    D_imp_xxh (h);
-
     auto	USTATUS	status;
 
     if (SQLCODE >= 0) {
@@ -498,7 +496,6 @@ int dbd_db_do (SV *dbh, char *statement)
 int dbd_db_disconnect (SV *dbh, imp_dbh_t *imp_dbh)
 {
     dTHX;
-    int transaction_active;
 
     dbg (3, "DBD::Unify::db_disconnect\n");
 
@@ -562,8 +559,6 @@ int dbd_db_STORE_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
     dTHX;
     STRLEN kl;
     char   *key = SvPV (keysv, kl);
-    SV     *cachesv = NULL;
-    int    on  = SvTRUE (valuesv);
 
     unless (DBIc_ACTIVE (imp_dbh))
 	return (0);
@@ -634,7 +629,7 @@ static short new_sth_id (SV *dbh)
 	    }
 	}
     i = n_sth_id + 4;
-    if (sth_id_on = realloc (sth_id_on, i * 8)) {
+    if ((sth_id_on = realloc (sth_id_on, i * 8))) {
 	b = n_sth_id * 8 + 1;
 	sth_id_on[n_sth_id++] = (byte)1;
 	sth_id_on[n_sth_id++] = (byte)0;
@@ -803,7 +798,7 @@ int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
     unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
 	return (0);
 
-    if (imp_sth->statement = (char *)malloc (strlen (statement) + 2))
+    if ((imp_sth->statement = (char *)malloc (strlen (statement) + 2)))
 	(void)strcpy (imp_sth->statement, statement);
     imp_sth->stat	 = 0;
     imp_sth->dbd_verbose = dbd_verbose;
@@ -918,7 +913,6 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
     dTHX;
     SV	*dbh = (SV *)DBIc_PARENT_H (imp_sth);
     D_imp_dbh_from_sth;
-    int	i;
 
     unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
 	return (0);
@@ -1942,7 +1936,6 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
     else
     if (kl == 10 && strEQ (key, "CursorName")) {
 	char c_nm[16];
-	SV *dbh = (SV *)DBIc_PARENT_H (imp_sth);
 
 	D_imp_dbh_from_sth;
 	(void)sprintf (c_nm, "c_sql_%02d_%06d", imp_dbh->id, imp_sth->id);
@@ -1962,7 +1955,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
 	    sprintf (key, "%d", p + 1);
 	    if (SvOK (sv))	SvREFCNT_inc (sv);
 	    else		sv = &PL_sv_undef;
-	    hv_store (hv, key, strlen (key), sv, 0);
+	    (void)hv_store (hv, key, strlen (key), sv, 0);
 	    }
 	}
     else
@@ -1972,7 +1965,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
 	while (--p >= 0) {
 	    char key[8];
 	    sprintf (key, "%d", p + 1);
-	    hv_store (hv, key, strlen (key), newSViv (imp_sth->prm[p].ftp), 0);
+	    (void)hv_store (hv, key, strlen (key), newSViv (imp_sth->prm[p].ftp), 0);
 	    }
 	}
     else
