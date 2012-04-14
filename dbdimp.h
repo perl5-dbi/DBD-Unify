@@ -15,13 +15,6 @@
 #include <rhli.h>
 #include <rhlierr.h>
 
-#ifndef SQLDATETIME
-#define SQLDATETIME 0xDEADBEAF
-#endif
-#ifndef UDL_DATETIME
-#define UDL_DATETIME 0xDEADBEAF
-#endif
-
 typedef	unsigned char	byte;
 
 /* Unify API calls used */

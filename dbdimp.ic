@@ -48,6 +48,12 @@ DBISTATE_DECLARE;
 #ifndef SQLCURRENCY
 #  define SQLCURRENCY	-18
 #  endif
+#ifndef SQLDATETIME
+#  define SQLDATETIME 0xDEADBEAF
+#  endif
+#ifndef UDL_DATETIME
+#  define UDL_DATETIME 0xDEADBEAF
+#  endif
 
 extern int      rangchk (int, int);
 extern int      sqlalcr (char    *, SQLCRCB *,                   SQLDBGST *);
