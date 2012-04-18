@@ -1,4 +1,9 @@
---- Release 0.82 - 02 Apr 2012 <h.m.brand@xs4all.nl>
+--- Release 0.83 - 18 Apr 2012 <h.m.brand@xs4all.nl>
+
+    - Code cleanup (Todd Zervas)
+    - Tested against new DBI-1.618_901
+
+*** Release 0.82 - 02 Apr 2012 <h.m.brand@xs4all.nl>
 
     - Up copyright to 2012
     - Fix two core dumps (Todd Zervas)
