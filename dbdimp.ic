@@ -36,6 +36,8 @@
 #include <dbd_xsh.h>
 
 #define NEED_sv_2pv_flags
+#define UEXTERN static
+#define UINIT0 =0
 #include "dbdimp.h"
 
 DBISTATE_DECLARE;

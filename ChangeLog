@@ -1,5 +1,6 @@
 --- Release 0.83 - 18 Apr 2012 <h.m.brand@xs4all.nl>
 
+    - Removed "defined but not used: n_dbh" compile warning (Todd Zervas)
     - Code cleanup (Todd Zervas)
     - Tested against new DBI-1.618_901
 
