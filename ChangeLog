@@ -2,6 +2,7 @@
 
     - Removed "defined but not used: n_dbh" compile warning (Todd Zervas)
     - Code cleanup (Todd Zervas)
+    - Fixed "subscript out of range" warning on HP-UX (Todd Zervas)
     - Tested against new DBI-1.618_901
 
 *** Release 0.82 - 02 Apr 2012 <h.m.brand@xs4all.nl>

@@ -53,9 +53,6 @@ DBISTATE_DECLARE;
 #ifndef SQLDATETIME
 #  define SQLDATETIME 0xDEADBEAF
 #  endif
-#ifndef UDL_DATETIME
-#  define UDL_DATETIME 0xDEADBEAF
-#  endif
 
 extern int      rangchk (int, int);
 extern int      sqlalcr (char    *, SQLCRCB *,                   SQLDBGST *);
@@ -1146,11 +1143,11 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 
 		/* trim any surrounding whitespace? */
 		s = SvPV (value, l);
-		if (l > UDL_DATETIME)
-		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, l, UDL_DATETIME, s);
+		if (l > sizeof(fdDTTM) - 1)
+		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, l, sizeof (fdDTTM) - 1, s);
 		st_dbg (4, imp_sth, "(%d) '%s'", strlen (s), s);
 		(void)memset (fdDTTM, 0x20202020, sizeof (fdDTTM));
-		(void)memcpy (fdDTTM, s, l); fdDTTM[UDL_DATETIME] = (char)0;
+		(void)memcpy (fdDTTM, s, l); fdDTTM[sizeof (fdDTTM) - 1] = (char)0;
 
 		EXEC SQL
 		    SET SQL DESCRIPTOR :i_sql_nm
