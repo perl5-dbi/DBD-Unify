@@ -71,8 +71,8 @@ test_requires:
     Test::Harness:       0
     Test::More:          0.90
 recommends:
-    perl:                5.014002
-    DBI:                 1.618
+    perl:                5.016003
+    DBI:                 1.625
 test_recommends:
     Test::More:          0.98
 resources:
