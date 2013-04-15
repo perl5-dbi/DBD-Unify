@@ -149,6 +149,20 @@ SHARED BUILDS on HP-UX
     shared object, which is *much* smaller than when built statically. This
     does not always work. If things fail, choose for the static route.
     
+NAMING CONFLICTS
+
+    In their enormous wisdom, Unify have chosen a function named "inflate"
+    to be exported in their libraries. This will conflict with libz. If
+    you use any module that uses a shared lib that requires libz, this
+    will result in core dumps that are hard to trace. A possible solution
+    is to rename the function *after* building. This is - of course - very
+    very very dirty, but if it works, it will circumvent the problem:
+
+     $ make
+     $ perl -pi -e's/\0inflate\0/\0InFlate\0/g' \
+          blib/arch/auto/DBD/Unify/Unify.so
+     $ make test
+
 RESTRICTIONS:
 
     This is a basic port for Unify. At the moment of writing, this DBD

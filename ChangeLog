@@ -1,9 +1,10 @@
---- Release 0.83 - 18 Apr 2012 <h.m.brand@xs4all.nl>
+--- Release 0.83 - 15 Apr 2013 <h.m.brand@xs4all.nl>
 
     - Removed "defined but not used: n_dbh" compile warning (Todd Zervas)
     - Code cleanup (Todd Zervas)
     - Fixed "subscript out of range" warning on HP-UX (Todd Zervas)
-    - Tested against new DBI-1.618_901
+    - Tested against new DBI-1.625
+    - Document naming conflict for inflate (README)
 
 *** Release 0.82 - 02 Apr 2012 <h.m.brand@xs4all.nl>
 
