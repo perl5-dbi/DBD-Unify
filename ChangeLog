@@ -5,6 +5,7 @@
     - Fixed "subscript out of range" warning on HP-UX (Todd Zervas)
     - Tested against new DBI-1.625
     - Document naming conflict for inflate (README)
+    - Up copyright to 2013
 
 *** Release 0.82 - 02 Apr 2012 <h.m.brand@xs4all.nl>
 
