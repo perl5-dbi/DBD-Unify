@@ -1,4 +1,4 @@
---- Release 0.83 - 15 Apr 2013 <h.m.brand@xs4all.nl>
+*** Release 0.83 - 17 Apr 2013 <h.m.brand@xs4all.nl>
 
     - Removed "defined but not used: n_dbh" compile warning (Todd Zervas)
     - Code cleanup (Todd Zervas)

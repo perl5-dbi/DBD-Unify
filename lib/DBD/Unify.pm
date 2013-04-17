@@ -813,7 +813,7 @@ Currently, the following levels are defined:
 
 No DBD messages implemented at level 1 and 2, as they are reserved for DBI
 
-=item 3
+=item Z<>3
 
   DBD::Unify::dbd_db_STORE (ScanLevel = 7)
   DBD::Unify::st_prepare u_sql_00_000000 ("select * from foo")
@@ -826,7 +826,7 @@ No DBD messages implemented at level 1 and 2, as they are reserved for DBI
   DBD::Unify::db_disconnect
   DBD::Unify::db_destroy
 
-=item 4
+=item Z<>4
 
 Level 3 plus errors and additional return codes and field types and values:
 
@@ -853,7 +853,7 @@ Level 3 plus errors and additional return codes and field types and values:
       After deallocO, sqlcode = 0
       After deallocU, sqlcode = 0
 
-=item 5
+=item Z<>5
 
 Level 4 plus some content info:
 
@@ -863,7 +863,7 @@ Level 4 plus some content info:
        Field   1: [05 00 04 00 00] c_bar: NUMERIC  4: (6030) 6030 ==
        Fetch done
 
-=item 6
+=item Z<>6
 
 Level 5 plus internal coding for exchanges and low(er) level return codes:
 
@@ -872,7 +872,7 @@ Level 5 plus internal coding for exchanges and low(er) level return codes:
        Field   1: [05 00 04 00 FFFFFFFF] c_bar
   DBD::Unify::st_prepare u_sql_00_000000 (<= 1, => 0)
 
-=item 7
+=item Z<>7
 
 Level 6 plus destroy/cleanup states:
 
@@ -881,7 +881,7 @@ Level 6 plus destroy/cleanup states:
    destroy alloci destroy allocp    After deallocU, sqlcode = 0
    destroy stat destroy growup destroy impset
 
-=item 8
+=item Z<>8
 
 No messages (yet) set to level 8 and up.
 
