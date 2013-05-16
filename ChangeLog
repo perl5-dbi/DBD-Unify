@@ -1,3 +1,7 @@
+--- Release 0.84 - 16 May 2013 <h.m.brand@xs4all.nl>
+
+    - Minor typo in README regarding Unicode version
+
 *** Release 0.83 - 17 Apr 2013 <h.m.brand@xs4all.nl>
 
     - Removed "defined but not used: n_dbh" compile warning (Todd Zervas)
