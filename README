@@ -9,11 +9,11 @@ See the ChangeLog file for a complete history
 REQUIREMENTS
 
     It has been ported and tested on DataServer 6.3AB, 6.3BE, 8.1CC, 8.1CE,
-    8.1DAB, 8.2AC, 8.2AD, 8.2B, 8.3E/64, 8.3F/64, 8.3I/64, and 8.3KAB/64,
+    8.1DAB, 8.2AC, 8.2AD, 8.2B, 8.2BC, 8.3E/64, 8.3F/64, 8.3I/64, and 8.3KAB/64,
     but this does not mean it might not work on U2000 databases or other
     DataServer releases. I do not have a DS 9.x to play with.
 
-    I use DBI 1.625 and perl-5.8.7 through perl5.14.2, but might get it to
+    I use DBI 1.628 and perl-5.8.7 through perl5.16.3, but might get it to
     work with DBI 0.93 or higher and perl 5.6.1 (the modern toolchain will
     require 5.8.1 as of Apr 2013). But then again, in that case you should
     consider an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite.
