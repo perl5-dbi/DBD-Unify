@@ -4,7 +4,7 @@ package DBD::Unify::GetInfo;
 # DBI::DBD::Metadata::write_getinfo_pm v2.008696.
 # And manually reformatted into readable style
 
-our $VERSION = 0.10;
+our $VERSION = $DBD::Unify::VERSION;
 
 use strict;
 use warnings;
