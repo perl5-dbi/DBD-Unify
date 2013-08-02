@@ -1,6 +1,8 @@
-0.84    - 16 May 2013, H.Merijn Brand
+0.84    - 02 Aug 2013, H.Merijn Brand
 
-    * Unify versions update in README
+    * Unicode versions update in README (5.18.0 shipped with Unicode 6.2)
+    * Unify   versions update (DBD::Unify::*Info share DBD::Unify's VERSION)
+    * Updated ChangeLog style
 
 0.83    - 17 Apr 2013, H.Merijn Brand
 

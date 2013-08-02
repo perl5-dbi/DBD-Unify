@@ -49,10 +49,10 @@ provides:
         version:         VERSION
     DBD::Unify::GetInfo:
         file:            lib/DBD/Unify/GetInfo.pm
-        version:         0.10
+        version:         VERSION
     DBD::Unify::TypeInfo:
         file:            lib/DBD/Unify/TypeInfo.pm
-        version:         0.10
+        version:         VERSION
 requires:     
     perl:                5.008004
     Carp:                0
@@ -72,7 +72,7 @@ test_requires:
     Test::More:          0.90
 recommends:
     perl:                5.016003
-    DBI:                 1.625
+    DBI:                 1.628
 test_recommends:
     Test::More:          0.98
 resources:
