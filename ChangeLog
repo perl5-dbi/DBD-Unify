@@ -1,3 +1,6 @@
+0.86    - 19 Aug 2013, H.Merijn Brand
+    - Correct handling of very small and very large numbers (Todd Zervas)
+
 0.85    - 02 Aug 2013, H.Merijn Brand
     * Fix CPAN complaints
 

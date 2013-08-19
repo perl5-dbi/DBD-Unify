@@ -1013,7 +1013,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		st_dbg (4, imp_sth, "DOUBL %1d.%2d: ", fln, fpr);
 		/* unless looks_like_number (...) carp (...) */
 		fdD = (double)SvNV (value);
-		st_dbg (4, imp_sth, "%8.4f", fdD);
+		st_dbg (4, imp_sth, "%g", fdD);
 		EXEC SQL
 		    SET SQL DESCRIPTOR :i_sql_nm
 		    VALUE :fix
@@ -1441,10 +1441,10 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
 		    return (NULL);
-		(void)sprintf (fdC, "%lf", fdD);
+		(void)sprintf (fdC, "%#g", fdD);
 		sv_setpvn (sv, fdC, strlen (fdC));
 	     /* sv_setnv  (sv, fdD); */
-		st_dbg (4, imp_sth, "%lf (%s)", SvNV (sv), fdC);
+		st_dbg (4, imp_sth, "%g (%s)", SvNV (sv), fdC);
 		break;
 
 	    case SQLAMOUNT:
