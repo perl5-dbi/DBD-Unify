@@ -25,6 +25,7 @@ if ($check) {
     $meta->check_required ();
     $meta->check_minimum ([ "lib", "t", "Makefile.PL" ]);
     $meta->check_minimum ("5.010", [ "examples" ]);
+    $meta->done_testing ();
     }
 elsif ($opt_v) {
     $meta->print_yaml ();
@@ -71,10 +72,10 @@ test_requires:
     Test::Harness:       0
     Test::More:          0.90
 recommends:
-    perl:                5.016003
-    DBI:                 1.628
+    perl:                5.020000
+    DBI:                 1.631
 test_recommends:
-    Test::More:          0.98
+    Test::More:          1.001003
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          http://repo.or.cz/w/DBD-Unify.git
