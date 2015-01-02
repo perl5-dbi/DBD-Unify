@@ -1,6 +1,7 @@
-0.86    - 01 Jan 2014, H.Merijn Brand
-    - Correct handling of very small and very large numbers (Todd Zervas)
-    - Up copyright to 2014
+0.86    - 02 Jan 2015, H.Merijn Brand
+    * Correct handling of very small and very large numbers (Todd Zervas)
+    * Up copyright to 2014
+    * Up copyright to 2015
 
 0.85    - 02 Aug 2013, H.Merijn Brand
     * Fix CPAN complaints
