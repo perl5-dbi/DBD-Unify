@@ -10,7 +10,7 @@ use warnings;
 
 package DBD::Unify;
 
-our $VERSION = "0.86";
+our $VERSION = "0.87";
 
 =head1 NAME
 
@@ -387,25 +387,44 @@ sub primary_key
 	}
 
     unless ($info_cache) {
+	# Note that PRIMRY is *only* set for tables with *ONE* key field
+	# for composite keys this doesn't work :(
 	my $sth = $dbh->prepare (
-	    "select COLUMN_NAME, PRIMRY, OWNR, TABLE_NAME ".
-	    "from   SYS.ACCESSIBLE_COLUMNS") or return;
+	    "select COLUMN_NAME, OWNR, TABLE_NAME ".
+	    "from   SYS.ACCESSIBLE_COLUMNS ".
+	    "where  PRIMRY = 'Y'") or return;
 	$sth->{ChopBlanks} = 1;
 	$sth->execute or return;
 
-	$sth->bind_columns (\my ($fld, $key, $sch, $tbl));
+	$sth->bind_columns (\my ($fld, $sch, $tbl));
 	while ($sth->fetch) {
-	    $key eq "Y" or next;
+	    #warn "* $sch.$tbl.$fld\n";
 	    push @{$info_cache->{key}{$sch}{$tbl}}, $fld;
+	    }
+
+	# For tables with a combined key, we need to analyse the automatic
+	# added HASH_INDEX for those tables
+	if (my $hth = $dbh->prepare (
+		"select   OWNR, TABLE_NAME, COLUMN_NAME, COLUMN_ORD ".
+		"from     SYS.HASH_INDEXES_G ".
+		"where    UNIQUE_SPEC = 'Y' ".
+		"order by OWNR, TABLE_NAME, COLUMN_ORD")) {
+	    $hth->{ChopBlanks} = 1;
+	    $hth->execute or return;
+	    $hth->bind_columns (\my ($sch, $tbl, $fld, $ord));
+	    while ($hth->fetch) {
+		#warn "$ord $sch.$tbl.$fld\n";
+		push @{$info_cache->{key}{$sch}{$tbl}}, $fld;
+		}
 	    }
 	}
     $info_cache && $info_cache->{key} or return;
 
     my @key;
     foreach my $sch (sort keys %{$info_cache->{key}}) {
-	defined $schema && $sch ne $schema and next;
+	defined $schema && lc $sch ne lc $schema and next;
 	foreach my $tbl (sort keys %{$info_cache->{key}{$sch}}) {
-	    defined $table && $tbl ne $table and next;
+	    defined $table && lc $tbl ne lc $table and next;
 	    push @key, @{$info_cache->{key}{$sch}{$tbl}};
 	    }
 	}

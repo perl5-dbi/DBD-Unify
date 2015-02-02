@@ -1,3 +1,6 @@
+0.87    - 02 Feb 2015, H.Merijn Brand
+    - primary_key to return correct info for composite keys
+
 0.86    - 02 Jan 2015, H.Merijn Brand
     * Correct handling of very small and very large numbers (Todd Zervas)
     * Up copyright to 2014
