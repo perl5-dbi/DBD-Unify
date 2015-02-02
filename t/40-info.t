@@ -121,7 +121,9 @@ ok ($sth->finish,	"finish");
 
 ok (1, "-- primary_key");
 is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "DIRS") ],
-			    [ "DIRID" ], "keys");
+			    [ "DIRID" ], "keys - single primary key");
+is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "ADEVLOCKS") ],
+			    [ "OBJID", "OBJTYPE" ], "keys - composite key");
 
 ok (1, "-- column_info");
 ok ($sth = $dbh->column_info (undef, "DBUTIL", "DIRS", "DIRID"), "column_info (foo)");
