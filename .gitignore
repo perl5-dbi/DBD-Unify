@@ -9,6 +9,7 @@
 *.xsi
 blib
 cover_db
+csv
 dbg2macro
 foreign_key.pl
 Makefile
