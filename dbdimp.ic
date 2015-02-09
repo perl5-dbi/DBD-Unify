@@ -81,7 +81,7 @@ extern SQLSTCB *sqlstnm (char    *, int,                         SQLDBGST *);
 extern int      sqltxop (int, int,                               SQLDBGST *);
 extern int      sqlxec  (CRSCB   *,                              SQLDBGST *);
 
-extern char *basename (const char *path);
+extern char    *basename (const char *path);
 
 #define MAX_SQL_LEN	4096
 #define Max(a,b)	((a)>=(b)?(a):(b))

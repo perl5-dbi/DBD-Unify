@@ -73,7 +73,7 @@ test_requires:
     Test::More:          0.90
 recommends:
     perl:                5.020001
-    DBI:                 1.632
+    DBI:                 1.633
 test_recommends:
     Test::More:          1.001014
 resources:

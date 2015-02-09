@@ -386,6 +386,14 @@ sub primary_key
 	return;
 	}
 
+    # Fetching table information from SYS is *extremely* slow
+    # Feel free to add your home-grown caching or prepared knowledge here
+    my @key = eval {
+	require PROCURA::U2000;
+	PROCURA::U2000::get_key ($schema, $table);
+	};
+    @key and return @key;
+
     unless ($info_cache) {
 	# Note that PRIMRY is *only* set for tables with *ONE* key field
 	# for composite keys this doesn't work :(
@@ -420,7 +428,6 @@ sub primary_key
 	}
     $info_cache && $info_cache->{key} or return;
 
-    my @key;
     foreach my $sch (sort keys %{$info_cache->{key}}) {
 	defined $schema && lc $sch ne lc $schema and next;
 	foreach my $tbl (sort keys %{$info_cache->{key}{$sch}}) {
