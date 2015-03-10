@@ -993,7 +993,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 		}
 
 	    case SQLFLOAT:
-		st_dbg (4, imp_sth, "FLOAT %2d.%1d: ", fln, fpr);
+		st_dbg (4, imp_sth, "FLOAT %2d.%1d.%02d: ", fln, fpr, fsc);
 		/* unless looks_like_number (...) carp (...) */
 		fdF = (float)SvNV (value);
 		st_dbg (4, imp_sth, "%8.4f", fdF);
@@ -1010,7 +1010,7 @@ int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
 	    case SQLCURRENCY:
 	    case SQLREAL:
 	    case SQLDBLPREC:
-		st_dbg (4, imp_sth, "DOUBL %1d.%2d: ", fln, fpr);
+		st_dbg (4, imp_sth, "DOUBL %1d.%2d.%02d: ", fln, fpr, fsc);
 		/* unless looks_like_number (...) carp (...) */
 		fdD = (double)SvNV (value);
 		st_dbg (4, imp_sth, "%g", fdD);
@@ -1416,7 +1416,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		break;
 
 	    case SQLFLOAT:
-		st_dbg (4, imp_sth, "FLOAT %2d.%1d: ", fln, fpr);
+		st_dbg (4, imp_sth, "FLOAT %2d.%1d.%02d: ", fln, fpr, fsc);
 		EXEC SQL
 		    GET DESCRIPTOR :o_sql_nm
 		    VALUE :fix
@@ -1426,14 +1426,14 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    return (NULL);
 		(void)sprintf (fdC, "%.*f", fsc, fdF);
 		sv_setpvn (sv, fdC, strlen (fdC));
-	     /* sv_setnv (sv, (double)fdF); */
+		sv_setnv (sv, (double)fdF);
 		st_dbg (4, imp_sth, "%lf", SvNV (sv));
 		break;
 
 	    case SQLCURRENCY:
 	    case SQLREAL:	/* fpr = 32	*/
 	    case SQLDBLPREC:	/* fpr = 64	*/
-		st_dbg (4, imp_sth, "DOUBL %1d.%2d: ", fln, fpr);
+		st_dbg (4, imp_sth, "DOUBL %1d.%02d.%02d: ", fln, fpr, fsc);
 		EXEC SQL
 		    GET DESCRIPTOR :o_sql_nm
 		    VALUE :fix
@@ -1441,9 +1441,16 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
 		    return (NULL);
-		(void)sprintf (fdC, "%#g", fdD);
+		(void)sprintf (fdC, "%f", fdD);
+		{   char *s = strchr (fdC, '.');
+		    if (s) {	/* ".00000" => "", ".125000" => ".125" */
+			int i = strlen (s);
+			while (i > 1 && s[i - 1] == '0') s[--i] = (char)0;
+			if (s[--i] == '.') s[i] = (char)0;
+			}
+		    }
 		sv_setpvn (sv, fdC, strlen (fdC));
-	     /* sv_setnv  (sv, fdD); */
+		sv_setnv  (sv, fdD);
 		st_dbg (4, imp_sth, "%g (%s)", SvNV (sv), fdC);
 		break;
 
@@ -1458,7 +1465,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    return (NULL);
 		(void)sprintf (fdC, "%.*f", fsc, fdF);
 		sv_setpvn (sv, fdC, strlen (fdC));
-	     /* sv_setnv  (sv, (double)fdF); */
+	        sv_setnv  (sv, (double)fdF);
 		st_dbg (4, imp_sth, "%lf (%s)", SvNV (sv), fdC);
 		break;
 
@@ -1473,7 +1480,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		    return (NULL);
 		(void)sprintf (fdC, "%.*lf", fsc, fdD);
 		sv_setpvn (sv, fdC, strlen (fdC));
-	     /* sv_setnv (sv, fdD); */
+		sv_setnv (sv, fdD);
 		st_dbg (4, imp_sth, "%lf", SvNV (sv));
 		break;
 
