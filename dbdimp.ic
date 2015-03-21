@@ -104,7 +104,7 @@ char	i_sql_nm[16];	/* Input  descriptor area	*/
 int	n_sql_st;
 
 int	fix, fln, fic, ftp, fpr, fsc, fnl;
-char	fnm[48], fdC[260];
+char	fnm[48], fdC[512];
 utxtptr	fdB;
 ubinptr	fdX;
 short	fdS;
@@ -1424,8 +1424,10 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
 		    return (NULL);
+#ifdef SET_PV_FOR_NV
 		(void)sprintf (fdC, "%.*f", fsc, fdF);
 		sv_setpvn (sv, fdC, strlen (fdC));
+#endif
 		sv_setnv (sv, (double)fdF);
 		st_dbg (4, imp_sth, "%lf", SvNV (sv));
 		break;
@@ -1441,6 +1443,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
 		    return (NULL);
+#ifdef SET_PV_FOR_NV
 		(void)sprintf (fdC, "%f", fdD);
 		{   char *s = strchr (fdC, '.');
 		    if (s) {	/* ".00000" => "", ".125000" => ".125" */
@@ -1450,6 +1453,7 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 			}
 		    }
 		sv_setpvn (sv, fdC, strlen (fdC));
+#endif
 		sv_setnv  (sv, fdD);
 		st_dbg (4, imp_sth, "%g (%s)", SvNV (sv), fdC);
 		break;
@@ -1463,8 +1467,10 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
 		    return (NULL);
+#ifdef SET_PV_FOR_NV
 		(void)sprintf (fdC, "%.*f", fsc, fdF);
 		sv_setpvn (sv, fdC, strlen (fdC));
+#endif
 	        sv_setnv  (sv, (double)fdF);
 		st_dbg (4, imp_sth, "%lf (%s)", SvNV (sv), fdC);
 		break;
@@ -1478,8 +1484,10 @@ AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
 		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
 		unless (sqlError (sth))
 		    return (NULL);
+#ifdef SET_PV_FOR_NV
 		(void)sprintf (fdC, "%.*lf", fsc, fdD);
 		sv_setpvn (sv, fdC, strlen (fdC));
+#endif
 		sv_setnv (sv, fdD);
 		st_dbg (4, imp_sth, "%lf", SvNV (sv));
 		break;

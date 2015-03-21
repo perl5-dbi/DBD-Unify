@@ -82,8 +82,8 @@ my $sth;
 ok ($sth = $dbh->prepare ("insert into xx values (?,?,?,?,?,?,?,?,05/29/07,02/06/07)"), "ins prepare");
 is ($sth->state, "", "state method");
 foreach my $v ( 10 .. 18 ) {
-    ok ($sth->execute ($v, 1000 + $v, "$v", $v + .125, $v + .25, $v + .50, 1000.4 + $v,
-	'11:31'), "insert $v");
+    ok ($sth->execute ($v, 1000 + $v, "$v", $v + .125, $v + .25, $v + .50,
+	1000.4 + $v, '11:31'), "insert $v");
     is ($sth->state, "", "state method");
     }
 ok ($sth->finish, "finish");
@@ -296,6 +296,24 @@ ok (1, "-- UPDATE THE TABLE, ERROR RETURN");
 { local ( $dbh->{RaiseError}, $dbh->{PrintError} );
   is ($dbh->do ("update xx set xs = null" ), undef, "do update");
   is ($dbh->state, "35000", "state method"); }
+ok ($dbh->rollback, "rollback");
+is ($dbh->state, "", "state method");
+
+my $f = 2.048+292;
+ok (1, "-- UPDATE THE TABLE, DIFFICULT VALUE");
+ok ($sth = $dbh->prepare ("update xx set xf = ? where xs = ?"), "do update positional");
+is ($sth->state, "", "state method");
+is ($sth->execute ($f, 4), 1, "execute");
+is ($sth->state, "", "state method");
+ok ($sth->finish, "finish");
+ok ($sth = $dbh->prepare ("select xf from xx where xs = ?"), "do update positional");
+is ($sth->state, "", "state method");
+is ($sth->execute (4), 1, "execute");
+is ($sth->state, "", "state method");
+ok (abs ($sth->fetchrow_array() - $f) < 10., "check value");	# will buffer_overflow at sprintf() dbdimp.ic:1444
+# sprintf("%f") => 28388618160000018497451294721350227627637411826951871234320765092996540962657090687798569929615618898448093343118153666833848990376985506350729861522020976796582984049006035668421083029084990144422509492799504516639545047046918391325065592732669068207219855370832709299468510957840035427123200.000000
+is ($sth->state, "", "state method");
+ok ($sth->finish, "finish");
 ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
