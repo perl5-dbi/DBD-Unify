@@ -104,7 +104,7 @@ char	i_sql_nm[16];	/* Input  descriptor area	*/
 int	n_sql_st;
 
 int	fix, fln, fic, ftp, fpr, fsc, fnl;
-char	fnm[48], fdC[512];
+char	fnm[48], fdC[1028];
 utxtptr	fdB;
 ubinptr	fdX;
 short	fdS;
