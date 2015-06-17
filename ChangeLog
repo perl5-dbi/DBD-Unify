@@ -1,5 +1,6 @@
 0.88    - 17 Jun 2015, H.Merijn Brand
     * Tested with perl-5.22 on Linux x64 with DS 9.1B
+    * Force sensible date format in tests
 
 0.87    - 27 Mar 2015, H.Merijn Brand
     * primary_key to return correct info for composite keys
