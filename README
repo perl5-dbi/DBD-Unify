@@ -33,6 +33,7 @@ REQUIREMENTS
 
       Perl    Unicode
       ------  -------
+      5.24.0    8.0.0  UCD 8.0.0 released 17 Jun 2015
       5.22.0    7.0.0  UCD 7.0.0 released 16 Jun 2014
       5.20.0    6.3.0  UCD 6.3.0 released 30 Sep 2013
       5.18.0    6.2.0  UCD 6.2.0 released 26 Sep 2012
