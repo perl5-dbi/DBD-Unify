@@ -86,6 +86,7 @@ extern char    *basename (const char *path);
 #define MAX_SQL_LEN	4096
 #define Max(a,b)	((a)>=(b)?(a):(b))
 
+static	char		*pgm = NULL;
 static	byte		*sth_id_on;
 static	short		n_sth_id = 4;	/* Start with max 32 $sth's */
 static	int		dbd_verbose = 0;
@@ -309,9 +310,10 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
 	(void)putenv (statement);
 	}
 
-    {	/* Register program to monitor system, must be done BEFORE connect */
-	char   *pgm = basename (SvPV_nolen (get_sv ("0", 0)));
+    unless (pgm) {
+	/* Register program to monitor system, must be done BEFORE connect */
 	USTATUS ustatus;
+	pgm = basename (SvPV_nolen (get_sv ("0", 0)));
 	(void)uinimsg (pgm, &ustatus);
 	dbg (4, "    After uinimsg ('%s'), status = %ld\n", pgm, ustatus);
 	}
