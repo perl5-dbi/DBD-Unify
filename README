@@ -28,11 +28,12 @@ REQUIREMENTS
     (UTF-8), use perl5.8.4 or up. Note that $LANG will need to match your
     database locale. See the Unicode site for the differences between the
     Unicode standards if you want to know what to expect
-    (http://www.unicode.org/versions/enumeratedversions.html) an
+    (http://www.unicode.org/versions/enumeratedversions.html) and
     http://www.unicode.org/history/publicationdates.html for their age.
 
       Perl    Unicode
       ------  -------
+                9.0.0  UCD 9.0.0 released 21 Jun 2016
       5.24.0    8.0.0  UCD 8.0.0 released 17 Jun 2015
       5.22.0    7.0.0  UCD 7.0.0 released 16 Jun 2014
       5.20.0    6.3.0  UCD 6.3.0 released 30 Sep 2013
