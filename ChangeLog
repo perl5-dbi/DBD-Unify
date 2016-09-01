@@ -1,7 +1,9 @@
-0.88    - 02 Jan 2016, H.Merijn Brand
+0.88    - 01 Sep 2016, H.Merijn Brand
     * Tested with perl-5.22 on Linux x64 with DS 9.1B
     * Force sensible date format in tests
     * It's 2016
+    * Merge META works from other projects
+    * Note release date for Unicode 8.0.0 and 9.0.0
 
 0.87    - 27 Mar 2015, H.Merijn Brand
     * primary_key to return correct info for composite keys
