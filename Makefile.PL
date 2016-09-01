@@ -96,8 +96,7 @@ if ($rv && <ulib/*.s[lo] >) {
     close $mf;
     }
 
-sub CheckUnify
-{
+sub CheckUnify {
     unless (exists $ENV{UNIFY}) {
 	print STDERR
 	    "\$UNIFY not set.  This probably means that you either do not have\n",
@@ -203,8 +202,7 @@ sub CheckUnify
 
     # --- Check development environment
 
-    sub Check ($)
-    {
+    sub Check {
 	my $f = shift;
 	-r "$UNITOP/$f" && -s _ && (-x _ || $f !~ m/^bin/) and return;
 	die "I can't find $f\n".
@@ -232,8 +230,7 @@ sub CheckUnify
 
 package MY;
 
-sub postamble
-{
+sub postamble {
     join "\n" =>
 	DBI::DBD::dbd_postamble (),
 	'',
@@ -274,8 +271,7 @@ sub postamble
 	'';
     } # postamble
 
-sub libscan
-{
+sub libscan {
     my ($self, $path) = @_;
     ($path =~ m/\~$/) ? undef : $path;
     } # libscan

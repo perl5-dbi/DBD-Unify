@@ -95,8 +95,7 @@ $errstr = "";		# holds error string for DBI::errstr
 $state  = "";		# holds SQL state    for DBI::state
 $drh    = undef;	# holds driver handle once initialized
 
-sub driver
-{
+sub driver {
     return $drh if $drh;
     my ($class, $attr) = @_;
 
@@ -123,8 +122,7 @@ package DBD::Unify::dr;
 
 $DBD::Unify::dr::imp_data_size = 0;
 
-sub connect
-{
+sub connect {
     my ($drh, $dbname, $user, $auth) = @_;
 
     unless ($ENV{UNIFY} && -d $ENV{UNIFY} && -x _) {
@@ -155,8 +153,7 @@ sub connect
     $dbh;
     } # connect
 
-sub data_sources
-{
+sub data_sources {
     my ($drh) = @_;
     $drh->{Warn} and
 	Carp::carp "\$drh->data_sources () not defined for Unify\n";
@@ -171,8 +168,7 @@ package DBD::Unify::db;
 
 $DBD::Unify::db::imp_data_size = 0;
 
-sub parse_trace_flag
-{
+sub parse_trace_flag {
     my ($dbh, $name) = @_;
   # print STDERR "# Flags: $name\n";
     return 0x7FFFFF00 if $name eq "DBD";	# $h->trace ("DBD"); -- ALL
@@ -183,15 +179,13 @@ sub parse_trace_flag
     return $dbh->SUPER::parse_trace_flag ($name);
     } # parse_trace_flag
 
-sub type_info_all
-{
+sub type_info_all {
     my ($dbh) = @_;
     require DBD::Unify::TypeInfo;
     return [ @$DBD::Unify::TypeInfo::type_info_all ];
     } # type_info_all
 
-sub get_info
-{
+sub get_info {
     my ($dbh, $info_type) = @_;
     require  DBD::Unify::GetInfo;
     my $v = $DBD::Unify::GetInfo::info{int $info_type};
@@ -199,8 +193,7 @@ sub get_info
     return $v;
     } # get_info
 
-sub private_attribute_info
-{
+sub private_attribute_info {
     return { 
 	dbd_verbose	=> undef,
 
@@ -209,15 +202,13 @@ sub private_attribute_info
 	};
     } # private_attribute_info
 
-sub ping
-{
+sub ping {
     my $dbh = shift;
     $dbh->prepare ("select USER_NAME from SYS.DATABASE_USERS") or return 0;
     return 1;
     } # ping
 
-sub prepare
-{
+sub prepare {
     my ($dbh, $statement, @attribs) = @_;
 
     # Strip comments
@@ -240,14 +231,12 @@ sub prepare
     $sth;
     } # prepare
 
-sub _is_or_like
-{
+sub _is_or_like {
     my ($fld, $val) = @_;
     $val =~ m/[_%]/ ? "$fld like '$val'" : "$fld = '$val'";
     } # _is_or_like
 
-sub table_info
-{
+sub table_info {
     my $dbh = shift;
     my ($catalog, $schema, $table, $type, $attr);
     ref $_[0] or ($catalog, $schema, $table, $type) = splice @_, 0, 4;
@@ -281,8 +270,7 @@ sub table_info
     $sth;
     } # table_info
 
-sub column_info
-{
+sub column_info {
     my $dbh = shift;
     my ($catalog, $schema, $table, $column);
     ref $_[0] or ($catalog, $schema, $table, $column) = splice @_, 0, 4;
@@ -376,8 +364,7 @@ sub column_info
 
 my $info_cache;
 
-sub primary_key
-{
+sub primary_key {
     my $dbh = shift;
     my ($catalog, $schema, $table) = @_;
     if ($catalog) {
@@ -438,8 +425,7 @@ sub primary_key
     return @key;
     } # primary_key
 
-sub quote_identifier
-{
+sub quote_identifier {
     my ($dbh, @arg) = map { defined $_ && $_ ne "" ? $_ : undef } @_;
     return $dbh->SUPER::quote_identifier (@arg);
     } # quote_identifier
@@ -448,8 +434,7 @@ sub quote_identifier
 #            $pk_catalog, $pk_schema, $pk_table,
 #            $fk_catalog, $fk_schema, $fk_table,
 #            \%attr);
-sub foreign_key_info
-{
+sub foreign_key_info {
     my $dbh = shift;
     my ($Pcatalog, $Pschema, $Ptable,
 	$Fcatalog, $Fschema, $Ftable, $attr) = (@_, {});
@@ -505,8 +490,7 @@ sub foreign_key_info
 
 # type = "R" ? references me : references
 # This is to be converted to foreign_key_info
-sub link_info
-{
+sub link_info {
     my $dbh = shift;
     my ($catalog, $schema, $table, $type, $attr);
     ref $_[0] or ($catalog, $schema, $table, $type) = splice @_, 0, 4;
@@ -549,8 +533,7 @@ sub link_info
 
 package DBD::Unify::st;
 
-sub private_attribute_info
-{
+sub private_attribute_info {
     return { 
 	uni_type	=> undef,
 	};
