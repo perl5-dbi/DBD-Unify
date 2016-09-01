@@ -4,6 +4,10 @@
     * It's 2016
     * Merge META works from other projects
     * Note release date for Unicode 8.0.0 and 9.0.0
+    * Make HP-UX ld happy
+    * Fix unchanged rows test
+    * Only register the program once
+    * Activate $dbh only if connect () succeeds
 
 0.87    - 27 Mar 2015, H.Merijn Brand
     * primary_key to return correct info for composite keys
