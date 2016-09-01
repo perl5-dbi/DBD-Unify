@@ -60,18 +60,23 @@ my %wm = (
 
     LINKTYPE      =>   "dynamic",
     INC           =>   "-I$UNITOP -I$UNITOP/include -I\$(DBI_INSTARCH_DIR)",
-    OBJECT        =>   "Unify\$(OBJ_EXT) dbdimp\$(OBJ_EXT)",
+    OBJECT        => ( join " " =>
+			"Unify\$(OBJ_EXT)",
+			"dbdimp\$(OBJ_EXT)",
+			$ULIBS,
+			$ULDOPTS, {
+			    hpux	=> "",
+			    aix		=> "-lm",
+			    dec_osf	=> "-lxnet",
+			    }->{$^O} || ""),
 
     depend        => { "dbdimp\$(OBJ_EXT)" => "dbdimp.c Unify.h",
 		       "Unify\$(OBJ_EXT)"  => "Unify.h",
 		       },
 
-    dynamic_lib   => { OTHERLDFLAGS => " $ULIBS \$(COMPOBJS) " .
-					    "-L$UNIFY " .(
-					    { hpux	=> "",
-					      aix	=> "-lm",
-					      dec_osf	=> "-lxnet",
-					      }->{$^O}||"") . $ULDOPTS,
+    dynamic_lib   => { OTHERLDFLAGS => join " " => "",
+			"-L$UNIFY",
+			"\$(COMPOBJS)",
 		       },
     macro         => { EPP    => "$UNITOP/bin/EPP",
 		       EPPOPT => "",
