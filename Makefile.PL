@@ -178,8 +178,8 @@ sub CheckUnify {
 		    (my $sl = "lib$a") =~ s/\.a$/.$dlext/o;
 		    $sl =~ s/^liblib/lib/;
 		    -f $sl and next;	# Already done;
-		    mkdir "_a_SL" or die "Cannot create temp dir for conversion: $!";
-		    chdir "_a_SL" or die "Cannot chdir to temp dir: $!";
+		    mkdir "_a_SL", 0775 or die "Cannot create temp dir for conversion: $!";
+		    chdir "_a_SL", 0775 or die "Cannot chdir to temp dir: $!";
 		    print STDERR "  Converting $a ...\n";
 		    system "ar x ../$a";
 		    system "ld -b +s -o ../$sl *.o";
