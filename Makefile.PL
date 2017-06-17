@@ -82,6 +82,7 @@ my %wm = (
 		       EPPOPT => "",
 		       CC     => ($^O eq "aix" ? "env UPPNAME='cc -E' " : "")
 		       			. "$UNITOP/bin/ucc",
+		       TARFLAGS       => "--format=ustar -c -v -f",
 		       SELINUXENABLED => "/usr/sbin/selinuxenabled",
 		       },
     );
