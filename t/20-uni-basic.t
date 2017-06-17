@@ -5,7 +5,8 @@ use warnings;
 
 my ($pid, $p_in, $p_out);
 BEGIN {
-    delete @ENV{qw( LC_ALL LANG BOOLFMT DATEFMT )};
+    delete @ENV{qw( BOOLFMT DATEFMT )};
+    #delete @ENV{qw( LC_ALL LANG )};
     $ENV{DATEFMT} = "MM/DD/YY";
 
     pipe ($p_in, $p_out);
