@@ -270,6 +270,140 @@ sub table_info {
     $sth;
     } # table_info
 
+{   my (%cache, @links, $pki);
+
+    sub _sys_clear_cache {
+	%cache = ();
+	@links = ();
+	$pki   = undef;
+	} # _sys_clear_cache
+    *DBI::db::uni_clear_cache = \&_sys_clear_cache;
+
+    sub _set_info_cache {
+	my $dbh = shift;
+
+	keys %cache and return;
+
+	my $sth = $dbh->prepare (join " " =>
+	    "select OWNR, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH,",
+		   "DATA_SCALE, DISPLAY_LENGTH, DISPLAY_SCALE, NULLABLE,",
+		   "RDNLY, PRIMRY, UNIQ, LOGGED, ORDERED",
+	    "from   SYS.ACCESSIBLE_COLUMNS") or return;
+	$sth->{ChopBlanks} = 1;
+	$sth->execute or return;
+	my %sac;
+	my @fld = @{$sth->{NAME_lc}};
+	$sth->bind_columns (\@sac{@fld});
+	while ($sth->fetch) {
+	    $cache{$sac{ownr} || ""}
+		  {$sac{table_name}}
+		  {$sac{column_name}} = [ @sac{@fld} ];
+	    }
+	} # _set_info_cache
+
+    sub _set_link_cache {
+	my $dbh = shift;
+
+	@links and return;
+
+	my $sth = $dbh->prepare (join " " =>
+	    "select INDEX_NAME,",
+		   "REFERENCED_OWNER,  REFERENCED_TABLE,  REFERENCED_COLUMN,",
+		   "REFERENCING_OWNER, REFERENCING_TABLE, REFERENCING_COLUMN,",
+		   "REFERENCING_COLUMN_ORD",
+	    "from   SYS.LINK_INDEXES");
+	$sth or return;
+	$sth->{ChopBlanks} = 1;
+	$sth->execute or return;
+	my %sli;
+	my @fld = @{$sth->{NAME_lc}};
+	$sth->bind_columns (\@sli{@fld});
+	while ($sth->fetch) {
+	    push @links, { %sli };
+	    }
+	} # _set_link_cache
+
+    sub _sys_column_info {
+	my ($dbh, $sch, $tbl, $col) = @_;
+
+	_set_info_cache ($dbh);
+
+	my @ci;
+	foreach my $s (sort keys %cache) {
+	    $sch and lc $sch ne lc $s and next;
+	    foreach my $t (sort keys %{$cache{$s}}) {
+		$tbl and lc $tbl ne lc $t and next;
+		foreach my $c (sort keys %{$cache{$s}{$t}}) {
+		    $col and lc $col ne lc $c and next;
+		    push @ci, $cache{$s}{$t}{$c};
+		    }
+		}
+	    }
+	@ci;
+	}
+
+    sub _sys_link_info {
+	my $dbh = shift;
+	my ($Pcatalog, $Pschema, $Ptable,
+	    $Fcatalog, $Fschema, $Ftable, $attr) = (@_, {});
+
+	_set_link_cache ($dbh);
+
+	my @fki;
+	for (@links) {
+	    $Pschema and lc $_->{referenced_owner}  ne lc $Pschema and next;
+	    $Ptable  and lc $_->{referenced_table}  ne lc $Ptable  and next;
+	    $Fschema and lc $_->{referencing_owner} ne lc $Fschema and next;
+	    $Ftable  and lc $_->{referencing_table} ne lc $Ftable  and next;
+
+	    push @fki, [
+		undef, @{$_}{qw( referenced_owner  referenced_table  referenced_column  )},
+		undef, @{$_}{qw( referencing_owner referencing_table referencing_column )},
+		$_->{referencing_column_ord} + 1,
+		undef, undef,
+		$_->{index_name}, undef,
+		undef, undef
+		];
+	    }
+	@fki;
+	} # _sys_link_info
+
+    sub _sys_primary_keys {
+	my $dbh = shift;
+	unless ($pki) {
+	    _set_info_cache ($dbh);
+
+	    # Note that PRIMRY is *only* set for tables with *ONE* key field
+	    # for composite keys this doesn't work :(
+	    foreach my $s (sort keys %cache) {
+		foreach my $t (sort keys %{$cache{$s}}) {
+		    foreach my $c (sort keys %{$cache{$s}{$t}}) {
+			$cache{$s}{$t}{$c}[-4] eq "Y" or next;
+			push @{$pki->{key}{$s}{$t}}, $c;
+			}
+		    }
+		}
+
+	    # For tables with a combined key, we need to analyse the automatic
+	    # added HASH_INDEX for those tables
+	    if (my $hth = $dbh->prepare (join " " =>
+		    "select   OWNR, TABLE_NAME, COLUMN_NAME, COLUMN_ORD",
+		    "from     SYS.HASH_INDEXES_G",
+		    "where    UNIQUE_SPEC = 'Y'",
+		    "order by OWNR, TABLE_NAME, COLUMN_ORD")) {
+		$hth->{ChopBlanks} = 1;
+		$hth->execute or return;
+		$hth->bind_columns (\my ($sch, $tbl, $fld, $ord));
+		while ($hth->fetch) {
+		    #warn "$ord $sch.$tbl.$fld\n";
+		    push @{$pki->{key}{$sch}{$tbl}}, $fld;
+		    }
+		}
+	    }
+	$pki;
+	} # _sys_primary_keys
+    }
+
 sub column_info {
     my $dbh = shift;
     my ($catalog, $schema, $table, $column);
@@ -279,21 +413,11 @@ sub column_info {
 	    Carp::carp "Unify does not support catalogs in column_info\n";
 	return;
 	}
-    my @where;
-    $schema and push @where, "OWNR        like '$schema'";
-    $table  and push @where, "TABLE_NAME  like '$table'";
-    $column and push @where, "COLUMN_NAME like '$column'";
-    local $" = " and ";
-    my $where = @where ? " where @where" : "";
-    my $sth = $dbh->prepare (
-	"select OWNR, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH, DATA_SCALE, DISPLAY_LENGTH, DISPLAY_SCALE, NULLABLE, RDNLY, PRIMRY, UNIQ, LOGGED, ORDERED ".
-	"from   SYS.ACCESSIBLE_COLUMNS ".
-	$where);
-    $sth or return;
-    $sth->execute;
+    my @ci = _sys_column_info ($dbh, $schema, $table, $column) or return;
     my @fki;
     require DBD::Unify::TypeInfo;
-    while (my @sli = $sth->fetchrow_array) {
+    for (@ci) {
+	my @sli = @$_;
 	my $uni_type_name = $sli[3];
 	   $uni_type_name =~ s/^CHARACTER$/CHAR/;
 	   $uni_type_name =~ s/^DOUBLE$/DOUBLE PRECISION/;
@@ -330,8 +454,6 @@ sub column_info {
 	    @sli[6,7,9..13],
 	    ];
 	}
-    $sth->finish;
-    $sth = undef;
 
     my @col_name = qw(
 	TABLE_CAT TABLE_SCHEM TABLE_NAME
@@ -352,17 +474,15 @@ sub column_info {
 	uni_uniq uni_logged uni_ordered
 	);
     DBI->connect ("dbi:Sponge:", "", "", {
-	RaiseError       => $sth->{RaiseError},
-	PrintError       => $sth->{PrintError},
+	RaiseError       => $dbh->{RaiseError},
+	PrintError       => $dbh->{PrintError},
 	ChopBlanks       => 1,
-	FetchHashKeyName => $sth->{FetchHashKeyName} || "NAME",
-	})->prepare ("select column_info $where", {
+	FetchHashKeyName => $dbh->{FetchHashKeyName} || "NAME",
+	})->prepare ("select column_info", {
 	    rows => \@fki,
 	    NAME => \@col_name,
 	    });
     } # column_info
-
-my $info_cache;
 
 sub primary_key {
     my $dbh = shift;
@@ -381,45 +501,14 @@ sub primary_key {
 	};
     @key and return @key;
 
-    unless ($info_cache) {
-	# Note that PRIMRY is *only* set for tables with *ONE* key field
-	# for composite keys this doesn't work :(
-	my $sth = $dbh->prepare (
-	    "select COLUMN_NAME, OWNR, TABLE_NAME ".
-	    "from   SYS.ACCESSIBLE_COLUMNS ".
-	    "where  PRIMRY = 'Y'") or return;
-	$sth->{ChopBlanks} = 1;
-	$sth->execute or return;
+    my $pki_cache = _sys_primary_keys ($dbh);
+    $pki_cache && $pki_cache->{key} or return;
 
-	$sth->bind_columns (\my ($fld, $sch, $tbl));
-	while ($sth->fetch) {
-	    #warn "* $sch.$tbl.$fld\n";
-	    push @{$info_cache->{key}{$sch}{$tbl}}, $fld;
-	    }
-
-	# For tables with a combined key, we need to analyse the automatic
-	# added HASH_INDEX for those tables
-	if (my $hth = $dbh->prepare (
-		"select   OWNR, TABLE_NAME, COLUMN_NAME, COLUMN_ORD ".
-		"from     SYS.HASH_INDEXES_G ".
-		"where    UNIQUE_SPEC = 'Y' ".
-		"order by OWNR, TABLE_NAME, COLUMN_ORD")) {
-	    $hth->{ChopBlanks} = 1;
-	    $hth->execute or return;
-	    $hth->bind_columns (\my ($sch, $tbl, $fld, $ord));
-	    while ($hth->fetch) {
-		#warn "$ord $sch.$tbl.$fld\n";
-		push @{$info_cache->{key}{$sch}{$tbl}}, $fld;
-		}
-	    }
-	}
-    $info_cache && $info_cache->{key} or return;
-
-    foreach my $sch (sort keys %{$info_cache->{key}}) {
+    foreach my $sch (sort keys %{$pki_cache->{key}}) {
 	defined $schema && lc $sch ne lc $schema and next;
-	foreach my $tbl (sort keys %{$info_cache->{key}{$sch}}) {
+	foreach my $tbl (sort keys %{$pki_cache->{key}{$sch}}) {
 	    defined $table && lc $tbl ne lc $table and next;
-	    push @key, @{$info_cache->{key}{$sch}{$tbl}};
+	    push @key, @{$pki_cache->{key}{$sch}{$tbl}};
 	    }
 	}
     return @key;
@@ -439,35 +528,9 @@ sub foreign_key_info {
     my ($Pcatalog, $Pschema, $Ptable,
 	$Fcatalog, $Fschema, $Ftable, $attr) = (@_, {});
 
-    my @where;
-    $Pschema and push @where, "REFERENCED_OWNER  = '$Pschema'";
-    $Ptable  and push @where, "REFERENCED_TABLE  = '$Ptable'";
-    $Fschema and push @where, "REFERENCING_OWNER = '$Fschema'";
-    $Ftable  and push @where, "REFERENCING_TABLE = '$Ftable'";
-
-    my $where = @where ? "where " . join " and " => @where : "";
-    my $sth = $dbh->prepare (join "\n",
-	"select INDEX_NAME, ",
-	"       REFERENCED_OWNER,  REFERENCED_TABLE,  REFERENCED_COLUMN,",
-	"       REFERENCING_OWNER, REFERENCING_TABLE, REFERENCING_COLUMN,",
-	"       REFERENCING_COLUMN_ORD",
-	"from   SYS.LINK_INDEXES",
-	$where);
-    $sth or return;
-    $sth->{ChopBlanks} = 1;
-    $sth->execute or return;
-    my @fki;
-    while (my @sli = $sth->fetchrow_array) {
-	push @fki, [
-	    undef, @sli[1..3],
-	    undef, @sli[4..6], $sli[7] + 1,
-	    undef, undef,
-	    $sli[0], undef,
-	    undef, undef
-	    ];
-	}
-    $sth->finish;
-    undef $sth;
+    my @fki = _sys_link_info ($dbh,
+	    $Pcatalog, $Pschema, $Ptable,
+	    $Fcatalog, $Fschema, $Ftable, $attr);
 
     my @col_name = qw(
 	UK_TABLE_CAT UK_TABLE_SCHEM UK_TABLE_NAME UK_COLUMN_NAME
@@ -478,11 +541,11 @@ sub foreign_key_info {
 	FK_NAME UK_NAME
 	DEFERABILITY UNIQUE_OR_PRIMARY );
     DBI->connect ("dbi:Sponge:", "", "", {
-	RaiseError       => $sth->{RaiseError},
-	PrintError       => $sth->{PrintError},
+	RaiseError       => $dbh->{RaiseError},
+	PrintError       => $dbh->{PrintError},
 	ChopBlanks       => 1,
-	FetchHashKeyName => $sth->{FetchHashKeyName} || "NAME",
-	})->prepare ("select link_info $where", {
+	FetchHashKeyName => $dbh->{FetchHashKeyName} || "NAME",
+	})->prepare ("select link_info", {
 	    rows => \@fki,
 	    NAME => \@col_name,
 	    });
@@ -729,6 +792,8 @@ alias C<uni_verbose>) level. See "trace" below.
 
 =item primary_key ($$$)
 
+=item uni_clear_cache ()
+
 Note that these five get their info by accessing the C<SYS> schema which
 is relatively extremely slow. e.g. Getting all the primary keys might well
 run into seconds, rather than milliseconds.
@@ -775,6 +840,12 @@ types C<currency> and C<huge integer>.
   smallint            SMALLINT          5    2 NUMERIC (4)
   text                TEXT             -1   -9 TEXT
   time                TIME             10   -7 TIME
+
+Currently the driver tries to cache information about the schema as it
+is required. When there are fields added, removed, or altered, references
+are added or removed or primary keys or unique hashes are added or removed
+it is wise to call C<< $dbh->uni_clear_cache >> to ensure that the info
+on next inquiries will be up to date.
 
 =item ping
 
