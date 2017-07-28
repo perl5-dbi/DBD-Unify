@@ -1,11 +1,14 @@
-personal_ws-1.1 en 14
+personal_ws-1.1 en 17
 auth
+destoffset
 AutoCommit
 ChopBlanks
 DBD
 DBI
 dbi
 lang
+len
+maxlen
 ODBC
 PrintError
 PV

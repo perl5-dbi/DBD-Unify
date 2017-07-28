@@ -7,6 +7,7 @@
 *.tbz
 *.tgz
 *.xsi
+.perlcriticrc
 blib
 cover_db
 csv

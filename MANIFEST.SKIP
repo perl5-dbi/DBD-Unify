@@ -6,6 +6,7 @@
 \.tar\.gz$
 \.git
 \.xsi$
+\.perlcriticrc
 blib/
 csv/
 cover_db/

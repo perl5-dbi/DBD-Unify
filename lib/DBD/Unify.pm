@@ -3,7 +3,7 @@
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
 
-require 5.006;
+use 5.8.4;
 
 use strict;
 use warnings;
@@ -89,11 +89,10 @@ use vars qw(@ISA);
 @ISA = qw(DynaLoader);
 bootstrap DBD::Unify $VERSION;
 
-use vars qw($err $errstr $state $drh);
-$err    = 0;		# holds error code   for DBI::err
-$errstr = "";		# holds error string for DBI::errstr
-$state  = "";		# holds SQL state    for DBI::state
-$drh    = undef;	# holds driver handle once initialized
+our $err    = 0;	# holds error code   for DBI::err
+our $errstr = "";	# holds error string for DBI::errstr
+our $state  = "";	# holds SQL state    for DBI::state
+our $drh    = undef;	# holds driver handle once initialized
 
 sub driver {
     return $drh if $drh;
@@ -123,19 +122,19 @@ package DBD::Unify::dr;
 $DBD::Unify::dr::imp_data_size = 0;
 
 sub connect {
-    my ($drh, $dbname, $user, $auth) = @_;
+    my ($dr_h, $dbname, $user, $auth) = @_;
 
     unless ($ENV{UNIFY} && -d $ENV{UNIFY} && -x _) {
-	$drh->{Warn} and
+	$dr_h->{Warn} and
 	    Carp::croak "\$UNIFY not set or invalid. UNIFY may fail\n";
 	}
     # More checks here if wanted ...
 
-    $user = "" unless defined $user;
-    $auth = "" unless defined $auth;
+    defined $user or $user = "";
+    defined $auth or $auth = "";
 
     # create a 'blank' dbh
-    my $dbh = DBI::_new_dbh ($drh, {
+    my $dbh = DBI::_new_dbh ($dr_h, {
 	Name          => $dbname,
 	USER          => $user,
 	CURRENT_USER  => $user,
@@ -154,9 +153,9 @@ sub connect {
     } # connect
 
 sub data_sources {
-    my ($drh) = @_;
-    $drh->{Warn} and
-	Carp::carp "\$drh->data_sources () not defined for Unify\n";
+    my ($dr_h) = @_;
+    $dr_h->{Warn} and
+	Carp::carp "\$dr_h->data_sources () not defined for Unify\n";
     "";
     } # data_sources
 
@@ -194,7 +193,7 @@ sub get_info {
     } # get_info
 
 sub private_attribute_info {
-    return { 
+    return {
 	dbd_verbose	=> undef,
 
 	uni_verbose	=> undef,
@@ -362,7 +361,7 @@ sub table_info {
 		$_->{referencing_column_ord} + 1,
 		undef, undef,
 		$_->{index_name}, undef,
-		undef, undef
+		undef, undef,
 		];
 	    }
 	@fki;
@@ -597,7 +596,7 @@ sub link_info {
 package DBD::Unify::st;
 
 sub private_attribute_info {
-    return { 
+    return {
 	uni_type	=> undef,
 	};
     } # private_attribute_info
@@ -605,6 +604,7 @@ sub private_attribute_info {
 1;
 
 ####### End ###################################################################
+__END__
 
 =head1 DESCRIPTION
 
@@ -765,7 +765,7 @@ Just here for DBI. No use in telling the end-user what to do with it :)
 =item data_sources
 
 There is no way for Unify to tell what data sources might be available.
-There is no central files (like /etc/oratab for Oracle) that lists all
+There is no central files (like F</etc/oratab> for Oracle) that lists all
 available sources, so this method will always return an empty list.
 
 =item quote_identifier
@@ -967,7 +967,7 @@ No messages (yet) set to level 8 and up.
 
 =back
 
-=item int  dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
+=item int  dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value, IV sql_type, SV *attribs, int is_inout, IV maxlen)
 
 =item SV  *dbd_db_FETCH_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
 
@@ -981,7 +981,7 @@ No messages (yet) set to level 8 and up.
 
 =item int  dbd_db_do (SV *dbh, char *statement)
 
-=item int  dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
+=item int  dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pwd)
 
 =item int  dbd_db_rollback (SV *dbh, imp_dbh_t *imp_dbh)
 
@@ -997,7 +997,7 @@ No messages (yet) set to level 8 and up.
 
 =item int  dbd_st_STORE_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv)
 
-=item int  dbd_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field,
+=item int  dbd_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field, long offset, long len, SV *destrv, long destoffset)
 
 =item void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)
 
@@ -1060,7 +1060,7 @@ documentation (DBD-Oracle is probably the most complete), the
 comp.lang.perl.modules newsgroup and the dbi-users mailing list
 (mailto:dbi-users-help@perl.org)
 
-=head1 AUTHORS
+=head1 AUTHOR
 
 DBI/DBD was developed by Tim Bunce, who also developed the DBD::Oracle.
 

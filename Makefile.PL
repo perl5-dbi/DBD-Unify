@@ -92,6 +92,22 @@ $Config{myarchname} eq "ia64-hpux"	and delete $wm{macro}{CC};
 
 my $rv = WriteMakefile (%wm);
 
+# perlcriticrc uses Config::Tiny, which does not support nesting
+if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
+    open my $fh, ">", ".perlcriticrc";
+    print $fh do {
+	local (@ARGV, $/) = ("$ENV{HOME}/.perlcriticrc"); <> };
+    print $fh join "\n" => "",
+	"[-Documentation::RequireLinkedURLs]\n", # L<DBI|http://...] requires 5.12
+	"[-Modules::ProhibitMultiplePackages]\n",
+	"[-Modules::RequireExplicitPackage]\n",			# use 5.8.0
+	"[-Subroutines::ProhibitBuiltinHomonyms]\n",		# connect
+	"[-Subroutines::ProtectPrivateSubs]\n",
+	"[-ValuesAndExpressions::ProhibitVersionStrings]\n",	# use 5.8.0
+	"";
+    close $fh;
+    }
+
 if ($rv && <ulib/*.s[lo] >) {
     open my $mf, "<Makefile" or die "Cannot read Makefile: $!\n";
     my @MF = <$mf>;
@@ -237,6 +253,7 @@ sub CheckUnify {
 package MY;
 
 sub postamble {
+    my @pc = -f ".perlcriticrc" ? ("\tperlcritic -1 Unify.pm") : ();
     join "\n" =>
 	DBI::DBD::dbd_postamble (),
 	'',
@@ -268,6 +285,7 @@ sub postamble {
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	@pc,
 	'',
 	'linkext::',
 	'	if [ -x $(SELINUXENABLED) ] && $(SELINUXENABLED); then chcon -t textrel_shlib_t $(INST_ARCHLIB)/auto/$(FULLEXT)/$(DLBASE).so; fi',
