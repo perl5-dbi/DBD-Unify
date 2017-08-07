@@ -376,7 +376,7 @@ static char *u_err (USTATUS s) {
 
    %db{AUTH}[4] = {	= $db{s}{"SYS"}
 	AID		=> 4,
-	AUTH		=> "SYS,
+	NAME		=> "SYS,
 
 	TABLES		=> [ 77, ...],
 	],
@@ -429,8 +429,6 @@ static int _db_dict (int refresh) {
     AV    **A_tbl;
     char   *A_typ[128];
 
-    warn ("Internal function called\n");
-
     if (h_dd) {
 	unless (refresh)
 	    return;
@@ -447,8 +445,6 @@ static int _db_dict (int refresh) {
 	warn ("Cannot start a transaction: %s\n", u_err (status));
 	return (0);
 	}
-
-    warn ("I got DBID %d for PID %d TXID %d\n", dbid, pid, txid);
 
     h_dd  = newHV ();
     a_typ = newAV ();
@@ -524,7 +520,7 @@ static int _db_dict (int refresh) {
 
 		/* warn ("AUTH %d %s\n", aid, al[i].authnm); */
 		(void)hv_store (h_dba, "AID",    3, newSViv (aid),             0);
-		(void)hv_store (h_dba, "AUTH",   4, newSVpv (al[i].authnm, 0), 0);
+		(void)hv_store (h_dba, "NAME",   4, newSVpv (al[i].authnm, 0), 0);
 		(void)hv_store (h_dba, "TABLES", 6, newRV_noinc ((SV *)a_tbl), 0);
 
 		(void)av_store (a_sch, aid, newRV_noinc ((SV *)h_dba));
@@ -543,7 +539,6 @@ static int _db_dict (int refresh) {
 	UTBLINF *tinfl = NULL;
 	USTATUS *tsl   = NULL;
 
-	warn ("ualltbl returned %d table entries. Status: %d\n", n, status);
 	if ((tinfl = (UTBLINF *)calloc (n, sizeof (UTBLINF))) != NULL &&
 	    (tsl   = (USTATUS *)calloc (n, sizeof (USTATUS))) != NULL &&
 	     uinftbl (txid, n, tidl, UALLINFO, tinfl, tsl, &status)) {
@@ -651,6 +646,7 @@ static int _db_dict (int refresh) {
 	}
     free (A_tbl);
 
+    /* Committing and disconnecting disables all subsequent actions
     unless (ucmttx (txid, &status))
 	warn ("Cannot commit transaction: %s\n", u_err (status));
 
@@ -658,6 +654,7 @@ static int _db_dict (int refresh) {
 	warn ("Cannot close database connection: %s\n", u_err (status));
 	return (0);
 	}
+    */
 
     return (0);
     } /* _db_dict */
