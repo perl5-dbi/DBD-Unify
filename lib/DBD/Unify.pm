@@ -1013,6 +1013,83 @@ No messages (yet) set to level 8 and up.
 
 =back
 
+=head2 DBD specific functions
+
+=head3 db_dict
+
+Query the data dictionary through HLI calls:
+
+ my $dd = $dbh->func ("db_dict");
+
+This function returns the data dictionary of the database in a hashref. The
+dictionary contains all information accessible to the current user and will
+likely contain all accessible schema's, tables, columns, and simple links
+(referential integrity).
+
+The dictionary will have 4 entries
+
+=over 2
+
+=item TYPE
+X<TYPE>
+
+ my $types = $dd->{TYPE};
+
+This holds a list with the native type descriptions of the C<TYPE> entries
+in the C<COLUMN> hashes.
+
+ say $dd->{TYPE}[3]; # DATE
+
+=item AUTH
+X<AUTH>
+
+ my $schemas = $dd->{AUTH};
+
+This will return a reference to a list of accessible schemas. The schemas
+that are not accessible or do not exist (anymore) have an C<undef> entry.
+
+Each auth entry is undef or a hashref with three entries:
+
+=over 2
+
+=item AID
+X<AID>
+
+Holds the AUTH ID of the schema (INTEGER). In the current implementation,
+the C<AID> entry is identical to the index in the list
+
+ say $schemas->[3]{AID};
+ # 3
+
+=item NAME
+X<NAME>
+
+Holds the name of the schema (STRING)
+
+ say $schemas->[3]{NAME};
+ # DBUTIL
+
+=item TABLES
+X<TABLES>
+
+Holds the list of accesible table ID's in this schema (ARRAY of INTEGERs)
+
+ say join ", " => $schemas->[3]{TABLES};
+ # 43, 45, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61
+
+=back
+
+=item TABLE
+X<TABLE>
+
+=item COLUMN
+X<COLUMN>
+
+=back
+
+Combining all of these into describing a table, might look like done in
+F<examples/describe.pl>
+
 =head1 TODO
 
 As this module is probably far from complete, so will the TODO list most
