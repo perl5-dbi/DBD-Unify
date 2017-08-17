@@ -648,7 +648,8 @@ static void _db_dict (int refresh) {
 			(void)hv_store (h_dbc, "TYPE",     4, newSViv (ctyp),                     0);
 			(void)hv_store (h_dbc, "LENGTH",   6, newSViv (ci->collen),               0);
 			(void)hv_store (h_dbc, "SCALE",    5, newSViv (ci->colscl),               0);
-			(void)hv_store (h_dbc, "NULLABLE", 8, newSViv (cops & DB_NONULL ? 1 : 0), 0);
+			(void)hv_store (h_dbc, "NULLABLE", 8, newSViv (cops &
+								(DB_NONULL | DB_COLKEY) ? 0 : 1), 0);
 			(void)hv_store (h_dbc, "DSP_LEN",  7, newSViv (ci->dsplen),               0);
 			(void)hv_store (h_dbc, "DSP_SCL",  7, newSViv (ci->dspscl),               0);
 			(void)hv_store (h_dbc, "DSP_PICT", 8, newSVpv (ci->dsppict, 0),           0);
