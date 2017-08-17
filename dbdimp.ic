@@ -416,14 +416,16 @@ static char *u_err (USTATUS s) {
 
  */
 
-static int _db_dict (int refresh) {
+static void _db_dict (int refresh) {
     int     n, err;
     pid_t   pid;
     UDBID   dbid;
     UAID   *aidl;
+    ULID   *lidl;
     UTID   *tidl;
     UTXID   txid;
     USTATUS status = -123;
+    UCID   *a_lnk;
     AV     *a_typ;
     AV     *a_sch;
     AV    **A_tbl;
@@ -439,11 +441,11 @@ static int _db_dict (int refresh) {
 
     unless (uopndb ((char *)0, DB_NOLOCK, &dbid, &status)) {
 	warn ("Cannot connect to database: %s\n", u_err (status));
-	return (0);
+	return;
 	}
     unless (sqlebtx (&txid, &status)) {
 	warn ("Cannot start a transaction: %s\n", u_err (status));
-	return (0);
+	return;
 	}
 
     h_dd  = newHV ();
@@ -502,6 +504,7 @@ static int _db_dict (int refresh) {
 
     (void)hv_store (h_dd, "TYPE", 4, newRV_noinc ((SV *)a_typ), 0);
 
+    /* Fetch SCHEMA's (AUTH) */
     if (uallath (txid, USLCK, &n, &aidl, &status)) {
 	UATHINF *al  = (UATHINF *)calloc (n, sizeof (UATHINF));
 	USTATUS *asl = (USTATUS *)calloc (n, sizeof (USTATUS));
@@ -529,6 +532,31 @@ static int _db_dict (int refresh) {
 	    }
 	if (al)  free (al);
 	if (asl) free (asl);
+	}
+
+    /* Fetch links: only one-to-one links are supported */
+    if (ualllnk (txid, UNULLTID, USLCK, &n, &lidl, &status)) {
+	ULNKINF *ll  = (ULNKINF *)calloc (n, sizeof (ULNKINF));
+	USTATUS *lsl = (USTATUS *)calloc (n, sizeof (USTATUS));
+	if (ll && lsl && uinflnk (txid, n, lidl, UALLINFO, ll, lsl, &status)) {
+	    int i, j, x = 0;
+	    for (i = 0; i < n; i++) {
+		for (j = 0; j < ll[i].count; j++) {
+		    if (ll[i].cloc[j] > x) x = ll[i].cloc[j];
+		    }
+		}
+	    a_lnk = (UCID *)calloc (x + 1, sizeof (UCID));
+	    a_lnk[0] = x;
+	    for (i = 0; i < n; i++) {
+		if (ll[i].count == 1)
+		    a_lnk[ll[i].cloc[0]] = ll[i].ploc[0];
+		}
+	    }
+	if (ll)  free (ll);
+	if (lsl) free (lsl);
+	}
+    else {
+	warn ("Call to fetch all links failed with code %d: %s\n", err, u_err (status));
 	}
 
     err = ualltbl (txid, UNULLAID, USLCK, &n, &tidl, &status);
@@ -628,7 +656,7 @@ static int _db_dict (int refresh) {
 			(void)hv_store (h_dbc, "PKEY",     4, newSViv (cops & DB_COLKEY ? 1 : 0), 0);
 			(void)hv_store (h_dbc, "RDONLY",   6, newSViv (cops & DB_RDONLY ? 1 : 0), 0);
 			(void)hv_store (h_dbc, "UNIQUE",   6, newSViv (cops & DB_UNIQUE ? 1 : 0), 0);
-			(void)hv_store (h_dbc, "LINK",     4, newSViv (-1),                       0);
+			(void)hv_store (h_dbc, "LINK",     4, newSViv (a_lnk && cid <= a_lnk[0] && a_lnk[cid] > 0 ? a_lnk[cid] : -1),                       0);
 			(void)av_store (a_fld, cid, newRV_noinc ((SV *)h_dbc));
 
 			if (cnames) free (cnames);
@@ -645,6 +673,7 @@ static int _db_dict (int refresh) {
 	free (tidl);
 	}
     free (A_tbl);
+    if (a_lnk) free (a_lnk);
 
     /* Committing and disconnecting disables all subsequent actions
     unless (ucmttx (txid, &status))
@@ -652,11 +681,9 @@ static int _db_dict (int refresh) {
 
     unless (uclsdb (dbid, DB_NOLOCK, &status)) {
 	warn ("Cannot close database connection: %s\n", u_err (status));
-	return (0);
+	return;
 	}
     */
-
-    return (0);
     } /* _db_dict */
 
 void dbd_st_destroy (SV *, imp_sth_t *);	/* Forward ref */
@@ -761,7 +788,7 @@ int dbd_db_dict (SV *dbh, int reload) {
     D_imp_dbh (dbh);
 
     dbg (3, "DBD::Unify::db_dict (%d)\n", reload);
-    (void)_db_dict (reload);
+    _db_dict (reload);
     sv_setsv (DEFSV, newRV_noinc ((SV *)h_dd)); /* $_ = \%db */
     return (1);
     } /* dbd_db_dict */

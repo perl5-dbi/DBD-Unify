@@ -43,13 +43,25 @@ is (scalar @utblid, scalar @utbl, "All tables in schema available in TABLE");
 is_deeply ([ sort { $a <=> $b } @utblid ],
            [ sort { $a <=> $b } map { $_->{TID} } @utbl ], "TID's match");
 
-ok (my $dirs = $dtbl->[$tbl{"DBUTIL.DIRS"}], "Table info for DBUTIL.DIRS");
-
+ok (my $dirs = $dtbl->[$tbl{"DBUTIL.DIRS"}],   "Table info for DBUTIL.DIRS");
 my $sth = $dbh->prepare ("select count (*) from DBUTIL.DIRS");
 $sth->execute;
 my ($cnt) = $sth->fetchrow_array;
 $sth->finish;
 ok (defined $cnt, "Count still fetchable");
+
+ok (my $athh = $dtbl->[$tbl{"DBUTIL.UTLATH"}], "Table info for DBUTIL.UTLATH");
+ok (my @acol = @{$athh->{COLUMNS}}, "DBUTIL.UTLATH has columns");
+@acol = map { $dfld->[$_] } @acol;
+ok (@acol >= 3, "Table has at least 3 columns");
+my @hexec = grep { $_->{NAME} eq "HOMEXEC" } @acol;
+is (scalar @hexec, 1, "DBUTIL.UTLATH.HOMEXEC found");
+is ($hexec[0]{LENGTH}, 9, "and its LENGHT = 9");
+my $lnk = $hexec[0]{LINK};
+ok ($lnk >= 0, "And it has referential integrity");
+ok (my $plnk = $dfld->[$lnk], "which is defined");
+is ($plnk->{TNAME}, "UTLXEC", "linking to table UTLXEC");
+is ($plnk->{NAME}, "XECID", "field XECID");
 
 $dbh->rollback;
 
