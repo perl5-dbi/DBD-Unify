@@ -55,7 +55,8 @@ my       @t = grep {    $_->{NAME} eq     $tbl    } @tbl;
    @t or die "Cannot find an accessible table matching $table\n";
 
 foreach my $t (@t) {
-    print "$t->{TID}: $aid{$t->{AID}}.$t->{NAME}";
+    print "$t->{TID}: " if $opt_v;
+    print "$aid{$t->{AID}}.$t->{NAME}";
     print " DIRECT KEYED" if $t->{DIRECTKEY};
     print " FIXED SIZE"   if $t->{FIXEDSIZE};
     print " SCATTERED"    if $t->{SCATTERED};
@@ -70,27 +71,26 @@ foreach my $t (@t) {
 		$dd->{COLUMN}[$l]{TNAME},
 		$dd->{COLUMN}[$l]{NAME};
 	    my $ts = $dd->{AUTH}[$dd->{TABLE}[$dd->{COLUMN}[$l]{TID}]{AID}]{NAME};
-	    substr $L, 0, 0, "$ts."              unless $ts eq $ENV{USCHEMA} // "";
-	    substr $L, 0, 0, sprintf "%3d: ", $l unless $opt_c;
+	    substr $L, 0, 0, "$ts."              if $ts ne $ENV{USCHEMA} // "";
+	    substr $L, 0, 0, sprintf "%3d: ", $l if $opt_v;
 	    }
 
+	my $cn = $c->{NAME};
+	substr $cn, 0, 0, sprintf "%3d:", $cid if $opt_v;
 	if ($opt_c) {
-	    printf "  %-17s %-20s %1s%1s %2d:%s (%d%s)\n", $c->{NAME}, $L,
+	    printf "  %-17s %-20s %1s%1s %2d:%s (%d%s)\n", $cn, $L,
 		$c->{PKEY}     ? "*" : " ",
 		$c->{NULLABLE} ? " " : "N",
 		$c->{TYPE}, $dd->{TYPE}[$c->{TYPE}], $c->{LENGTH},
-		$c->{SCALE}    ? ".$c->{SCALE}" : "",
-		;
-
-	    next;
+		$c->{SCALE}    ? ".$c->{SCALE}" : "";
 	    }
-	printf "%6d: %-20s %-20s (%3d%s)\t%s%s\n",
-	    $cid, $c->{NAME},
-	    $dd->{TYPE}[$c->{TYPE}], $c->{LENGTH},
-	    $c->{SCALE}    ? ".$c->{SCALE}" : "",
-	    $c->{NULLABLE} ? "" : " NOT NULL",
-	    $c->{PKEY}     ? " PRIMARY KEY" : "",
-	    ;
-	$L and printf "%12s %s\n", "-->", $L;
+	else {
+	    printf "   %-23s %-20s (%3d%s)\t%s%s\n", $cn,
+		$dd->{TYPE}[$c->{TYPE}], $c->{LENGTH},
+		$c->{SCALE}    ? ".$c->{SCALE}" : "",
+		$c->{NULLABLE} ? "" : " NOT NULL",
+		$c->{PKEY}     ? " PRIMARY KEY" : "";
+	    $L and printf "%12s %s\n", "-->", $L;
+	    }
 	}
     }
