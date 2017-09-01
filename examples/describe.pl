@@ -1,11 +1,30 @@
 #!/usr/bin/perl
 
-use strict;
+use 5.14.2;
 use warnings;
 
-use DBI;
+our $VERSION = "0.02 - 20170901";
+my $cmd = $0 =~ s{.*/}{}r;
 
-my $table = shift or die "usage: $0 tablename | table-pattern\n";
+sub usage {
+    my $err = shift and select STDERR;
+    say "usage: $cmd tablename | tale-pattern";
+    exit $err;
+    } # usage
+
+use DBI;
+use Getopt::Long qw(:config bundling);
+my $opt_v = 0;
+GetOptions (
+    "help|?"	=> sub { usage (0); },
+    "V|version"	=> sub { say "$cmd [$VERSION]"; exit 0; },
+
+    "c|compact!"	=> \my $opt_c,
+
+    "v|verbose:1"	=> \   $opt_v,
+    ) or usage (1);
+
+my $table = shift or usage (1);
 
 my $dbh = DBI->connect ("dbi:Unify:");
 
@@ -44,6 +63,27 @@ foreach my $t (@t) {
 
     foreach my $cid (@{$t->{COLUMNS}}) {
 	my $c = $dd->{COLUMN}[$cid];
+	my $L = "";
+	my $l = $c->{LINK};
+	if ($l >= 0) {
+	    $L = sprintf "%s.%s",
+		$dd->{COLUMN}[$l]{TNAME},
+		$dd->{COLUMN}[$l]{NAME};
+	    my $ts = $dd->{AUTH}[$dd->{TABLE}[$dd->{COLUMN}[$l]{TID}]{AID}]{NAME};
+	    substr $L, 0, 0, "$ts."              unless $ts eq $ENV{USCHEMA} // "";
+	    substr $L, 0, 0, sprintf "%3d: ", $l unless $opt_c;
+	    }
+
+	if ($opt_c) {
+	    printf "  %-17s %-20s %1s%1s %2d:%s (%d%s)\n", $c->{NAME}, $L,
+		$c->{PKEY}     ? "*" : " ",
+		$c->{NULLABLE} ? " " : "N",
+		$c->{TYPE}, $dd->{TYPE}[$c->{TYPE}], $c->{LENGTH},
+		$c->{SCALE}    ? ".$c->{SCALE}" : "",
+		;
+
+	    next;
+	    }
 	printf "%6d: %-20s %-20s (%3d%s)\t%s%s\n",
 	    $cid, $c->{NAME},
 	    $dd->{TYPE}[$c->{TYPE}], $c->{LENGTH},
@@ -51,11 +91,6 @@ foreach my $t (@t) {
 	    $c->{NULLABLE} ? "" : " NOT NULL",
 	    $c->{PKEY}     ? " PRIMARY KEY" : "",
 	    ;
-	my $lnk = $c->{LINK};
-	$lnk >= 0 or next;
-	printf "%12s %3d: %s.%s.%s\n", "-->", $lnk,
-	    $dd->{AUTH}[$dd->{TABLE}[$dd->{COLUMN}[$lnk]{TID}]{AID}]{NAME},
-	    $dd->{COLUMN}[$lnk]{TNAME},
-	    $dd->{COLUMN}[$lnk]{NAME};
+	$L and printf "%12s %s\n", "-->", $L;
 	}
     }
