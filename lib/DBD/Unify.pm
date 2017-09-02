@@ -1048,7 +1048,7 @@ X<AUTH>
 This will return a reference to a list of accessible schemas. The schemas
 that are not accessible or do not exist (anymore) have an C<undef> entry.
 
-Each auth entry is C<undef> or a hashref with three entries:
+Each auth entry is C<undef> or a hashref with these entries:
 
 =over 2
 
@@ -1087,14 +1087,14 @@ X<TABLE>
 This will return a reference to a list of accessible tables. The tables
 that are not accessible or do not exist (anymore) have an C<undef> entry.
 
-Each table entry is C<undef> or a hashref with 10 entries:
+Each table entry is C<undef> or a hashref with these entries:
 
 =over 2
 
 =item AID
 X<AID>
 
-Holds the AUTH ID of the schema (INTEGER) of the schema this table belongs to.
+Holds the AUTH ID (INTEGER) of the schema this table belongs to.
 
  say $tables->[43]{AID};
  # 3
@@ -1173,27 +1173,186 @@ Holds a list of column indices (C<CID>'s) of the columns of this table.
 =item COLUMN
 X<COLUMN>
 
+ my $columns = $dd->{COLUMN};
+
+This will return a reference to a list of accessible columns. The columns
+that are not accessible or do not exist (anymore) have an C<undef> entry.
+
+Each columns entry is C<undef> or a hashref with these entries:
+
 =over 2
+
 =item CID
+X<CID>
+
+Holds the COLUMN ID of the column (INTEGER). In the current implementation,
+the C<CID> entry is identical to the index in the list
+
+ say $columns->[186]{CID};
+ # 186
+
 =item NAME
+X<NAME>
+
+Holds the name of the column
+
+ say $columns->[186]{NAME};
+ # ATHID
+
 =item TID
+X<TID>
+
+Holds the TABLE ID (INTEGER) of the table this column belongs to.
+
+ say $columns->[186]{TID};
+ # 43
+
 =item TNAME
+X<TNAME>
+
+Holds the name of the table this column belongs to.
+
+ say $columns->[186]{TNAME};
+ # DBUTIL
+
 =item TYPE
+X<TYPE>
+
+Holds the type (INTEGER) of the column
+
+ say $columns->[186]{TYPE};
+ # 2
+
+The description of the type can be found in the C<TYPE> entry in C<$dd->{TYPE}>.
+
 =item LENGTH
+X<LENGTH>
+
+Holds the length of the column or C<0> if not appropriate.
+
+ say $columns->[186]{LENGTH};
+ # 9
+
 =item SCALE
+X<SCALE>
+
+Holds the scale of the column or C<0> if not appropriate.
+
+ say $columns->[186]{SCALE};
+ # 0
+
 =item NULLABLE
+X<NULLABLE>
+
+Holds the true/false indication of this column allowing C<NULL> as value
+
+ say $columns->[186]{NULLABLE};
+ # 0
+
+Primary keys implicitely do not allow C<NULL> values
+
 =item DSP_LEN
+X<DSP_LEN>
+
+Holds, if appropriate, the display length of the column
+
+ say $columns->[186]{DSP_LEN};
+ # 10
+
 =item DSP_SCL
+X<DSP_SCL>
+
+Holds, if appropriate, the display scale of the column
+
+ say $columns->[186]{DSP_SCL};
+ # 0
+
 =item DSP_PICT
+X<DSP_PICT>
+
+Holds, if appropriate, the display format of the column
+
+ say $columns->[186]{DSP_PICT};
+ #
+
 =item OPTIONS
+X<OPTIONS>
+
+Holds the internal (bitmap) representation of the options for this column.
+Most, if not all, of these options have been translated to the other entries
+in this hash.
+
+ say $columns->[186]{OPTIONS};
+ # 16412
+
 =item PKEY
+X<PKEY>
+
+Holds a true/false indication of the column is a (single) primary key.
+
+ say $columns->[186]{PKEY};
+ # 1
+
 =item RDONLY
+X<RDONLY>
+
+Holds a true/false indication of the column is read-only.
+
+ say $columns->[186]{RDONLY};
+ # 0
+
 =item UNIQUE
+X<UNIQUE>
+
+Holds a true/false indication of the column is unique.
+
+ say $columns->[186]{UNIQUE};
+ # 1
+
 =item LINK
+X<LINK>
+
+Holds the C<CID> of the column this column links to through referential
+integrety. This value is C<-1> if there is no link.
+
+ say $columns->[186]{LINK};
+ # -1
+
 =item NBTREE
+X<NBTREE>
+
+Holds the number of B-tree indices the column particitates in
+
+ say $columns->[186]{NBTREE};
+ # 0
+
 =item NHASH
+X<NHASH>
+
+Holds the number of hash-tables the column belongs to
+
+ say $columns->[186]{NHASH};
+ # 0
+
 =item NPLINK
+X<NPLINK>
+
+Holds the number of links the column is parent of
+
+ say $columns->[186]{NPLINK};
+ # 2
+
 =item NCLINK
+X<NCLINK>
+
+Holds the number of links the column is child of (<C0> or C<1>)
+
+ say $columns->[186]{NCLINK};
+ # 0
+
+If this entry holds C<1>, the C<LINK> entry holds the C<CID> of the
+parent column.
+
 =back
 
 =back
