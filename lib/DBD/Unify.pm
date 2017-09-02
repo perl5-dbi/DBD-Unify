@@ -1082,8 +1082,43 @@ Holds the list of accesible table ID's in this schema (ARRAY of INTEGERs)
 =item TABLE
 X<TABLE>
 
+=over 2
+=item AID
+=item TID
+=item DIRECTKEY
+=item FIXEDSIZE
+=item NAME
+=item OPTIONS
+=item PKEYED
+=item SCATTERED
+=item COLUMNS
+=back
+
 =item COLUMN
 X<COLUMN>
+
+=over 2
+=item CID
+=item NAME
+=item TID
+=item TNAME
+=item TYPE
+=item LENGTH
+=item SCALE
+=item NULLABLE
+=item DSP_LEN
+=item DSP_SCL
+=item DSP_PICT
+=item OPTIONS
+=item PKEY
+=item RDONLY
+=item UNIQUE
+=item LINK
+=item NBTREE
+=item NHASH
+=item NPLINK
+=item NCLINK
+=back
 
 =back
 
