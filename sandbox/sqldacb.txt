@@ -1,0 +1,154 @@
+E/SQL:
+
+/pro/asql/v91B/include/sqle_usr.h
+
+/*********************************************************************
+ *      Descriptor Area Structure
+ *********************************************************************/
+typedef struct {                /* Descriptor Area Control Block */
+    int           alcd_size;    /* allocated size of descriptor area    */
+    int           count;        /* number of items currently in use     */
+    HVDS        * hvds_list;    /* host variable description of items   */
+    SQLDITM     * item_list;    /* descriptor area specific information */
+    int           nomallochvar; /* 1 - don't malloc mem for host vars   */
+    } SQLDACB;
+
+struct hvds {                   /* Host Variable Descriptor             */
+    RTYPE         valp;         /* generic address of variable          */
+    char        * varnm ;       /* variable name                        */
+    int         * curlenp;      /* ptr to cur len of var len var        */
+    struct hvds * inddsp;       /* ptr to indicator variable descrip    */
+    int           bytsz;        /* physical size in bytes               */
+    int           dataknd;      /* Host data type                       */
+    char          dgtslt;       /* digits left of decimal point         */
+    char          dgtsrt;       /* digits right of decimal point        */
+    };
+typedef struct hvds HVDS;
+
+/*********************************************************************
+ *      Descriptor Area Item Structure
+ *********************************************************************/
+typedef struct {                /* Descriptor Area Item Info */
+    int           indicator;    /* space to hold indicator value        */
+    SQLCOLTYPE    type;         /* data type of item's value            */
+    int           length;       /* length    of data type, if string    */
+    int           precision;    /* precision of data type, if numeric   */
+    int           scale;        /* scale     of data type, if numeric   */
+    int           nullable;     /* whether item's value can be NULL     */
+    char        * name;         /* name of projected column, if any     */
+    } SQLDITM;
+
+    typedef int  SQLCOLTYPE;
+#   define SQLNOTYPE    ((SQLCOLTYPE)0)
+#   define SQLCHAR      ((SQLCOLTYPE)1)
+#   define SQLNUMERIC   ((SQLCOLTYPE)2)
+#   define SQLDECIMAL   ((SQLCOLTYPE)3)
+#   define SQLINTEGER   ((SQLCOLTYPE)4)
+#   define SQLSMINT     ((SQLCOLTYPE)5)
+#   define SQLFLOAT     ((SQLCOLTYPE)6)
+#   define SQLREAL      ((SQLCOLTYPE)7)
+#   define SQLDBLPREC   ((SQLCOLTYPE)8)
+#   define SQLDATE      ((SQLCOLTYPE)(-(U_DATE)))
+#   define SQLAMOUNT    ((SQLCOLTYPE)(-(U_AMT)))
+#   define SQLHUGEAMT   ((SQLCOLTYPE)(-(U_HAMT)))
+#   define SQLSMTIME    ((SQLCOLTYPE)(-(U_TIME)))
+#   define SQLTEXT      ((SQLCOLTYPE)(-(U_VTXT)))
+#   define SQLBINARY    ((SQLCOLTYPE)(-(U_VBIN)))
+#   define SQLHDATE     ((SQLCOLTYPE)(-(U_HDATE)))
+#   define SQLBYTE      ((SQLCOLTYPE)(-(U_BYT)))
+#   define SQLINT64     ((SQLCOLTYPE)(-(U_GINT)))
+#   define SQLAMT64     ((SQLCOLTYPE)(-(U_GAMT)))
+#   define SQLDATETIME  ((SQLCOLTYPE)(-(U_DATETIME)))
+
+	EXEC SQL
+	    GET DESCRIPTOR :o_sql_nm
+	    VALUE :fix
+		  :ftp = TYPE,
+		  :fln = LENGTH,
+		  :fpr = PRECISION,
+		  :fic = INDICATOR,
+		  :fsc = SCALE,
+		  :fnl = NULLABLE,
+		  :fnm = NAME;
+
+expands to
+
+{   SQLDACB     *sqlda000;
+    (sqlhv001+0)->valp = o_sql_nm;
+    (sqlhv001+1)->valp = (char *)&fix;
+    (sqlhv001+2)->valp = (char *)&ftp;
+    (sqlhv001+3)->valp = (char *)&fln;
+    (sqlhv001+4)->valp = (char *)&fpr;
+    (sqlhv001+5)->valp = (char *)&fic;
+    (sqlhv001+6)->valp = (char *)&fsc;
+    (sqlhv001+7)->valp = (char *)&fnl;
+    (sqlhv001+8)->valp = fnm;
+    sqlob000[0].ob_name = o_sql_nm;
+    if ( ! (sqlda000 = sqldanm (o_sql_nm, 0, sqldbgst + 5)))
+        goto SQL1ERR;
+    if (fix < 1 || fix > sqlda000->alcd_size) {
+        sqlstcd (-2129);
+        goto SQL1ERR;
+        }
+    if (sqlda000->count > sqlda000->alcd_size || fix > sqlda000->count) {
+        sqlstcd (-2153);
+        goto SQL1ERR;
+        }
+    (void)rangchk ((int)(sqlda000->item_list[fix - 1].type),       4));
+             ftp = (int)(sqlda000->item_list[fix - 1].type);
+    (void)rangchk ((int)(sqlda000->item_list[fix - 1].length),     4));
+             fln = (int)(sqlda000->item_list[fix - 1].length);
+    (void)rangchk ((int)(sqlda000->item_list[fix - 1].precision),  4));
+             fpr = (int)(sqlda000->item_list[fix - 1].precision);
+    (void)rangchk ((int)(sqlda000->item_list[fix - 1].indicator),  4));
+             fic = (int)(sqlda000->item_list[fix - 1].indicator);
+    (void)rangchk ((int)(sqlda000->item_list[fix - 1].scale),      4));
+             fsc = (int)(sqlda000->item_list[fix - 1].scale);
+    (void)rangchk ((int)(sqlda000->item_list[fix - 1].nullable),   4));
+             fnl = (int)(sqlda000->item_list[fix - 1].nullable);
+    if ( ! sqlgtd2 (sqlda000, fix, 8, 11, 48L, (int *)0, fnm, 257, sqldbgst + 5))
+        goto SQL1ERR;
+
+    goto SQL1OK;
+    SQL1ERR:
+    SQL1OK:
+        ;
+    }
+
+=================================================================================
+R/HLI
+/pro/asql/v91B/include/rhli.h
+
+/* {{{2 UCOLINF: Column Information Structure */
+typedef struct {
+    /* information always retrieved                                      */
+    UTID          tid;          /* table to which column belongs         */
+    UAID          aid;          /* authorization of the table            */
+    UCID          cid;          /* its column id                         */
+    UCID          remapid;      /* logical column id (if re-mapped)      */
+
+    /* information retrieval class: I (UCLASS1)                          */
+    UDEFID        defid;        /* column definition identifier          */
+    UDEFID        chgid;        /* column modification identifier        */
+    UMAPID        mapid;        /* column summation identifier           */
+
+    int           coltyp;       /* unify type                            */
+    int           collen;       /* column storage precision              */
+    int           colscl;       /* column storage scale                  */
+
+    UOPTS         colopts;      /* column processing options             */
+
+    /* information retrieval class: II (UCLASS2)                         */
+    int           dsplen;       /* column display precision              */
+    int           dspscl;       /* column display scale                  */
+
+    /* information retrieval class: III (UCLASS3)                        */
+    int           nbt;          /* # of b-trees column participates in   */
+    int           nhsh;         /* # of hash-tables column belongs to    */
+    int           nplnk;        /* # of links column is parent of        */
+    int           nclnk;        /* # of links column is child of (0/1)   */
+
+    /* information retrieval class: IV (UCLASS4)                         */
+    char        * dsppict;      /* --> column display picture (or NIL)   */
+    char        * coldesc;      /* --> column description (or NIL)       */
+    } UCOLINF;
