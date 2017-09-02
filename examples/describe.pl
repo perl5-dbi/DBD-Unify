@@ -13,6 +13,7 @@ sub usage {
     } # usage
 
 use DBI;
+use Data::Peek;
 use Getopt::Long qw(:config bundling);
 my $opt_v = 0;
 GetOptions (
@@ -55,6 +56,7 @@ my       @t = grep {    $_->{NAME} eq     $tbl    } @tbl;
    @t or die "Cannot find an accessible table matching $table\n";
 
 foreach my $t (@t) {
+    $opt_v > 8 and DDumper $t;
     print "$t->{TID}: " if $opt_v;
     print "$aid{$t->{AID}}.$t->{NAME}";
     print " DIRECT KEYED" if $t->{DIRECTKEY};
@@ -64,6 +66,7 @@ foreach my $t (@t) {
 
     foreach my $cid (@{$t->{COLUMNS}}) {
 	my $c = $dd->{COLUMN}[$cid];
+	$opt_v > 8 and DDumper $c;
 	my $L = "";
 	my $l = $c->{LINK};
 	if ($l >= 0) {
@@ -77,17 +80,19 @@ foreach my $t (@t) {
 
 	my $cn = $c->{NAME};
 	substr $cn, 0, 0, sprintf "%3d:", $cid if $opt_v;
+
+	my $cl = $c->{LENGTH} ? sprintf " (%d%s)",
+		$c->{LENGTH}, $c->{SCALE}    ? ".$c->{SCALE}" : "" : "";
+
 	if ($opt_c) {
-	    printf "  %-17s %-20s %1s%1s %2d:%s (%d%s)\n", $cn, $L,
+	    printf "  %-17s %-20s %1s%1s %2d:%s%s\n", $cn, $L,
 		$c->{PKEY}     ? "*" : " ",
 		$c->{NULLABLE} ? " " : "N",
-		$c->{TYPE}, $dd->{TYPE}[$c->{TYPE}], $c->{LENGTH},
-		$c->{SCALE}    ? ".$c->{SCALE}" : "";
+		$c->{TYPE}, $dd->{TYPE}[$c->{TYPE}], $cl;
 	    }
 	else {
-	    printf "   %-23s %-20s (%3d%s)\t%s%s\n", $cn,
-		$dd->{TYPE}[$c->{TYPE}], $c->{LENGTH},
-		$c->{SCALE}    ? ".$c->{SCALE}" : "",
+	    printf "   %-23s %-20s%s\t%s%s\n", $cn,
+		$dd->{TYPE}[$c->{TYPE}], $cl,
 		$c->{NULLABLE} ? "" : " NOT NULL",
 		$c->{PKEY}     ? " PRIMARY KEY" : "";
 	    $L and printf "%12s %s\n", "-->", $L;
