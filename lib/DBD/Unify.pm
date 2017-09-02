@@ -1048,7 +1048,7 @@ X<AUTH>
 This will return a reference to a list of accessible schemas. The schemas
 that are not accessible or do not exist (anymore) have an C<undef> entry.
 
-Each auth entry is undef or a hashref with three entries:
+Each auth entry is C<undef> or a hashref with three entries:
 
 =over 2
 
@@ -1082,16 +1082,92 @@ Holds the list of accesible table ID's in this schema (ARRAY of INTEGERs)
 =item TABLE
 X<TABLE>
 
+ my $tables = $dd->{TABLE};
+
+This will return a reference to a list of accessible tables. The tables
+that are not accessible or do not exist (anymore) have an C<undef> entry.
+
+Each table entry is C<undef> or a hashref with 10 entries:
+
 =over 2
+
 =item AID
+X<AID>
+
+Holds the AUTH ID of the schema (INTEGER) of the schema this table belongs to.
+
+ say $tables->[43]{AID};
+ # 3
+
 =item TID
-=item DIRECTKEY
-=item FIXEDSIZE
+X<TID>
+
+Holds the TABLE ID of the table (INTEGER). In the current implementation,
+the C<TID> entry is identical to the index in the list
+
+ say $tables->[43]{TID};
+ # 43
+
 =item NAME
+X<NAME>
+
+Holds the name of the table
+
+ say $tables->[43]{NAME};
+ # UTLATH
+
+=item KEY
+X<KEY>
+
+Holds a list of column indices (C<CID>'s) of the columns that are the
+primary key of this table. The list can be empty if the table has no
+primary key.
+
+ say for @{$tables->[43]{KEY}};
+ # 186
+
+=item DIRECTKEY
+X<DIRECTKEY>
+
+Holds a true/false indication of the table being C<DIRECT-KEYED>.
+
+ say $tables->[43]{DIRECTKEY}
+ # 1
+
+=item FIXEDSIZE
+X<FIXEDSIZE>
+
+Holds a true/false indication of the table being of fixed size.
+See also L<EXPNUM>
+
+=item EXPNUM
+X<EXPNUM>
+
+If L<FIXEDNUM> is true, this entry holds the number of records of the table
+
 =item OPTIONS
+X<OPTIONS>
+
 =item PKEYED
+X<PKEYED>
+
+Holds a true/false indication of the table being primary keyd
+
 =item SCATTERED
+X<SCATTERED>
+
+Holds a true/false indication if the table has data scattered accross volumes
+
 =item COLUMNS
+X<COLUMNS>
+
+Holds a list of column indices (C<CID>'s) of the columns of this table.
+
+ say for @{$tables->[43]{COLUMNS}};
+ # 186
+ # 187
+ # 188
+
 =back
 
 =item COLUMN

@@ -8,7 +8,7 @@ my $cmd = $0 =~ s{.*/}{}r;
 
 sub usage {
     my $err = shift and select STDERR;
-    say "usage: $cmd tablename | tale-pattern";
+    say "usage: $cmd tablename | TID | tale-pattern";
     exit $err;
     } # usage
 
@@ -30,6 +30,10 @@ my $table = shift or usage (1);
 my $dbh = DBI->connect ("dbi:Unify:");
 
 my $dd = $dbh->func ("db_dict");
+
+$table =~ m/^\d+$/ && exists $dd->{TABLE}[$table] and
+    $table = join "." => $dd->{AUTH}[$dd->{TABLE}[$table]{AID}]{NAME},
+			 $dd->{TABLE}[$table]{NAME};
 
 my ($sch, $tbl) = split m/\./ => $table;
 $tbl or ($tbl, $sch) = ($sch, $ENV{USCHEMA} || die "No (explicit) schema\n");
@@ -64,6 +68,9 @@ foreach my $t (@t) {
     print " SCATTERED"    if $t->{SCATTERED};
     print "\n";
 
+    my @key = @{$t->{KEY}};
+    my %key = map { $_ => 1 } @key;
+
     foreach my $cid (@{$t->{COLUMNS}}) {
 	my $c = $dd->{COLUMN}[$cid];
 	$opt_v > 8 and DDumper $c;
@@ -86,16 +93,19 @@ foreach my $t (@t) {
 
 	if ($opt_c) {
 	    printf "  %-17s %-20s %1s%1s %2d:%s%s\n", $cn, $L,
-		$c->{PKEY}     ? "*" : " ",
-		$c->{NULLABLE} ? " " : "N",
+		$c->{PKEY} || $key{$cid} ? "*" : " ",
+		$c->{NULLABLE}           ? " " : "N",
 		$c->{TYPE}, $dd->{TYPE}[$c->{TYPE}], $cl;
 	    }
 	else {
-	    printf "   %-23s %-20s%s\t%s%s\n", $cn,
+	    $c->{PKEY} and @key = ();
+	    printf "  %-23s %-20s%s\t%s%s\n", $cn,
 		$dd->{TYPE}[$c->{TYPE}], $cl,
 		$c->{NULLABLE} ? "" : " NOT NULL",
 		$c->{PKEY}     ? " PRIMARY KEY" : "";
 	    $L and printf "%12s %s\n", "-->", $L;
 	    }
 	}
+    @key && !$opt_c and print "  PRIMARY KEY (",
+	join (", " => map { $dd->{COLUMN}[$_]{NAME} } @key), ")\n";
     }

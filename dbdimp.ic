@@ -586,6 +586,7 @@ static void _db_dict (int refresh) {
 		UCOLINF *cinfl  = NULL;
 		HV      *h_dbt  = newHV ();
 		AV      *a_dbc  = newAV ();
+		AV      *a_dbk  = newAV ();
 
 		char    *aname  = "?";
 		char   **anames = NULL; /* Cannot find the function to get the schema *name* */
@@ -608,12 +609,19 @@ static void _db_dict (int refresh) {
 		(void)hv_store (h_dbt, "DIRECTKEY", 9, newSViv (tops & DB_DIRECT  ? 1 : 0), 0);
 		(void)hv_store (h_dbt, "SCATTERED", 9, newSViv (tops & DB_SCATTR  ? 1 : 0), 0);
 		(void)hv_store (h_dbt, "FIXEDSIZE", 9, newSViv (tops & DB_FIXSIZE ? 1 : 0), 0);
+		(void)hv_store (h_dbt, "EXPNUM",    6, newSViv (ti->expnum),                0);
 		(void)hv_store (h_dbt, "PKEYED",    6, newSViv (tops & DB_KEYED   ? 1 : 0), 0);
 		(void)hv_store (h_dbt, "COLUMNS",   7, newRV_noinc ((SV *)a_dbc),           0);
+		(void)hv_store (h_dbt, "KEY",       3, newRV_noinc ((SV *)a_dbk),           0);
+		/* do I want to keep the ti->tbldesc as DESCRIPTION ? */
+		/* No need here to store nvol, nbtree, nhsh, and nlnk yet */
 
 		(void)av_store (a_tbl, tid, newRV_noinc ((SV *)h_dbt));
 
 		if (A_tbl[aid]) av_push (A_tbl[aid], newSViv (tid));
+
+		for (c = 0; c < ti->nkey; c++)
+		    av_push (a_dbk, newSViv (ti->keycidl[c]));
 
 		if ((cinfl = (UCOLINF *)calloc (ti->ncol, sizeof (UCOLINF))) != NULL &&
 		    (csl   = (USTATUS *)calloc (ti->ncol, sizeof (USTATUS))) != NULL &&
