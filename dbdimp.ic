@@ -410,6 +410,7 @@ static char *u_err (USTATUS s) {
 	RDONLY		=> 0,
 	UNIQUE		=> 0,
 	LINK		=> -1,		# CID
+	REFS		= [],
 	},
 
     $db{TYPE}[5] = [ 5, "CHAR", "CHAR" ],
@@ -637,6 +638,8 @@ static void _db_dict (int refresh) {
 			UOPTS    cops   = ci->colopts;
 			int      ctyp   = ci->coltyp;
 
+			AV      *a_plnk = newAV ();
+
 			if (ufchcnm (txid, cid, &nn, &cnames, &status))
 			    cname = cnames[0];
 
@@ -665,7 +668,9 @@ static void _db_dict (int refresh) {
 			(void)hv_store (h_dbc, "PKEY",     4, newSViv (cops & DB_COLKEY ? 1 : 0), 0);
 			(void)hv_store (h_dbc, "RDONLY",   6, newSViv (cops & DB_RDONLY ? 1 : 0), 0);
 			(void)hv_store (h_dbc, "UNIQUE",   6, newSViv (cops & DB_UNIQUE ? 1 : 0), 0);
-			(void)hv_store (h_dbc, "LINK",     4, newSViv (a_lnk && cid <= a_lnk[0] && a_lnk[cid] > 0 ? a_lnk[cid] : -1),                       0);
+			(void)hv_store (h_dbc, "LINK",     4, newSViv (a_lnk && cid <= a_lnk[0]
+			                                    && a_lnk[cid] > 0 ? a_lnk[cid] : -1), 0);
+			(void)hv_store (h_dbc, "REFS",     4, newRV_noinc ((SV *)a_plnk),         0);
 
 			(void)hv_store (h_dbc, "NBTREE",   6, newSViv (ci->nbt),                  0);
 			(void)hv_store (h_dbc, "NHASH",    5, newSViv (ci->nhsh),                 0);
@@ -673,6 +678,14 @@ static void _db_dict (int refresh) {
 			(void)hv_store (h_dbc, "NCLINK",   6, newSViv (ci->nclnk),                0);
 
 			(void)av_store (a_fld, cid, newRV_noinc ((SV *)h_dbc));
+
+			if (ci->nplnk && a_lnk && a_lnk[0]) {
+			    int lc;
+			    for (lc = 1; lc < a_lnk[0]; lc++) {
+				if (a_lnk[lc] == cid)
+				    av_push (a_plnk, newSViv (lc));
+				}
+			    }
 
 			if (cnames) free (cnames);
 			}

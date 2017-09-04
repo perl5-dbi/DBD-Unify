@@ -1318,6 +1318,16 @@ integrety. This value is C<-1> if there is no link.
  say $columns->[186]{LINK};
  # -1
 
+=item REFS
+X<REFS>
+
+Holds a list of column indices (C<CID>'s) of the columns referencing
+this column in a link.
+
+ say for @{$columns->[186]{REFS}};
+ # 191
+ # 202
+
 =item NBTREE
 X<NBTREE>
 
