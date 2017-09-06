@@ -98,14 +98,13 @@ foreach my $t (@t) {
 		$c->{TYPE}, $dd->{TYPE}[$c->{TYPE}], $cl;
 	    }
 	else {
-	    $c->{PKEY} and @key = ();
 	    printf "  %-23s %-20s%s\t%s%s\n", $cn,
 		$dd->{TYPE}[$c->{TYPE}], $cl,
-		$c->{NULLABLE} ? "" : " NOT NULL",
-		$c->{PKEY}     ? " PRIMARY KEY" : "";
+		$c->{NULLABLE}         ? "" : " NOT NULL",
+		@key < 2 && $c->{PKEY} ? " PRIMARY KEY" : "";
 	    $L and printf "%12s %s\n", "-->", $L;
 	    }
 	}
-    @key && !$opt_c and print "  PRIMARY KEY (",
+    @key >= 2 && !$opt_c and print "  PRIMARY KEY (",
 	join (", " => map { $dd->{COLUMN}[$_]{NAME} } @key), ")\n";
     }
