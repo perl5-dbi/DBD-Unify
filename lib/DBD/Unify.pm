@@ -283,6 +283,21 @@ sub table_info {
 
 	keys %cache and return;
 
+	if (my $dd = $dbh->func ("db_dict")) {
+	    require DBD::Unify::TypeInfo;
+	    foreach my $c (grep { defined } @{$dd->{COLUMN}}) {
+		my $t = $dd->{TABLE}[$c->{TID}];
+		my $s = $t->{ANAME} || "";
+		my @c = (@{$c}{qw(
+		    NAME TYPE LENGTH SCALE DSP_LEN DSP_SCL
+		    NULLABLE RDONLY PKEY UNIQUE )}, 1, 0);
+		$c[$_] = $c[$_] ? "Y" : "N" for -6, -5, -4, -3, -2, -1;
+		$c[1] = DBD::Unify::TypeInfo::hli_type ($c[1]);
+		$cache{$s}{$t->{NAME}}{$c->{NAME}} = [ $s, $t->{NAME}, @c ];
+		}
+	    return;
+	    }
+
 	my $sth = $dbh->prepare (join " " =>
 	    "select OWNR, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH,",
 		   "DATA_SCALE, DISPLAY_LENGTH, DISPLAY_SCALE, NULLABLE,",
@@ -304,6 +319,27 @@ sub table_info {
 	my $dbh = shift;
 
 	@links and return;
+
+	if (my $dd = $dbh->func ("db_dict")) {
+	    foreach my $c (grep { defined && $_->{LINK} >= 0 } @{$dd->{COLUMN}}) {
+		my $t = $dd->{TABLE}[$c->{TID}];
+		my $s = $t->{ANAME} || "";
+		my $p = $dd->{COLUMN}[$c->{LINK}];
+		my $T = $dd->{TABLE}[$p->{TID}];
+		my $S = $T->{ANAME} || "";
+		push @links, {
+		    index_name			=> "",		# ?
+		    referenced_owner		=> $S,
+		    referenced_table		=> $T->{NAME},
+		    referenced_column		=> $p->{NAME},
+		    referencing_owner		=> $s,
+		    referencing_table		=> $t->{NAME},
+		    referencing_column		=> $c->{NAME},
+		    referencing_column_ord	=> 0,		# ?
+		    };
+		}
+	    return;
+	    }
 
 	my $sth = $dbh->prepare (join " " =>
 	    "select INDEX_NAME,",
@@ -490,6 +526,19 @@ sub primary_key {
 	$dbh->{Warn} and
 	    Carp::carp "Unify does not support catalogs in table_info\n";
 	return;
+	}
+
+    if (my $dd = $dbh->func ("db_dict")) {
+	my @key;
+	foreach my $c (grep { defined && $_->{PKEY} } @{$dd->{COLUMN}}) {
+	    my $t   = $dd->{TABLE}[$c->{TID}];
+	    my $sch = $t->{ANAME} || "";
+	    my $tbl = $t->{NAME};
+	    defined $schema && lc $sch ne lc $schema and next;
+	    defined $table  && lc $tbl ne lc $table  and next;
+	    push @key, $c->{NAME};
+	    }
+	return @key;
 	}
 
     # Fetching table information from SYS is *extremely* slow
@@ -1019,12 +1068,17 @@ No messages (yet) set to level 8 and up.
 
 Query the data dictionary through HLI calls:
 
- my $dd = $dbh->func ("db_dict");
+ my $dd = $dbh->func (   "db_dict");
+ my $dd = $dbh->func (0, "db_dict"); # same
+ my $dd = $dbh->func (1, "db_dict"); # force reload
 
 This function returns the data dictionary of the database in a hashref. The
 dictionary contains all information accessible to the current user and will
 likely contain all accessible schema's, tables, columns, and simple links
 (referential integrity).
+
+The force_reload argument is useful if the data dictionary might have changed:
+adding/removing tables/links/primary keys, altering tables etc.
 
 The dictionary will have 4 entries
 
@@ -1098,6 +1152,14 @@ Holds the AUTH ID (INTEGER) of the schema this table belongs to.
 
  say $tables->[43]{AID};
  # 3
+
+=item ANAME
+X<ANAME>
+
+Holds the name of the schema this table belongs too.
+
+ say $tables->[43]{NAME};
+ # UTLATH
 
 =item TID
 X<TID>

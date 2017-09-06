@@ -43,12 +43,12 @@ _do (dbh, statement, attribs = "", params = NULL)
 	}
 
 void
-db_dict (dbh)
+db_dict (dbh, reload = 0)
     SV *	dbh
+    int		reload
 
-  PROTOTYPE: ;$
   PPCODE:
-    dbd_db_dict (dbh, items ? SvTRUE (ST (0)) : 0);
+    dbd_db_dict (dbh, reload);
     EXTEND (SP, 1);
     ST (0) = DEFSV;
     XSRETURN (1);

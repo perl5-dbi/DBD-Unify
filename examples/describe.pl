@@ -32,7 +32,7 @@ my $dbh = DBI->connect ("dbi:Unify:");
 my $dd = $dbh->func ("db_dict");
 
 $table =~ m/^\d+$/ && exists $dd->{TABLE}[$table] and
-    $table = join "." => $dd->{AUTH}[$dd->{TABLE}[$table]{AID}]{NAME},
+    $table = join "." => $dd->{TABLE}[$table]{ANAME},
 			 $dd->{TABLE}[$table]{NAME};
 
 my ($sch, $tbl) = split m/\./ => $table;
@@ -62,7 +62,7 @@ my       @t = grep {    $_->{NAME} eq     $tbl    } @tbl;
 foreach my $t (@t) {
     $opt_v > 8 and DDumper $t;
     print "$t->{TID}: " if $opt_v;
-    print "$aid{$t->{AID}}.$t->{NAME}";
+    print "$t->{ANAME}.$t->{NAME}";
     print " DIRECT KEYED" if $t->{DIRECTKEY};
     print " FIXED SIZE"   if $t->{FIXEDSIZE};
     print " SCATTERED"    if $t->{SCATTERED};
@@ -80,7 +80,7 @@ foreach my $t (@t) {
 	    $L = sprintf "%s.%s",
 		$dd->{COLUMN}[$l]{TNAME},
 		$dd->{COLUMN}[$l]{NAME};
-	    my $ts = $dd->{AUTH}[$dd->{TABLE}[$dd->{COLUMN}[$l]{TID}]{AID}]{NAME};
+	    my $ts = $dd->{TABLE}[$dd->{COLUMN}[$l]{TID}]{ANAME};
 	    substr $L, 0, 0, "$ts."              if $ts ne $ENV{USCHEMA} // "";
 	    substr $L, 0, 0, sprintf "%3d: ", $l if $opt_v;
 	    }

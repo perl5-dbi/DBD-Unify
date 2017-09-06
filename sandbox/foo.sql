@@ -10,3 +10,8 @@ create table foo (
     t_foo	TIME,
     b_foo	BINARY
     );
+
+create table bar (
+    c_bar       CHAR (4) NOT NULL PRIMARY KEY,
+    bar         NUMERIC (4)
+    );

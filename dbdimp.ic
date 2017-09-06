@@ -429,19 +429,22 @@ static void _db_dict (int refresh) {
     UCID   *a_lnk;
     AV     *a_typ;
     AV     *a_sch;
+    SV    **A_anm = NULL;
     AV    **A_tbl;
     char   *A_typ[128];
 
     if (h_dd) {
 	unless (refresh)
 	    return;
+	dbg (9, "REFRESH DD DICT CACHE (%d)\n", refresh);
 	sv_free ((SV *)h_dd);
 	}
 
     pid  = getpid ();
 
     unless (uopndb ((char *)0, DB_NOLOCK, &dbid, &status)) {
-	warn ("Cannot connect to database: %s\n", u_err (status));
+	unless (status == -151) /* Database already opened. (-151) */
+	    warn ("Cannot connect to database: %s\n", u_err (status));
 	return;
 	}
     unless (sqlebtx (&txid, &status)) {
@@ -514,6 +517,7 @@ static void _db_dict (int refresh) {
 	    for (i = 0; i < n; i++) {
 		if (al[i].aid > x) x = al[i].aid;
 		}
+	    A_anm = (SV **)calloc (x + 1, sizeof (SV *));
 	    A_tbl = (AV **)calloc (x + 1, sizeof (AV *));
 
 	    (void)hv_store (h_dd, "AUTH", 4, newRV_noinc ((SV *)a_sch), 0);
@@ -522,9 +526,10 @@ static void _db_dict (int refresh) {
 		HV  *h_dba = newHV ();
 		AV  *a_tbl = newAV ();
 
-		/* warn ("AUTH %d %s\n", aid, al[i].authnm); */
+		A_anm[aid] = newSVpv (al[i].authnm, 0);
+
 		(void)hv_store (h_dba, "AID",    3, newSViv (aid),             0);
-		(void)hv_store (h_dba, "NAME",   4, newSVpv (al[i].authnm, 0), 0);
+		(void)hv_store (h_dba, "NAME",   4, A_anm[aid],                0);
 		(void)hv_store (h_dba, "TABLES", 6, newRV_noinc ((SV *)a_tbl), 0);
 
 		(void)av_store (a_sch, aid, newRV_noinc ((SV *)h_dba));
@@ -588,9 +593,8 @@ static void _db_dict (int refresh) {
 		HV      *h_dbt  = newHV ();
 		AV      *a_dbc  = newAV ();
 		AV      *a_dbk  = newAV ();
+		SV	*t_nm;
 
-		char    *aname  = "?";
-		char   **anames = NULL; /* Cannot find the function to get the schema *name* */
 		char    *tname  = "?";
 		char   **tnames = NULL;
 		int      nn;
@@ -598,14 +602,13 @@ static void _db_dict (int refresh) {
 
 		if (ufchtnm (txid, tid, &nn, &tnames, &status))
 		    tname = tnames[0];
-		/*
-		warn ("%03d: AID.TID %4d.%4d %10s.%-20s %3d columns (%2x)\n", i,
-		    aid, tid, "?", tname, ti->ncol, tops);
-		*/
+
+		t_nm = newSVpv (tname, 0);
 
 		(void)hv_store (h_dbt, "AID",       3, newSViv (aid),                       0);
+		(void)hv_store (h_dbt, "ANAME",     5, SvREFCNT_inc (A_anm[aid]),           0);
 		(void)hv_store (h_dbt, "TID",       3, newSViv (tid),                       0);
-		(void)hv_store (h_dbt, "NAME",      4, newSVpv (tname, 0),                  0);
+		(void)hv_store (h_dbt, "NAME",      4, t_nm,                                0);
 		(void)hv_store (h_dbt, "OPTIONS",   7, newSViv (tops),                      0);
 		(void)hv_store (h_dbt, "DIRECTKEY", 9, newSViv (tops & DB_DIRECT  ? 1 : 0), 0);
 		(void)hv_store (h_dbt, "SCATTERED", 9, newSViv (tops & DB_SCATTR  ? 1 : 0), 0);
@@ -637,23 +640,25 @@ static void _db_dict (int refresh) {
 
 			UOPTS    cops   = ci->colopts;
 			int      ctyp   = ci->coltyp;
+			int	 pkey   = cops & DB_COLKEY ? 1 : 0;
 
 			AV      *a_plnk = newAV ();
 
 			if (ufchcnm (txid, cid, &nn, &cnames, &status))
 			    cname = cnames[0];
 
-			/*
-			warn ("%7d: CID %5d %-20s %5d:%-12s (%3d) %3d (%4d:%4d %s) %02x\n", c,
-			    cid, cname, ci->coltyp, A_typ[ctyp] ? A_typ[ctyp] : "Unknown",
-			    ci->collen, ci->colscl, ci->dsplen, ci->dspscl,
-			    ci->dsppict ? ci->dsppict : "", cops);
-			*/
+
+			if (ti->nkey > 1) { /* Combined keys */
+			    int kc;
+			    for (kc = 0; kc < ti->nkey; kc++) {
+				if (ti->keycidl[kc] == cid) pkey++;
+				}
+			    }
 
 			av_push (a_dbc, newSViv (cid));
 
 			(void)hv_store (h_dbc, "TID",      3, newSViv (tid),                      0);
-			(void)hv_store (h_dbc, "TNAME",    5, newSVpv (tname, 0),                 0);
+			(void)hv_store (h_dbc, "TNAME",    5, SvREFCNT_inc (t_nm),                0);
 			(void)hv_store (h_dbc, "CID",      3, newSViv (cid),                      0);
 			(void)hv_store (h_dbc, "NAME",     4, newSVpv (cname, 0),                 0);
 			(void)hv_store (h_dbc, "TYPE",     4, newSViv (ctyp),                     0);
@@ -665,7 +670,7 @@ static void _db_dict (int refresh) {
 			(void)hv_store (h_dbc, "DSP_SCL",  7, newSViv (ci->dspscl),               0);
 			(void)hv_store (h_dbc, "DSP_PICT", 8, newSVpv (ci->dsppict, 0),           0);
 			(void)hv_store (h_dbc, "OPTIONS",  7, newSViv (cops),                     0);
-			(void)hv_store (h_dbc, "PKEY",     4, newSViv (cops & DB_COLKEY ? 1 : 0), 0);
+			(void)hv_store (h_dbc, "PKEY",     4, newSViv (pkey),                     0);
 			(void)hv_store (h_dbc, "RDONLY",   6, newSViv (cops & DB_RDONLY ? 1 : 0), 0);
 			(void)hv_store (h_dbc, "UNIQUE",   6, newSViv (cops & DB_UNIQUE ? 1 : 0), 0);
 			(void)hv_store (h_dbc, "LINK",     4, newSViv (a_lnk && cid <= a_lnk[0]
@@ -702,6 +707,7 @@ static void _db_dict (int refresh) {
 	}
     free (A_tbl);
     if (a_lnk) free (a_lnk);
+    if (A_anm) free (A_anm);
 
     /* Committing and disconnecting disables all subsequent actions
     unless (ucmttx (txid, &status))
