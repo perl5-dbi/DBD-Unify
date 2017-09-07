@@ -85,6 +85,9 @@ extern int      sqlxec  (CRSCB   *,                              SQLDBGST *);
 
 extern char    *basename (const char *path);
 
+extern int	uallcgp (UTXID, UTID, int, int*, UCID **, USTATUS *);
+extern int	uinfcgp (UTXID, int, UCID *, UOPTS, UCGPINF *, USTATUS *, USTATUS *);
+
 #define MAX_SQL_LEN	4096
 #define Max(a,b)	((a)>=(b)?(a):(b))
 
@@ -422,12 +425,14 @@ static void _db_dict (int refresh) {
     pid_t   pid;
     UDBID   dbid;
     UAID   *aidl;
+    UCID   *cidl;
     ULID   *lidl;
     UTID   *tidl;
     UTXID   txid;
     USTATUS status = -123;
     UCID   *a_lnk;
     AV     *a_typ;
+    AV     *a_grp;
     AV     *a_sch;
     SV    **A_anm = NULL;
     AV    **A_tbl;
@@ -454,6 +459,7 @@ static void _db_dict (int refresh) {
 
     h_dd  = newHV ();
     a_typ = newAV ();
+    a_grp = newAV ();
     a_sch = newAV ();
 
     A_typ[U_INT]	= "INTEGER";
@@ -538,7 +544,29 @@ static void _db_dict (int refresh) {
 	    }
 	if (al)  free (al);
 	if (asl) free (asl);
+	if (n)   free (aidl);
 	}
+
+    /* Fetch col-groups */
+    if (uallcgp (txid, UNULLTID, USLCK, &n, &cidl, &status)) {
+	UCGPINF *lcg = (UCGPINF *)calloc (n, sizeof (UCGPINF));
+	USTATUS *lsl = (USTATUS *)calloc (n, sizeof (USTATUS));
+	if (lcg && lsl && uinfcgp (txid, n, cidl, UNOCLASS, lcg, lsl, &status)) {
+	    int i, j, x = 0;
+	    for (i = 0; i < n; i++) {
+		if (lcg[i].ncol > 0) {
+		    AV  *a_cid = newAV ();
+		    for (j = 0; j < lcg[i].ncol; j++)
+			(void)av_store (a_cid, j, newSViv (lcg[i].grpcidl[j]));
+		    (void)av_store (a_grp, lcg[i].cid, newRV_noinc ((SV *)a_cid));
+		    }
+		}
+	    }
+	if (lcg) free (lcg);
+	if (lsl) free (lsl);
+	if (n)   free (cidl);
+	}
+    (void)hv_store (h_dd, "COLGRP", 6, newRV_noinc ((SV *)a_grp), 0);
 
     /* Fetch links: only one-to-one links are supported */
     if (ualllnk (txid, UNULLTID, USLCK, &n, &lidl, &status)) {
@@ -560,6 +588,7 @@ static void _db_dict (int refresh) {
 	    }
 	if (ll)  free (ll);
 	if (lsl) free (lsl);
+	if (n)   free (lidl);
 	}
     else {
 	warn ("Call to fetch all links failed with code %d: %s\n", err, u_err (status));

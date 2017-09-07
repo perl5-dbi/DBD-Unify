@@ -1427,6 +1427,25 @@ parent column.
 
 =back
 
+=item COLGRP
+X<COLGRP>
+
+Holds the list of column groups. The index is the C<CID> of the group,
+the entry is either C<undef> (this group is not defined) or a list if
+C<CID>s that belong to this group.
+
+ say for @{$dd->{COLGRP}[260]
+ # 255
+ # 256
+
+In column groups, the ID does not have an entry in th C<{COLUMN}> entry
+of the dictionary. The entries in the group however do
+
+ say $dd->{COLUMN}[255]{NAME}
+ # OBJID
+
+A column group is a unit of fields that e.g. compose a primary key.
+
 =back
 
 Combining all of these into describing a table, might look like done in

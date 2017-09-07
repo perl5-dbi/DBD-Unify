@@ -127,6 +127,7 @@ ok (1, "-- primary_key");
 is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "DIRS") ],
 			    [ "DIRID" ], "keys - single primary key");
 # I cannot prove this to be a valid test for all databases
+# 255:OBJID & 256:OBJTYPE are in COLGRP 260
 #is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "ADEVLOCKS") ],
 #			    [ "OBJID", "OBJTYPE" ], "keys - composite key");
 
