@@ -1188,6 +1188,44 @@ primary key.
  say for @{$tables->[43]{KEY}};
  # 186
 
+=item CGRP
+X<CGRP>
+
+Holds a list of column groups for this table (if any).
+
+ my $cgrp = $dd->{TABLE}[59];
+
+Each entry in the list holds a has with the following entries
+
+=over 2
+
+=item CID
+X<CID>
+
+Holds the column ID of this column group
+
+ say $cgrp->[0]{CID}
+ # 260
+
+=item TYPE
+X<TYPE>
+
+Holds the type of this group. This will always be C<100>.
+
+ say $cgrp->[0]{TYPE}
+ # 100
+
+=item COLUMNS
+X<COLUMNS>
+
+Holds the list of C<CID>s this group consists of
+
+ say for @{$cgrp->[0]{COLUMNS}}
+ # 255
+ # 256
+
+=back
+
 =item DIRECTKEY
 X<DIRECTKEY>
 
@@ -1426,25 +1464,6 @@ If this entry holds C<1>, the C<LINK> entry holds the C<CID> of the
 parent column.
 
 =back
-
-=item COLGRP
-X<COLGRP>
-
-Holds the list of column groups. The index is the C<CID> of the group,
-the entry is either C<undef> (this group is not defined) or a list if
-C<CID>s that belong to this group.
-
- say for @{$dd->{COLGRP}[260]
- # 255
- # 256
-
-In column groups, the ID does not have an entry in th C<{COLUMN}> entry
-of the dictionary. The entries in the group however do
-
- say $dd->{COLUMN}[255]{NAME}
- # OBJID
-
-A column group is a unit of fields that e.g. compose a primary key.
 
 =back
 
