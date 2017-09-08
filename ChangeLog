@@ -1,5 +1,8 @@
-0.89    - 28 Jul 2017, H.Merijn Brand
-    * 
+0.89    - 08 Sep 2017, H.Merijn Brand
+    * Implement dictionary introspection in HLI
+      - add $dbh->func ("db_dict")
+      - new tests
+      - introspection now has more information and is about 10 times faster
 
 0.88    - 28 Jul 2017, H.Merijn Brand
     * Tested with perl-5.22 on Linux x64 with DS 9.1B
