@@ -1099,7 +1099,7 @@ X<AUTH>
 
  my $schemas = $dd->{AUTH};
 
-This will return a reference to a list of accessible schemas. The schemas
+This will return a reference to a list of accessible schema's. The schema's
 that are not accessible or do not exist (anymore) have an C<undef> entry.
 
 Each auth entry is C<undef> or a hashref with these entries:
@@ -1126,7 +1126,7 @@ Holds the name of the schema (STRING)
 =item TABLES
 X<TABLES>
 
-Holds the list of accesible table ID's in this schema (ARRAY of INTEGERs)
+Holds the list of accessible table ID's in this schema (ARRAY of INTEGER's)
 
  say join ", " => $schemas->[3]{TABLES};
  # 43, 45, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61
@@ -1251,12 +1251,12 @@ X<OPTIONS>
 =item PKEYED
 X<PKEYED>
 
-Holds a true/false indication of the table being primary keyd
+Holds a true/false indication of the table being primary keyed
 
 =item SCATTERED
 X<SCATTERED>
 
-Holds a true/false indication if the table has data scattered accross volumes
+Holds a true/false indication if the table has data scattered across volumes
 
 =item COLUMNS
 X<COLUMNS>
@@ -1349,7 +1349,7 @@ Holds the true/false indication of this column allowing C<NULL> as value
  say $columns->[186]{NULLABLE};
  # 0
 
-Primary keys implicitely do not allow C<NULL> values
+Primary keys implicitly do not allow C<NULL> values
 
 =item DSP_LEN
 X<DSP_LEN>
@@ -1413,7 +1413,7 @@ Holds a true/false indication of the column is unique.
 X<LINK>
 
 Holds the C<CID> of the column this column links to through referential
-integrety. This value is C<-1> if there is no link.
+integrity. This value is C<-1> if there is no link.
 
  say $columns->[186]{LINK};
  # -1
@@ -1431,7 +1431,7 @@ this column in a link.
 =item NBTREE
 X<NBTREE>
 
-Holds the number of B-tree indices the column particitates in
+Holds the number of B-tree indices the column participates in
 
  say $columns->[186]{NBTREE};
  # 0
