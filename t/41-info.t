@@ -26,12 +26,10 @@ ok (my $dfld = $dd->{COLUMN}, "Fetch stored columns");
 my ($catalog, $schema, $table, $type, $rw);
 ok (1, "-- table_info ()");
 
-my %tbl = map  { join ("." => $dsch->[$_->{AID}]{NAME}, $_->{NAME}) => $_->{TID} }
+my %tbl = map  { join ("." => $_->{ANAME}, $_->{NAME}) => $_->{TID} }
 	  grep { defined }
 	  @{$dtbl};
 ok ($tbl{"DBUTIL.DIRS"}, "DBUTIL.DIRS found");
-#my $n = keys %tbl;
-#print "$_\n" for sort keys %tbl;
 
 my ($usch) = grep { defined and $_->{NAME} eq "DBUTIL" } @$dsch;
 ok ($usch, "Schema DBUTIL found");
@@ -49,6 +47,8 @@ $sth->execute;
 my ($cnt) = $sth->fetchrow_array;
 $sth->finish;
 ok (defined $cnt, "Count still fetchable");
+is ($dirs->{ANAME},	"DBUTIL",	"Schema name");
+is ($dirs->{NAME},	"DIRS",		"Table name");
 
 ok (my $athh = $dtbl->[$tbl{"DBUTIL.UTLATH"}], "Table info for DBUTIL.UTLATH");
 ok (my @acol = @{$athh->{COLUMNS}}, "DBUTIL.UTLATH has columns");
@@ -61,7 +61,7 @@ my $lnk = $hexec[0]{LINK};
 ok ($lnk >= 0, "And it has referential integrity");
 ok (my $plnk = $dfld->[$lnk], "which is defined");
 is ($plnk->{TNAME}, "UTLXEC", "linking to table UTLXEC");
-is ($plnk->{NAME}, "XECID", "field XECID");
+is ($plnk->{NAME},  "XECID",  "field XECID");
 
 $dbh->rollback;
 
