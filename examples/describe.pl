@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use 5.14.2;
+use strict;
 use warnings;
 
-our $VERSION = "0.02 - 20170901";
-my $cmd = $0 =~ s{.*/}{}r;
+our $VERSION = "0.02 - 20170914";
+(my $cmd = $0) =~ s{.*/}{};
 
 sub usage {
     my $err = shift and select STDERR;
@@ -81,7 +81,7 @@ foreach my $t (@t) {
 		$dd->{COLUMN}[$l]{TNAME},
 		$dd->{COLUMN}[$l]{NAME};
 	    my $ts = $dd->{TABLE}[$dd->{COLUMN}[$l]{TID}]{ANAME};
-	    substr $L, 0, 0, "$ts."              if $ts ne $ENV{USCHEMA} // "";
+	    substr $L, 0, 0, "$ts."              if $ts ne $ENV{USCHEMA} || "";
 	    substr $L, 0, 0, sprintf "%3d: ", $l if $opt_v;
 	    }
 
