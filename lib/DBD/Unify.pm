@@ -96,7 +96,7 @@ our $drh    = undef;	# holds driver handle once initialized
 
 sub driver {
     return $drh if $drh;
-    my ($class, $attr) = @_;
+    my $class = shift; # second argument ($attr) not used: ignored
 
     $class .= "::dr";
 
@@ -179,7 +179,7 @@ sub parse_trace_flag {
     } # parse_trace_flag
 
 sub type_info_all {
-    my ($dbh) = @_;
+    #my ($dbh) = @_;
     require DBD::Unify::TypeInfo;
     return [ @$DBD::Unify::TypeInfo::type_info_all ];
     } # type_info_all
@@ -258,11 +258,11 @@ sub table_info {
     $type   and $type = uc substr $type, 0, 1;
     $type   and push @where, _is_or_like ("TABLE_TYPE", $type);
     local $" = " and ";
-    my $where = @where ? " where @where" : "";
-    my $sth = $dbh->prepare (
-	"select '', OWNR, TABLE_NAME, TABLE_TYPE, RDWRITE ".
-	"from   SYS.ACCESSIBLE_TABLES ".
-	$where);
+    my $sql = join " " =>
+	q{select '', OWNR, TABLE_NAME, TABLE_TYPE, RDWRITE},
+	q{from   SYS.ACCESSIBLE_TABLES},
+	(@where ? " where @where" : "");
+    my $sth = $dbh->prepare ($sql);
     $sth or return;
     $sth->{ChopBlanks} = 1;
     $sth->execute;
@@ -290,7 +290,7 @@ sub table_info {
 		my $s = $t->{ANAME} || "";
 		my @c = (@{$c}{qw(
 		    NAME TYPE LENGTH SCALE DSP_LEN DSP_SCL
-		    NULLABLE RDONLY PKEY UNIQUE )}, 1, 0);
+		    NULLABLE RDONLY PKEY UNIQUE )}, 1, 0,);
 		$c[$_] = $c[$_] ? "Y" : "N" for -6, -5, -4, -3, -2, -1;
 		$c[1] = DBD::Unify::TypeInfo::hli_type ($c[1]);
 		$cache{$s}{$t->{NAME}}{$c->{NAME}} = [ $s, $t->{NAME}, @c ];
@@ -381,6 +381,11 @@ sub table_info {
 	my $dbh = shift;
 	my ($Pcatalog, $Pschema, $Ptable,
 	    $Fcatalog, $Fschema, $Ftable, $attr) = (@_, {});
+
+	$Pcatalog and warn "Catalogs are not supported in Unify\n";
+	$Fcatalog and warn "Catalogs are not supported in Unify\n";
+
+	$attr && ref $attr && keys %$attr and warn "Attributes are ignored in link_info\n";
 
 	_set_link_cache ($dbh);
 

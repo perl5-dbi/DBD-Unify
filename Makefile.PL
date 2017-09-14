@@ -101,9 +101,11 @@ if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
 	"[-Documentation::RequireLinkedURLs]", # L<DBI|http://...] requires 5.12
 	"[-Modules::ProhibitMultiplePackages]",
 	"[-Modules::RequireExplicitPackage]",			# use 5.8.0
+	"[-RegularExpressions::ProhibitFixedStringMatches]",	# deliberate
 	"[-Subroutines::ProhibitBuiltinHomonyms]",		# connect
 	"[-Subroutines::ProtectPrivateSubs]",
 	"[-ValuesAndExpressions::ProhibitVersionStrings]",	# use 5.8.0
+	"[-Variables::ProhibitPackageVars]",			# our
 	"";
     close $fh;
     }
