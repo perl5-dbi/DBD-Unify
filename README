@@ -64,6 +64,8 @@ REQUIREMENTS
     - 0.76 working on 32bit 9.0G on Linux 2.6.18-92.1.22.el5PAE
     - 0.77 working on 32bit 9.0G on Linux 2.6.18-128.1.14.el5PAE
                     with GNU g++ 4.1.2, perl-5.8.8, and DBI-1.609
+    - 0.89 working on 64bit 9.1D on Linux 2.6.32-642.6.2 (RHEL 6.7)
+		    with DBI 1.623
 
 BUILDING, TESTING AND INSTALLING:
 
