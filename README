@@ -1,8 +1,8 @@
 DBD::Unify --  a Unify interface for Perl 5 using DBI.
 
 This is the Database Driver for the Unify family of database products.
-See http://www.unify.com/Products/DataServer/default.aspx for Unify
-DataServer products.
+See http://support.guptatechnologies.com/supportwiki/index.php/Platforms
+for Unify DataServer products.
 
 See the ChangeLog file for a complete history
 

@@ -129,7 +129,7 @@ EXEC SQL END   DECLARE SECTION;
 #define DBI_debug	(dbis->debug & DBIc_TRACE_LEVEL_MASK)
 
 /* For more info about error handling, read
- * http://search.cpan.org/dist/DBI/lib/DBI/DBD.pm#The_dbd_drv_error_method
+ * https://metacpan.org/pod/DBI::DBD#The-dbd_drv_error-method
  */
 
 #ifdef I_STDARG
