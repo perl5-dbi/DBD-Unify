@@ -34,7 +34,9 @@ REQUIREMENTS
       Perl version
       Stable  Devel   Unicode
       ------  ------  -------
-              5.27.2   10.0.0  UCD 10.0.0 released 20 Jun 2017
+              5.29.9   12.0.0  UCD 12.0.0 released 
+              5.29.2   11.0.0  UCD 11.0.0 released 05 Jun 2018
+      5.28.0  5.27.2   10.0.0  UCD 10.0.0 released 20 Jun 2017
       5.26.0  5.25.3    9.0.0  UCD  9.0.0 released 21 Jun 2016
       5.24.0  5.23.0    8.0.0  UCD  8.0.0 released 17 Jun 2015
       5.22.0  5.21.1    7.0.0  UCD  7.0.0 released 16 Jun 2014
