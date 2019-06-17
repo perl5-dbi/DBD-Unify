@@ -9,6 +9,7 @@ ppport.h
 README
 Unify.h
 Unify.xs
+cpanfile
 lib/DBD/Unify.pm
 lib/DBD/Unify/TypeInfo.pm
 lib/DBD/Unify/GetInfo.pm
