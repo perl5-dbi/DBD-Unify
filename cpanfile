@@ -20,6 +20,6 @@ on "build" => sub {
 on "test" => sub {
     requires   "Test::Harness";
     requires   "Test::More"               => "0.90";
-    
-    recommends "Test::More"               => "1.302164";
+
+    recommends "Test::More"               => "1.302166";
     };
