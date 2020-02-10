@@ -2,7 +2,7 @@ requires   "Carp";
 requires   "DBI"                      => "1.42";
 requires   "DynaLoader";
 
-recommends "DBI"                      => "1.642";
+recommends "DBI"                      => "1.643";
 
 on "configure" => sub {
     requires   "Config";
@@ -21,5 +21,5 @@ on "test" => sub {
     requires   "Test::Harness";
     requires   "Test::More"               => "0.90";
 
-    recommends "Test::More"               => "1.302166";
+    recommends "Test::More"               => "1.302171";
     };
