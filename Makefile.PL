@@ -104,6 +104,7 @@ if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
 	"[-RegularExpressions::ProhibitFixedStringMatches]",	# deliberate
 	"[-Subroutines::ProhibitBuiltinHomonyms]",		# connect
 	"[-Subroutines::ProtectPrivateSubs]",
+	"[-TooMuchCode::ProhibitDuplicateSub]",	# sub private_attribute_info
 	"[-ValuesAndExpressions::ProhibitVersionStrings]",	# use 5.8.0
 	"[-Variables::ProhibitPackageVars]",			# our
 	"";
