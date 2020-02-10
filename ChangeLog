@@ -1,10 +1,11 @@
-0.90    - 18 Aug 2019, H.Merijn Brand
+0.90    - 10 Feb 2020, H.Merijn Brand
     * It's 2018
     * Update links
     * It's 2019
     * Update to Devel::PPPort-3.52
     * Tested with perl-5.30.0
     * Provide cpanfile
+    * It's 2020
 
 0.89    - 14 Sep 2017, H.Merijn Brand
     * Implement dictionary introspection in HLI
