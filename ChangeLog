@@ -6,6 +6,7 @@
     * Tested with perl-5.30.0
     * Provide cpanfile
     * It's 2020
+    * Update to Devel::PPPort-3.57
 
 0.89    - 14 Sep 2017, H.Merijn Brand
     * Implement dictionary introspection in HLI
