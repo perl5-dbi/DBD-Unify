@@ -106,10 +106,10 @@ int	dbd_st_rows	(SV *, imp_sth_t *);
 EXEC SQL BEGIN DECLARE SECTION;
 char	u_sql_do[4096];
 char	u_sql_st[4096];
-char	u_sql_nm[16];
-char	c_sql_nm[16];
-char	o_sql_nm[16];	/* Output descriptor area	*/
-char	i_sql_nm[16];	/* Input  descriptor area	*/
+char	u_sql_nm[20];
+char	c_sql_nm[20];
+char	o_sql_nm[20];	/* Output descriptor area	*/
+char	i_sql_nm[20];	/* Input  descriptor area	*/
 int	n_sql_st;
 
 int	fix, fln, fic, ftp, fpr, fsc, fnl;
@@ -1052,10 +1052,14 @@ static int use_sth_id (SV *dbh, short dbhid, short id) {
 	error (dbh, 0, "Cannot use statement ID");
 	return (0);
 	}
-    (void)sprintf (u_sql_nm, "u_sql_%02d_%06d", dbhid, id);
-    (void)sprintf (c_sql_nm, "c_sql_%02d_%06d", dbhid, id);
-    (void)sprintf (o_sql_nm, "o_sql_%02d_%06d", dbhid, id);
-    (void)sprintf (i_sql_nm, "i_sql_%02d_%06d", dbhid, id);
+    if (dbhid < 0 || dbhid > 99999) {
+	error (dbh, 0, "Cannot use DBH ID");
+	return (0);
+	}
+    (void)sprintf (u_sql_nm, "u_sql_%05d_%06d", dbhid, id);
+    (void)sprintf (c_sql_nm, "c_sql_%05d_%06d", dbhid, id);
+    (void)sprintf (o_sql_nm, "o_sql_%05d_%06d", dbhid, id);
+    (void)sprintf (i_sql_nm, "i_sql_%05d_%06d", dbhid, id);
     return (1);
     } /* use_sth_id */
 
