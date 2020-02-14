@@ -2329,7 +2329,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv) {
 	char c_nm[16];
 
 	D_imp_dbh_from_sth;
-	(void)sprintf (c_nm, "c_sql_%02d_%06d", imp_dbh->id, imp_sth->id);
+	(void)sprintf (c_nm, "c_sql_%05d_%06d", imp_dbh->id, imp_sth->id);
 	retsv = newSVpv (c_nm, 0);
 	}
     else

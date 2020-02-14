@@ -119,7 +119,7 @@ ok (1, "-- Check the internals");
 	SCALE         => [ 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
 #	NULLABLE      => [ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], # Does not work in Unify (yet)
 	NULLABLE      => [ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-	CursorName    => "c_sql_00_000001",
+	CursorName    => "c_sql_00000_000001",
 	NUM_OF_FIELDS => 10,
 	NUM_OF_PARAMS =>  3,
 	Database      => $dbh,
