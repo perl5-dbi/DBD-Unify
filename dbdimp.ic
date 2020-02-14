@@ -88,7 +88,6 @@ extern char    *basename (const char *path);
 extern int	uallcgp (UTXID, UTID, int, int*, UCID **, USTATUS *);
 extern int	uinfcgp (UTXID, int, UCID *, UOPTS, UCGPINF *, USTATUS *, USTATUS *);
 
-#define MAX_SQL_LEN	4096
 #define Max(a,b)	((a)>=(b)?(a):(b))
 
 static	char		*pgm = NULL;
@@ -103,6 +102,9 @@ HV	*h_dd = NULL;
 int	dbd_st_finish	(SV *, imp_sth_t *);
 int	dbd_st_rows	(SV *, imp_sth_t *);
 
+/* Check source for use: these defines cannot be used inside EXEC SQL ! */
+#define MAX_SQL_LEN	4096
+#define MAX_NM_LEN	20
 EXEC SQL BEGIN DECLARE SECTION;
 char	u_sql_do[4096];
 char	u_sql_st[4096];
@@ -2326,7 +2328,7 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv) {
 	}
     else
     if (kl == 10 && strEQ (key, "CursorName")) {
-	char c_nm[16];
+	char c_nm[MAX_NM_LEN];
 
 	D_imp_dbh_from_sth;
 	(void)sprintf (c_nm, "c_sql_%05d_%06d", imp_dbh->id, imp_sth->id);

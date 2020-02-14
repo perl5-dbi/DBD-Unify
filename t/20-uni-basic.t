@@ -128,11 +128,7 @@ ok (1, "-- Check the internals");
 	ParamArrays   => undef, # NYI
 	RowsInCache   => 0,
 	);
-    foreach my $attr (sort keys %attr) {
-	#printf STDERR "\n%-20s %s\n", $attr, "@{$sth->{$attr}}";
-	my $av = exists $sth->{$attr} ? $sth->{$attr} : undef;
-	is_deeply ($av, $attr{$attr}, "attr $attr");
-	}
+    is_deeply ($sth->{$_}, $attr{$_}, "attr $_") for sort keys %attr;
     }
 while (my ($xs, $xl, $xc, $xf, $xr, $xa, $xh, $xt, $xd, $xe) = $sth->fetchrow_array ()) {
     is ($sth->state, "", "state method");
