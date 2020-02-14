@@ -13,22 +13,22 @@ REQUIREMENTS
     and 9.1B, but this does not mean it might not work on U2000 databases or
     other DataServer releases.
 
-    I use DBI 1.637 and perl-5.8.7 through perl5.26.0, but might get it to
-    work with DBI 0.93 or higher and perl 5.6.2 (the modern toolchain will
-    require 5.8.1 as of Apr 2013). But then again, in that case you should
-    consider an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite.
-    As of DBD-Unify-0.70, I have made perl-5.6 a prerequisite.
+    I have tested with DBI-1.632 .. DBI 1.643 and perl-5.8.6 through 5.31.8,
+    but you might get it to work with DBI 0.93 or higher.  But then again, in
+    that case you should consider an upgrade. As of DBD-Unify-0.40 I've made
+    DBI-1.42 prerequisite.  DBD-Unify-0.70 raised the minimum supported
+    perl version to perl-5.6 and version 0.90 raised it to perl-5.8.6.
 
     The test case however uses scalarIO to catch errors, so if you use a
     perl that does not support scalarIO (e.g. perlIO enabled), you will
     have to disable the failing tests that use it yourself and hope for
     the best (or better, upgrade to a perl that supports scalarIO).
 
-    If you plan to use DataServer 8.1 or higher database in Unicode encoding
-    (UTF-8), use perl5.8.4 or up. Note that $LANG will need to match your
-    database locale. See the Unicode site for the differences between the
-    Unicode standards if you want to know what to expect
-    (http://www.unicode.org/versions/enumeratedversions.html) and
+    Don't expect anything Unicode releated DataServer data to work on perl
+    versions below 5.8.4 (if you get it to work at all).  Note that $LANG
+    will need to match your database locale. See the Unicode site for the
+    differences between the Unicode standards if you want to know what to
+    expect (http://www.unicode.org/versions/enumeratedversions.html) and
     http://www.unicode.org/history/publicationdates.html for their age.
 
       Perl version

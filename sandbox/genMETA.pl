@@ -56,7 +56,7 @@ provides:
         file:            lib/DBD/Unify/TypeInfo.pm
         version:         VERSION
 requires:     
-    perl:                5.008004
+    perl:                5.008006
     Carp:                0
     DBI:                 1.42
     DynaLoader:          0
