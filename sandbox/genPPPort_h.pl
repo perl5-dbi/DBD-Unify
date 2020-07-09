@@ -18,12 +18,12 @@ if ($Devel::PPPort::VERSION lt $cv) {
 my $old = do { local (@ARGV, $/) = ($ph); <> };
 move $ph, "$ph.bkp";
 
-Devel::PPPort::WriteFile ("ppport.h");
+Devel::PPPort::WriteFile ($ph);
 
 my $new = do { local (@ARGV, $/) = ($ph); <> };
 
 if ($old ne $new) {
-    print STDERR "ppport.h updated to $Devel::PPPort::VERSION\n";
+    print STDERR "$ph updated to $Devel::PPPort::VERSION\n";
     unlink "$ph.bkp";
     }
 else {
