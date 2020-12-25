@@ -1,6 +1,7 @@
 0.91    - 25 Dec 2020, H.Merijn Brand
     * Update to Devel::PPPort-3.58
     * Update to Devel::PPPort-3.62
+    * Fix META issue for bugtracker
 
 0.90    - 14 Feb 2020, H.Merijn Brand
     * It's 2018
