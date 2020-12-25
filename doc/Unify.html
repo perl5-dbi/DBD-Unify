@@ -1,0 +1,1033 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DBD::Unify - DBI driver for Unify database systems</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:hmbrand@cpan.org" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Extensions-Changes">Extensions/Changes</a></li>
+      <li><a href="#Stuff-implemented-in-perl">Stuff implemented in perl</a></li>
+      <li><a href="#Stuff-implemented-in-C-XS">Stuff implemented in C (XS)</a></li>
+      <li><a href="#DBD-specific-functions">DBD specific functions</a>
+        <ul>
+          <li><a href="#db_dict">db_dict</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::Unify - DBI driver for Unify database systems</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> # Examples marked NYT are Not Yet Tested, they might work
+ #  all others have been tested.
+ # man DBI for explanation of each method (there&#39;s more than listed here)
+
+ $dbh = DBI-&gt;connect (&quot;DBI:Unify:[\$dbname]&quot;, &quot;&quot;, $schema, {
+                         AutoCommit    =&gt; 0,
+                         ChopBlanks    =&gt; 1,
+                         uni_unicode   =&gt; 0,
+                         uni_verbose   =&gt; 0,
+                         uni_scanlevel =&gt; 2,
+                         });
+ $dbh = DBI-&gt;connect_cached (...);                   # NYT
+ $dbh-&gt;do ($statement);
+ $dbh-&gt;do ($statement, \%attr);
+ $dbh-&gt;do ($statement, \%attr, @bind);
+ $dbh-&gt;commit;
+ $dbh-&gt;rollback;
+ $dbh-&gt;disconnect;
+
+ $all = $dbh-&gt;selectall_arrayref ($statement);
+ @row = $dbh-&gt;selectrow_array ($statement);
+ $col = $dbh-&gt;selectcol_arrayref ($statement);
+
+ $sth = $dbh-&gt;prepare ($statement);
+ $sth = $dbh-&gt;prepare ($statement, \%attr);
+ $sth = $dbh-&gt;prepare_cached ($statement);           # NYT
+ $sth-&gt;execute;
+ @row = $sth-&gt;fetchrow_array;
+ $row = $sth-&gt;fetchrow_arrayref;
+ $row = $sth-&gt;fetchrow_hashref;
+ $all = $sth-&gt;fetchall_arrayref;
+ $sth-&gt;finish;
+
+ # Statement has placeholders like where field = ?
+ $sth = $dbh-&gt;prepare ($statement);
+ $sth-&gt;bind_param ($p_num, $bind_value);             # NYT
+ $sth-&gt;bind_param ($p_num, $bind_value, $bind_type); # NYT
+ $sth-&gt;bind_param ($p_num, $bind_value, \%attr);     # NYT
+ $sth-&gt;bind_col ($col_num, \$col_variable);          # NYT
+ $sth-&gt;bind_columns (@list_of_refs_to_vars_to_bind);
+ $sth-&gt;execute (@bind_values);
+
+ $cnt = $sth-&gt;rows;
+
+ $sql = $dbh-&gt;quote ($string);
+
+ $err = $dbh-&gt;err;
+ $err = $sth-&gt;err;
+ $str = $dbh-&gt;errstr;
+ $str = $sth-&gt;errstr;
+ $stt = $dbh-&gt;state;
+ $stt = $sth-&gt;state;
+
+ For large DB fetches the combination $sth-&gt;bind_columns ()
+ with $sth-&gt;fetchrow_arrayref is the fastest (DBI
+ documentation).</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DBD::Unify is an extension to Perl which allows access to Unify databases. It is built on top of the standard DBI extension and implements the methods that DBI requires.</p>
+
+<p>This document describes the differences between the &quot;generic&quot; DBD and DBD::Unify.</p>
+
+<h2 id="Extensions-Changes">Extensions/Changes</h2>
+
+<dl>
+
+<dt id="returned-types">returned types</dt>
+<dd>
+
+<p>The DBI docs state that:</p>
+
+<pre><code>   Most data is returned to the perl script as strings (null values
+   are returned as undef).  This allows arbitrary precision numeric
+   data to be handled without loss of accuracy.  Be aware that perl
+   may  not preserve the same accuracy when the string is used as a
+   number.</code></pre>
+
+<p>Integers are returned as integer values (perl&#39;s IV&#39;s).</p>
+
+<p>(Huge) amounts, floats, reals and doubles are returned as strings for which numeric context (perl&#39;s NV&#39;s) has been invoked already, so adding zero to force convert to numeric context is not needed.</p>
+
+<p>Chars are returned as strings (perl&#39;s PV&#39;s).</p>
+
+<p>Chars, Dates, Huge Dates and Times are returned as strings (perl&#39;s PV&#39;s). Unify represents midnight with 00:00, not 24:00.</p>
+
+</dd>
+<dt id="connect">connect</dt>
+<dd>
+
+<pre><code>    connect (&quot;DBI:Unify:dbname[;options]&quot; [, user [, auth [, attr]]]);</code></pre>
+
+<p>Options to the connection are passed in the data-source argument. This argument should contain the database name possibly followed by a semicolon and the database options which are ignored.</p>
+
+<p>Since Unify database authorization is done using grant&#39;s using the user name, the <i>user</i> argument may be empty or undef. The <i>auth</i> field will be used as a default schema. If the <i>auth</i> field is empty or undefined connect will check for the environment variable $USCHEMA to use as a default schema. If neither exists, you will end up in your default schema, or if none is assigned, in the schema PUBLIC.</p>
+
+<p>At the moment none of the attributes documented in DBI&#39;s &quot;ATTRIBUTES COMMON TO ALL HANDLES&quot; are implemented specifically for the Unify DBD driver, but they might have been inherited from DBI. The <i>ChopBlanks</i> attribute is implemented, but defaults to 1 for DBD::Unify. The Unify driver supports &quot;uni_scanlevel&quot; to set the transaction scan level to a value between 1 and 16 and &quot;uni_verbose&quot; to set DBD specific debugging, allowing to show only massages from DBD-Unify without using the default DBI-&gt;trace () call.</p>
+
+<p>The connect call will result in statements like:</p>
+
+<pre><code>    CONNECT;
+    SET CURRENT SCHEMA TO PUBLIC;  -- if auth = &quot;PUBLIC&quot;
+    SET TRANSACTION SCAN LEVEL 7;  -- if attr has { uni_scanlevel =&gt; 7 }</code></pre>
+
+<p>local database</p>
+
+<pre><code>    connect (&quot;/data/db/unify/v63AB&quot;, &quot;&quot;, &quot;SYS&quot;)</code></pre>
+
+</dd>
+<dt id="AutoCommit">AutoCommit</dt>
+<dd>
+
+<p>It is recommended that the <code>connect</code> call ends with the attributes <span style="white-space: nowrap;">{ AutoCommit =</span> 0 }&gt;, although it is not implemented (yet).</p>
+
+<p>If you don&#39;t want to check for errors after <b>every</b> call use <span style="white-space: nowrap;">{ AutoCommit =</span> 0, RaiseError =&gt; 1 }&gt; instead. This will <code>die</code> with an error message if any DBI call fails.</p>
+
+</dd>
+<dt id="Unicode">Unicode</dt>
+<dd>
+
+<p>By default, this driver is completely Unicode unaware: what you put into the database will be returned to you without the encoding applied.</p>
+
+<p>To enable automatic decoding of UTF-8 when fetching from the database, set the <code>uni_unicode</code> attribute to a true value for the database handle (statement handles will inherit) or to the statement handle.</p>
+
+<pre><code>  $dbh-&gt;{uni_unicode} = 1;</code></pre>
+
+<p>When CHAR or TEXT fields are retrieved and the content fetched is valid UTF-8, the value will be marked as such.</p>
+
+</dd>
+<dt id="re-connect">re-connect</dt>
+<dd>
+
+<p>Though both the syntax and the module support connecting to different databases, even at the same time, the Unify libraries seem to quit connecting to a new database, even if the old one is closed following every rule of precaution.</p>
+
+<p>To be safe in closing a handle of all sorts, undef it after it is done with, it will than be destroyed. (As of 0.12 this is tried internally for handles that proved to be finished)</p>
+
+<p>explicit:</p>
+
+<pre><code> my $dbh = DBI-&gt;connect (...);
+ my $sth = $dbh-&gt;prepare (...);
+ :
+ $sth-&gt;finish;     undef $sth;
+ $dbh-&gt;disconnect; undef $dbh;</code></pre>
+
+<p>or implicit:</p>
+
+<pre><code> {   my $dbh = DBI-&gt;connect (...);
+     {   my $sth = $dbh-&gt;prepare (...);
+         while (my @data = $sth-&gt;fetchrow_array) {
+             :
+             }
+         }  # $sth implicitly destroyed by end-of-scope
+     $dbh-&gt;disconnect;
+     }  # $dbh implicitly destroyed by end-of-scope</code></pre>
+
+</dd>
+<dt id="do">do</dt>
+<dd>
+
+<pre><code> $dbh-&gt;do ($statement)</code></pre>
+
+<p>This is implemented as a call to &#39;EXECUTE IMMEDIATE&#39; with all the limitations that this implies.</p>
+
+</dd>
+<dt id="commit-and-rollback-invalidates-open-cursors">commit and rollback invalidates open cursors</dt>
+<dd>
+
+<p>DBD::Unify does warn when a commit or rollback is issued on a $dbh with open cursors.</p>
+
+<p>Possibly a commit/rollback/disconnect should also undef the $sth&#39;s. (This should probably be done in the DBI-layer as other drivers will have the same problems).</p>
+
+<p>After a commit or rollback the cursors are all -&gt;finish&#39;ed, i.e. they are closed and the DBI/DBD will warn if an attempt is made to fetch from them.</p>
+
+<p>A future version of DBD::Unify might re-prepare the statement.</p>
+
+</dd>
+</dl>
+
+<h2 id="Stuff-implemented-in-perl">Stuff implemented in perl</h2>
+
+<dl>
+
+<dt id="driver">driver</dt>
+<dd>
+
+<p>Just here for DBI. No use in telling the end-user what to do with it :)</p>
+
+</dd>
+<dt id="connect1">connect</dt>
+<dd>
+
+</dd>
+<dt id="data_sources">data_sources</dt>
+<dd>
+
+<p>There is no way for Unify to tell what data sources might be available. There is no central files (like <i>/etc/oratab</i> for Oracle) that lists all available sources, so this method will always return an empty list.</p>
+
+</dd>
+<dt id="quote_identifier">quote_identifier</dt>
+<dd>
+
+<p>As DBI&#39;s <code>quote_identifier ()</code> gladly accepts the empty string as a valid identifier, I have to override this method to translate empty strings to undef, so the method behaves properly. Unify does not allow to select <code>NULL</code> as a constant as in:</p>
+
+<pre><code>    select NULL, foo from bar;</code></pre>
+
+</dd>
+<dt id="prepare-statement-attr">prepare ($statement [, \%attr])</dt>
+<dd>
+
+<p>The only attribute currently supported is the <code>dbd_verbose</code> (or its alias <code>uni_verbose</code>) level. See &quot;trace&quot; below.</p>
+
+</dd>
+<dt id="table_info">table_info ($;$$$$)</dt>
+<dd>
+
+</dd>
+<dt id="columne_info">columne_info ($$$$)</dt>
+<dd>
+
+</dd>
+<dt id="foreign_key_info">foreign_key_info ($$$$$$;$)</dt>
+<dd>
+
+</dd>
+<dt id="link_info">link_info ($;$$$$)</dt>
+<dd>
+
+</dd>
+<dt id="primary_key">primary_key ($$$)</dt>
+<dd>
+
+</dd>
+<dt id="uni_clear_cache">uni_clear_cache ()</dt>
+<dd>
+
+<p>Note that these five get their info by accessing the <code>SYS</code> schema which is relatively extremely slow. e.g. Getting all the primary keys might well run into seconds, rather than milliseconds.</p>
+
+<p>This is work-in-progress, and we hope to find faster ways to get to this information. Also note that in order to keep it fast across multiple calls, some information is cached, so when you alter the data dictionary after a call to one of these, that cached information is not updated.</p>
+
+<p>For <code>column_info ()</code>, the returned <code>DATA_TYPE</code> is deduced from the <code>TYPE_NAME</code> returned from <code>SYS.ACCESSIBLE_COLUMNS</code>. The type is in the ODBC range and the original Unify type and type_name are returned in the additional fields <code>uni_type</code> and <code>uni_type_name</code>. Somehow selecting from that table does not return valid statement handles for types <code>currency</code> and <code>huge integer</code>.</p>
+
+<pre><code>  Create as           sth attributes       uni_type/uni_type_name
+  ------------------- -------------------  -------------------------
+  amount              FLOAT             6   -4 AMOUNT (9, 2)
+  amount (5, 2)       FLOAT             6   -4 AMOUNT (5, 2)
+  huge amount         REAL              7   -6 HUGE AMOUNT (15, 2)
+  huge amount (5, 2)  REAL              7   -6 HUGE AMOUNT (5, 2)
+  huge amount (15, 2) REAL              7   -6 HUGE AMOUNT (15, 2)
+  byte                BINARY           -2  -12 BYTE (1)
+  byte (512)          BINARY           -2  -12 BYTE (512)
+  char                CHAR              1    1 CHAR (1)
+  char (12)           CHAR              1    1 CHAR (12)
+  currency            DECIMAL           3    - ?
+  currency (9)        DECIMAL           3    - ?
+  currency (7,2)      DECIMAL           3    - ?
+  date                DATE              9   -3 DATE
+  huge date           TIMESTAMP        11  -11 HUGE DATE
+  decimal             NUMERIC           2    2 NUMERIC (9)
+  decimal (2)         NUMERIC           2    2 NUMERIC (2)
+  decimal (8)         NUMERIC           2    2 NUMERIC (8)
+  double precision    DOUBLE PRECISION  8    8 DOUBLE PRECISION (64)
+  float               DOUBLE PRECISION  8    6 FLOAT (64)
+  huge integer        HUGE INTEGER     -5    - ?
+  integer             NUMERIC           2    2 NUMERIC (9)
+  numeric             NUMERIC           2    2 NUMERIC (9)
+  numeric (2)         SMALLINT          5    2 NUMERIC (2)
+  numeric (6)         NUMERIC           2    2 NUMERIC (6)
+  real                REAL              7    7 REAL (32)
+  smallint            SMALLINT          5    2 NUMERIC (4)
+  text                TEXT             -1   -9 TEXT
+  time                TIME             10   -7 TIME</code></pre>
+
+<p>Currently the driver tries to cache information about the schema as it is required. When there are fields added, removed, or altered, references are added or removed or primary keys or unique hashes are added or removed it is wise to call <code>$dbh-&gt;uni_clear_cache</code> to ensure that the info on next inquiries will be up to date.</p>
+
+</dd>
+<dt id="ping">ping</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Stuff-implemented-in-C-XS">Stuff implemented in C (XS)</h2>
+
+<dl>
+
+<dt id="trace">trace</dt>
+<dd>
+
+<p>The <code>DBI-&gt;trace (level)</code> call will promote the level to DBD::Unify, showing both the DBI layer debugging messages as well as the DBD::Unify specific driver-side debug messages.</p>
+
+<p>It is however also possible to trace <b>only</b> the DBD-Unify without the <code>DBI-&gt;trace ()</code> call by using the <code>uni_verbose</code> attribute on <code>connect ()</code> or by setting it later to the database handle, the default level is set from the environment variable <code>$DBD_TRACE</code> if defined:</p>
+
+<pre><code>  $dbh = DBI-&gt;connect (&quot;DBI::Unify&quot;, &quot;&quot;, &quot;&quot;, { uni_verbose =&gt; 3 });
+  $dbh-&gt;{uni_verbose} = 3;</code></pre>
+
+<p>As DBD::Oracle also supports this scheme since version 1.22, <code>dbd_verbose</code> is a portable alias for <code>uni_verbose</code>, which is also supported in DBD::Oracle.</p>
+
+<p>DBD::Unify now also allows an even finer grained debugging, by allowing <code>dbd_verbose</code> on statement handles too. The default <code>dbd_verbose</code> for statement handles is the global <code>dbd_verbose</code> at creation time of the statement handle.</p>
+
+<p>The environment variable <code>DBD_VERBOSE</code> is used if defined and overrules <code>$DBD_TRACE</code>.</p>
+
+<pre><code>  $dbh-&gt;{dbd_verbose} = 4;
+  $sth = $dbh-&gt;prepare (&quot;select * from foo&quot;);  # sth&#39;s dbd_verbose = 4
+  $dbh-&gt;{dbd_verbose} = 3;                     # sth&#39;s dbd_verbose = 4
+  $sth-&gt;{dbd_verbose} = 5;                     # now 5</code></pre>
+
+<p>Currently, the following levels are defined:</p>
+
+<dl>
+
+<dt id="pod1-2">1 &amp; 2</dt>
+<dd>
+
+<p>No DBD messages implemented at level 1 and 2, as they are reserved for DBI</p>
+
+</dd>
+<dt id="pod3">3</dt>
+<dd>
+
+<pre><code>  DBD::Unify::dbd_db_STORE (ScanLevel = 7)
+  DBD::Unify::st_prepare u_sql_00_000000 (&quot;select * from foo&quot;)
+  DBD::Unify::st_prepare u_sql_00_000000 (&lt;= 4, =&gt; 0)
+  DBD::Unify::st_execute u_sql_00_000000
+  DBD::Unify::st_destroy &#39;select * from parm&#39;
+  DBD::Unify::st_free u_sql_00_000000
+  DBD::Unify::st 0x7F7F25CC 0x0000 0x0000 0x00000000 0x00000000 0x00000000
+  DBD::Unify::st destroyed
+  DBD::Unify::db_disconnect
+  DBD::Unify::db_destroy</code></pre>
+
+</dd>
+<dt id="pod4">4</dt>
+<dd>
+
+<p>Level 3 plus errors and additional return codes and field types and values:</p>
+
+<pre><code>  DBD::Unify::st_prepare u_sql_00_000000 (&quot;select c_bar from foo where c_foo = 1&quot;)
+      After allocate, sqlcode = 0
+      After prepare,  sqlcode = 0
+      After allocate, sqlcode = 0
+      After describe, sqlcode = 0
+      After count,    sqlcode = 0, count = 1
+  DBD::Unify::fld_describe o_sql_00_000000 (1 fields)
+      After get,      sqlcode = 0
+  DBD::Unify::st_prepare u_sql_00_000000 (&lt;= 1, =&gt; 0)
+  DBD::Unify::st_execute u_sql_00_000000
+      After open,     sqlcode = 0 (=&gt; 0)
+  DBD::Unify::st_fetch u_sql_00_000000
+      Fetched         sqlcode = 0, fields = 1
+      After get,      sqlcode = 0
+       Field   1: c_bar: NUMERIC  4: (6030) 6030 ==
+       Fetch done
+  DBD::Unify::st_finish u_sql_00_000000
+      After close,    sqlcode = 0
+  DBD::Unify::st_destroy &#39;select c_bar from foo where c_foo = 1&#39;
+  DBD::Unify::st_free u_sql_00_000000
+      After deallocO, sqlcode = 0
+      After deallocU, sqlcode = 0</code></pre>
+
+</dd>
+<dt id="pod5">5</dt>
+<dd>
+
+<p>Level 4 plus some content info:</p>
+
+<pre><code>  DBD::Unify::st_fetch u_sql_00_000000
+      Fetched         sqlcode = 0, fields = 1
+      After get,      sqlcode = 0
+       Field   1: [05 00 04 00 00] c_bar: NUMERIC  4: (6030) 6030 ==
+       Fetch done</code></pre>
+
+</dd>
+<dt id="pod6">6</dt>
+<dd>
+
+<p>Level 5 plus internal coding for exchanges and low(er) level return codes:</p>
+
+<pre><code>  DBD::Unify::fld_describe o_sql_00_000000 (1 fields)
+      After get,      sqlcode = 0
+       Field   1: [05 00 04 00 FFFFFFFF] c_bar
+  DBD::Unify::st_prepare u_sql_00_000000 (&lt;= 1, =&gt; 0)</code></pre>
+
+</dd>
+<dt id="pod7">7</dt>
+<dd>
+
+<p>Level 6 plus destroy/cleanup states:</p>
+
+<pre><code>  DBD::Unify::st_free u_sql_00_000000
+   destroy allocc destroy alloco    After deallocO, sqlcode = 0
+   destroy alloci destroy allocp    After deallocU, sqlcode = 0
+   destroy stat destroy growup destroy impset</code></pre>
+
+</dd>
+<dt id="pod8">8</dt>
+<dd>
+
+<p>No messages (yet) set to level 8 and up.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="int-dbd_bind_ph-SV-sth-imp_sth_t-imp_sth-SV-param-SV-value-IV-sql_type-SV-attribs-int-is_inout-IV-maxlen">int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value, IV sql_type, SV *attribs, int is_inout, IV maxlen)</dt>
+<dd>
+
+</dd>
+<dt id="SV-dbd_db_FETCH_attrib-SV-dbh-imp_dbh_t-imp_dbh-SV-keysv">SV *dbd_db_FETCH_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_db_STORE_attrib-SV-dbh-imp_dbh_t-imp_dbh-SV-keysv-SV-valuesv">int dbd_db_STORE_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_db_commit-SV-dbh-imp_dbh_t-imp_dbh">int dbd_db_commit (SV *dbh, imp_dbh_t *imp_dbh)</dt>
+<dd>
+
+</dd>
+<dt id="void-dbd_db_destroy-SV-dbh-imp_dbh_t-imp_dbh">void dbd_db_destroy (SV *dbh, imp_dbh_t *imp_dbh)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_db_disconnect-SV-dbh-imp_dbh_t-imp_dbh">int dbd_db_disconnect (SV *dbh, imp_dbh_t *imp_dbh)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_db_do-SV-dbh-char-statement">int dbd_db_do (SV *dbh, char *statement)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_db_login-SV-dbh-imp_dbh_t-imp_dbh-char-dbname-char-user-char-pwd">int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pwd)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_db_rollback-SV-dbh-imp_dbh_t-imp_dbh">int dbd_db_rollback (SV *dbh, imp_dbh_t *imp_dbh)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_discon_all-SV-drh-imp_drh_t-imp_drh">int dbd_discon_all (SV *drh, imp_drh_t *imp_drh)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_fld_describe-SV-dbh-imp_sth_t-imp_sth-int-num_fields">int dbd_fld_describe (SV *dbh, imp_sth_t *imp_sth, int num_fields)</dt>
+<dd>
+
+</dd>
+<dt id="void-dbd_init-dbistate_t-dbistate">void dbd_init (dbistate_t *dbistate)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_prm_describe-SV-dbh-imp_sth_t-imp_sth-int-num_params">int dbd_prm_describe (SV *dbh, imp_sth_t *imp_sth, int num_params)</dt>
+<dd>
+
+</dd>
+<dt id="SV-dbd_st_FETCH_attrib-SV-sth-imp_sth_t-imp_sth-SV-keysv">SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_st_STORE_attrib-SV-sth-imp_sth_t-imp_sth-SV-keysv-SV-valuesv">int dbd_st_STORE_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_st_blob_read-SV-sth-imp_sth_t-imp_sth-int-field-long-offset-long-len-SV-destrv-long-destoffset">int dbd_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field, long offset, long len, SV *destrv, long destoffset)</dt>
+<dd>
+
+</dd>
+<dt id="void-dbd_st_destroy-SV-sth-imp_sth_t-imp_sth">void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_st_execute-SV-sth-imp_sth_t-imp_sth">int dbd_st_execute (SV *sth, imp_sth_t *imp_sth)</dt>
+<dd>
+
+</dd>
+<dt id="AV-dbd_st_fetch-SV-sth-imp_sth_t-imp_sth">AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_st_finish-SV-sth-imp_sth_t-imp_sth">int dbd_st_finish (SV *sth, imp_sth_t *imp_sth)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_st_prepare-SV-sth-imp_sth_t-imp_sth-char-statement-SV-attribs">int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)</dt>
+<dd>
+
+</dd>
+<dt id="int-dbd_st_rows-SV-sth-imp_sth_t-imp_sth">int dbd_st_rows (SV *sth, imp_sth_t *imp_sth)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="DBD-specific-functions">DBD specific functions</h2>
+
+<h3 id="db_dict">db_dict</h3>
+
+<p>Query the data dictionary through HLI calls:</p>
+
+<pre><code> my $dd = $dbh-&gt;func (   &quot;db_dict&quot;);
+ my $dd = $dbh-&gt;func (0, &quot;db_dict&quot;); # same
+ my $dd = $dbh-&gt;func (1, &quot;db_dict&quot;); # force reload</code></pre>
+
+<p>This function returns the data dictionary of the database in a hashref. The dictionary contains all information accessible to the current user and will likely contain all accessible schema&#39;s, tables, columns, and simple links (referential integrity).</p>
+
+<p>The force_reload argument is useful if the data dictionary might have changed: adding/removing tables/links/primary keys, altering tables etc.</p>
+
+<p>The dictionary will have 4 entries</p>
+
+<dl>
+
+<dt id="TYPE">TYPE </dt>
+<dd>
+
+<pre><code> my $types = $dd-&gt;{TYPE};</code></pre>
+
+<p>This holds a list with the native type descriptions of the <code>TYPE</code> entries in the <code>COLUMN</code> hashes.</p>
+
+<pre><code> say $dd-&gt;{TYPE}[3]; # DATE</code></pre>
+
+</dd>
+<dt id="AUTH">AUTH </dt>
+<dd>
+
+<pre><code> my $schemas = $dd-&gt;{AUTH};</code></pre>
+
+<p>This will return a reference to a list of accessible schema&#39;s. The schema&#39;s that are not accessible or do not exist (anymore) have an <code>undef</code> entry.</p>
+
+<p>Each auth entry is <code>undef</code> or a hashref with these entries:</p>
+
+<dl>
+
+<dt id="AID">AID </dt>
+<dd>
+
+<p>Holds the AUTH ID of the schema (INTEGER). In the current implementation, the <code>AID</code> entry is identical to the index in the list</p>
+
+<pre><code> say $schemas-&gt;[3]{AID};
+ # 3</code></pre>
+
+</dd>
+<dt id="NAME1">NAME </dt>
+<dd>
+
+<p>Holds the name of the schema (STRING)</p>
+
+<pre><code> say $schemas-&gt;[3]{NAME};
+ # DBUTIL</code></pre>
+
+</dd>
+<dt id="TABLES">TABLES </dt>
+<dd>
+
+<p>Holds the list of accessible table ID&#39;s in this schema (ARRAY of INTEGER&#39;s)</p>
+
+<pre><code> say join &quot;, &quot; =&gt; $schemas-&gt;[3]{TABLES};
+ # 43, 45, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61</code></pre>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="TABLE">TABLE </dt>
+<dd>
+
+<pre><code> my $tables = $dd-&gt;{TABLE};</code></pre>
+
+<p>This will return a reference to a list of accessible tables. The tables that are not accessible or do not exist (anymore) have an <code>undef</code> entry.</p>
+
+<p>Each table entry is <code>undef</code> or a hashref with these entries:</p>
+
+<dl>
+
+<dt id="AID1">AID </dt>
+<dd>
+
+<p>Holds the AUTH ID (INTEGER) of the schema this table belongs to.</p>
+
+<pre><code> say $tables-&gt;[43]{AID};
+ # 3</code></pre>
+
+</dd>
+<dt id="ANAME">ANAME </dt>
+<dd>
+
+<p>Holds the name of the schema this table belongs too.</p>
+
+<pre><code> say $tables-&gt;[43]{NAME};
+ # UTLATH</code></pre>
+
+</dd>
+<dt id="TID">TID </dt>
+<dd>
+
+<p>Holds the TABLE ID of the table (INTEGER). In the current implementation, the <code>TID</code> entry is identical to the index in the list</p>
+
+<pre><code> say $tables-&gt;[43]{TID};
+ # 43</code></pre>
+
+</dd>
+<dt id="NAME2">NAME </dt>
+<dd>
+
+<p>Holds the name of the table</p>
+
+<pre><code> say $tables-&gt;[43]{NAME};
+ # UTLATH</code></pre>
+
+</dd>
+<dt id="KEY">KEY </dt>
+<dd>
+
+<p>Holds a list of column indices (<code>CID</code>&#39;s) of the columns that are the primary key of this table. The list can be empty if the table has no primary key.</p>
+
+<pre><code> say for @{$tables-&gt;[43]{KEY}};
+ # 186</code></pre>
+
+</dd>
+<dt id="CGRP">CGRP </dt>
+<dd>
+
+<p>Holds a list of column groups for this table (if any).</p>
+
+<pre><code> my $cgrp = $dd-&gt;{TABLE}[59];</code></pre>
+
+<p>Each entry in the list holds a has with the following entries</p>
+
+<dl>
+
+<dt id="CID">CID </dt>
+<dd>
+
+<p>Holds the column ID of this column group</p>
+
+<pre><code> say $cgrp-&gt;[0]{CID}
+ # 260</code></pre>
+
+</dd>
+<dt id="TYPE1">TYPE </dt>
+<dd>
+
+<p>Holds the type of this group. This will always be <code>100</code>.</p>
+
+<pre><code> say $cgrp-&gt;[0]{TYPE}
+ # 100</code></pre>
+
+</dd>
+<dt id="COLUMNS">COLUMNS </dt>
+<dd>
+
+<p>Holds the list of <code>CID</code>s this group consists of</p>
+
+<pre><code> say for @{$cgrp-&gt;[0]{COLUMNS}}
+ # 255
+ # 256</code></pre>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="DIRECTKEY">DIRECTKEY </dt>
+<dd>
+
+<p>Holds a true/false indication of the table being <code>DIRECT-KEYED</code>.</p>
+
+<pre><code> say $tables-&gt;[43]{DIRECTKEY}
+ # 1</code></pre>
+
+</dd>
+<dt id="FIXEDSIZE">FIXEDSIZE </dt>
+<dd>
+
+<p>Holds a true/false indication of the table being of fixed size. See also <a>EXPNUM</a></p>
+
+</dd>
+<dt id="EXPNUM">EXPNUM </dt>
+<dd>
+
+<p>If <a>FIXEDNUM</a> is true, this entry holds the number of records of the table</p>
+
+</dd>
+<dt id="OPTIONS">OPTIONS </dt>
+<dd>
+
+</dd>
+<dt id="PKEYED">PKEYED </dt>
+<dd>
+
+<p>Holds a true/false indication of the table being primary keyed</p>
+
+</dd>
+<dt id="SCATTERED">SCATTERED </dt>
+<dd>
+
+<p>Holds a true/false indication if the table has data scattered across volumes</p>
+
+</dd>
+<dt id="COLUMNS1">COLUMNS </dt>
+<dd>
+
+<p>Holds a list of column indices (<code>CID</code>&#39;s) of the columns of this table.</p>
+
+<pre><code> say for @{$tables-&gt;[43]{COLUMNS}};
+ # 186
+ # 187
+ # 188</code></pre>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="COLUMN">COLUMN </dt>
+<dd>
+
+<pre><code> my $columns = $dd-&gt;{COLUMN};</code></pre>
+
+<p>This will return a reference to a list of accessible columns. The columns that are not accessible or do not exist (anymore) have an <code>undef</code> entry.</p>
+
+<p>Each columns entry is <code>undef</code> or a hashref with these entries:</p>
+
+<dl>
+
+<dt id="CID1">CID </dt>
+<dd>
+
+<p>Holds the COLUMN ID of the column (INTEGER). In the current implementation, the <code>CID</code> entry is identical to the index in the list</p>
+
+<pre><code> say $columns-&gt;[186]{CID};
+ # 186</code></pre>
+
+</dd>
+<dt id="NAME3">NAME </dt>
+<dd>
+
+<p>Holds the name of the column</p>
+
+<pre><code> say $columns-&gt;[186]{NAME};
+ # ATHID</code></pre>
+
+</dd>
+<dt id="TID1">TID </dt>
+<dd>
+
+<p>Holds the TABLE ID (INTEGER) of the table this column belongs to.</p>
+
+<pre><code> say $columns-&gt;[186]{TID};
+ # 43</code></pre>
+
+</dd>
+<dt id="TNAME">TNAME </dt>
+<dd>
+
+<p>Holds the name of the table this column belongs to.</p>
+
+<pre><code> say $columns-&gt;[186]{TNAME};
+ # DBUTIL</code></pre>
+
+</dd>
+<dt id="TYPE2">TYPE </dt>
+<dd>
+
+<p>Holds the type (INTEGER) of the column</p>
+
+<pre><code> say $columns-&gt;[186]{TYPE};
+ # 2</code></pre>
+
+<p>The description of the type can be found in the <code>TYPE</code> entry in <code>$dd-</code>{TYPE}&gt;.</p>
+
+</dd>
+<dt id="LENGTH">LENGTH </dt>
+<dd>
+
+<p>Holds the length of the column or <code>0</code> if not appropriate.</p>
+
+<pre><code> say $columns-&gt;[186]{LENGTH};
+ # 9</code></pre>
+
+</dd>
+<dt id="SCALE">SCALE </dt>
+<dd>
+
+<p>Holds the scale of the column or <code>0</code> if not appropriate.</p>
+
+<pre><code> say $columns-&gt;[186]{SCALE};
+ # 0</code></pre>
+
+</dd>
+<dt id="NULLABLE">NULLABLE </dt>
+<dd>
+
+<p>Holds the true/false indication of this column allowing <code>NULL</code> as value</p>
+
+<pre><code> say $columns-&gt;[186]{NULLABLE};
+ # 0</code></pre>
+
+<p>Primary keys implicitly do not allow <code>NULL</code> values</p>
+
+</dd>
+<dt id="DSP_LEN">DSP_LEN </dt>
+<dd>
+
+<p>Holds, if appropriate, the display length of the column</p>
+
+<pre><code> say $columns-&gt;[186]{DSP_LEN};
+ # 10</code></pre>
+
+</dd>
+<dt id="DSP_SCL">DSP_SCL </dt>
+<dd>
+
+<p>Holds, if appropriate, the display scale of the column</p>
+
+<pre><code> say $columns-&gt;[186]{DSP_SCL};
+ # 0</code></pre>
+
+</dd>
+<dt id="DSP_PICT">DSP_PICT </dt>
+<dd>
+
+<p>Holds, if appropriate, the display format of the column</p>
+
+<pre><code> say $columns-&gt;[186]{DSP_PICT};
+ #</code></pre>
+
+</dd>
+<dt id="OPTIONS1">OPTIONS </dt>
+<dd>
+
+<p>Holds the internal (bitmap) representation of the options for this column. Most, if not all, of these options have been translated to the other entries in this hash.</p>
+
+<pre><code> say $columns-&gt;[186]{OPTIONS};
+ # 16412</code></pre>
+
+</dd>
+<dt id="PKEY">PKEY </dt>
+<dd>
+
+<p>Holds a true/false indication of the column is a (single) primary key.</p>
+
+<pre><code> say $columns-&gt;[186]{PKEY};
+ # 1</code></pre>
+
+</dd>
+<dt id="RDONLY">RDONLY </dt>
+<dd>
+
+<p>Holds a true/false indication of the column is read-only.</p>
+
+<pre><code> say $columns-&gt;[186]{RDONLY};
+ # 0</code></pre>
+
+</dd>
+<dt id="UNIQUE">UNIQUE </dt>
+<dd>
+
+<p>Holds a true/false indication of the column is unique.</p>
+
+<pre><code> say $columns-&gt;[186]{UNIQUE};
+ # 1</code></pre>
+
+</dd>
+<dt id="LINK">LINK </dt>
+<dd>
+
+<p>Holds the <code>CID</code> of the column this column links to through referential integrity. This value is <code>-1</code> if there is no link.</p>
+
+<pre><code> say $columns-&gt;[186]{LINK};
+ # -1</code></pre>
+
+</dd>
+<dt id="REFS">REFS </dt>
+<dd>
+
+<p>Holds a list of column indices (<code>CID</code>&#39;s) of the columns referencing this column in a link.</p>
+
+<pre><code> say for @{$columns-&gt;[186]{REFS}};
+ # 191
+ # 202</code></pre>
+
+</dd>
+<dt id="NBTREE">NBTREE </dt>
+<dd>
+
+<p>Holds the number of B-tree indices the column participates in</p>
+
+<pre><code> say $columns-&gt;[186]{NBTREE};
+ # 0</code></pre>
+
+</dd>
+<dt id="NHASH">NHASH </dt>
+<dd>
+
+<p>Holds the number of hash-tables the column belongs to</p>
+
+<pre><code> say $columns-&gt;[186]{NHASH};
+ # 0</code></pre>
+
+</dd>
+<dt id="NPLINK">NPLINK </dt>
+<dd>
+
+<p>Holds the number of links the column is parent of</p>
+
+<pre><code> say $columns-&gt;[186]{NPLINK};
+ # 2</code></pre>
+
+</dd>
+<dt id="NCLINK">NCLINK </dt>
+<dd>
+
+<p>Holds the number of links the column is child of (&lt;C0&gt; or <code>1</code>)</p>
+
+<pre><code> say $columns-&gt;[186]{NCLINK};
+ # 0</code></pre>
+
+<p>If this entry holds <code>1</code>, the <code>LINK</code> entry holds the <code>CID</code> of the parent column.</p>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+<p>Combining all of these into describing a table, might look like done in <i>examples/describe.pl</i></p>
+
+<h1 id="TODO">TODO</h1>
+
+<p>As this module is probably far from complete, so will the TODO list most likely will be far from complete. More generic (test) items are mentioned in the README in the module distribution.</p>
+
+<dl>
+
+<dt id="Handle-attributes">Handle attributes</dt>
+<dd>
+
+<p>Check if all documented handle (database- and statement-) attributes are supported and work as expected.</p>
+
+<pre><code>  local $dbh-&gt;{RaiseError}       = 0;
+  local $sth-&gt;{FetchHashKeyName} = &quot;NAME&quot;;</code></pre>
+
+</dd>
+<dt id="Statement-attributes">Statement attributes</dt>
+<dd>
+
+<p>Allow setting and getting statement attributes. A specific example might be</p>
+
+<pre><code>  $sth-&gt;{PrintError}       = 0;
+  $sth-&gt;{FetchHashKeyName} = &quot;NAME_uc&quot;;</code></pre>
+
+</dd>
+<dt id="argument-bind_param">3-argument bind_param ()</dt>
+<dd>
+
+<p>Investigate and implement 3-argument versions of $sth-&gt;bind_param ()</p>
+
+</dd>
+<dt id="looks_as_number">looks_as_number ()</dt>
+<dd>
+
+<p>Investigate if looks_as_number () should be used in st_bind (). Comments are in where it should.</p>
+
+</dd>
+<dt id="Multiple-open-databases">Multiple open databases</dt>
+<dd>
+
+<p>Try finding a way to open several different Unify databases at the same time for parallel (or at least sequential) processing.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>The DBI documentation in <a>DBI</a>, a lot of web pages, some very good, the Perl 5 DBI Home page (http://dbi.perl.org/), other DBD modules&#39; documentation (DBD-Oracle is probably the most complete), the comp.lang.perl.modules newsgroup and the dbi-users mailing list (mailto:dbi-users-help@perl.org)</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>DBI/DBD was developed by Tim Bunce, who also developed the DBD::Oracle.</p>
+
+<p>H.Merijn Brand developed the DBD::Unify extension.</p>
+
+<p>Todd Zervas has given a lot of feedback and patches.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 1999-2020 H.Merijn Brand</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

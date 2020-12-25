@@ -24,3 +24,5 @@ tags
 tar
 test-*
 ulib/
+xt/
+doc/

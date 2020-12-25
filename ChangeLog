@@ -2,6 +2,7 @@
     * Update to Devel::PPPort-3.58
     * Update to Devel::PPPort-3.62
     * Fix META issue for bugtracker
+    * Add static docs for github
 
 0.90    - 14 Feb 2020, H.Merijn Brand
     * It's 2018

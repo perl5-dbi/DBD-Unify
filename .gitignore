@@ -6,6 +6,7 @@
 *.tar.gz
 *.tbz
 *.tgz
+*.tmp
 *.xsi
 .perlcriticrc
 blib
@@ -22,5 +23,6 @@ tags
 tar
 test-*
 test_*
+tmp/*
 ulib
 sandbox/dta
