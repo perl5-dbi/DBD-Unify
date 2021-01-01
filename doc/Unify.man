@@ -771,11 +771,11 @@ STDIN(1)              User Contributed Perl Documentation             STDIN(1)
        Todd Zervas has given a lot of feedback and patches.
 
 [1mCOPYRIGHT AND LICENSE[0m
-       Copyright (C) 1999-2020 H.Merijn Brand
+       Copyright (C) 1999-2021 H.Merijn Brand
 
        This library is free software; you can redistribute it and/or modify it
        under the same terms as Perl itself.
 
 
 
-perl v5.32.0                      2020-12-25                          STDIN(1)
+perl v5.32.0                      2021-01-01                          STDIN(1)
