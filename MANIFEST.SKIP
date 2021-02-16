@@ -4,6 +4,7 @@
 \.bs$
 \.t[bg]z$
 \.tar\.gz$
+\.tmp$
 \.git
 \.xsi$
 \.perlcriticrc
