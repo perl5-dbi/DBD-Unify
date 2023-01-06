@@ -530,7 +530,7 @@ sub primary_key {
     if ($catalog) {
 	$dbh->{Warn} and
 	    Carp::carp "Unify does not support catalogs in table_info\n";
-	return;
+	return ();
 	}
 
     if (my $dd = $dbh->func ("db_dict")) {
@@ -555,7 +555,7 @@ sub primary_key {
     @key and return @key;
 
     my $pki_cache = _sys_primary_keys ($dbh);
-    $pki_cache && $pki_cache->{key} or return;
+    $pki_cache && $pki_cache->{key} or return @key; # @key still empty
 
     foreach my $sch (sort keys %{$pki_cache->{key}}) {
 	defined $schema && lc $sch ne lc $schema and next;
