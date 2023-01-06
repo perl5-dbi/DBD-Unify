@@ -3,8 +3,7 @@
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
 
-use 5.8.4;
-
+use 5.008004;
 use strict;
 use warnings;
 

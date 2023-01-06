@@ -1,6 +1,6 @@
 #!/pro/bin/perl -w
 
-use 5.18.2;
+use 5.018002;
 use warnings;
 use integer;
 
