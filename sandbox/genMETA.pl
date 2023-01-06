@@ -76,7 +76,7 @@ recommends:
     perl:                5.030001
     DBI:                 1.643
 test_recommends:
-    Test::More:          1.302188
+    Test::More:          1.302191
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          https://github.com/perl5-dbi/DBD-Unify
