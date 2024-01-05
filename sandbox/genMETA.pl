@@ -60,11 +60,18 @@ requires:
     Carp:                0
     DBI:                 1.42
     DynaLoader:          0
+recommends:
+    perl:                5.018002
+    DBI:                 1.643
+suggests:
+    perl:                5.038002
 configure_requires:
     ExtUtils::MakeMaker: 0
     Config:              0
     Cwd:                 0
     DBI::DBD:            0
+configure_recommends:
+    ExtUtils::MakeMaker: 7.70
 build_requires:
     Config:              0
     File::Copy:          0
@@ -72,11 +79,8 @@ build_requires:
 test_requires:
     Test::Harness:       0
     Test::More:          0.90
-recommends:
-    perl:                5.030001
-    DBI:                 1.643
 test_recommends:
-    Test::More:          1.302191
+    Test::More:          1.302198
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          https://github.com/perl5-dbi/DBD-Unify
