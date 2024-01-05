@@ -42,7 +42,7 @@ version:                 VERSION
 abstract:                DBI driver for Unify database systems
 license:                 perl
 author:              
-    - H.Merijn Brand <h.m.brand@xs4all.nl>
+    - H.Merijn Brand <hmbrand@cpan.org>
 generated_by:            Author
 distribution_type:       module
 provides:
