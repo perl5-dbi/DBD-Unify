@@ -865,7 +865,7 @@ Todd Zervas has given a lot of feedback and patches.
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 1999-2023 H.Merijn Brand
+Copyright (C) 1999-2024 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
