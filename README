@@ -13,7 +13,7 @@ REQUIREMENTS
     and 9.1B, but this does not mean it might not work on U2000 databases or
     other DataServer releases.
 
-    I have tested with DBI-1.632 .. DBI 1.643 and perl-5.8.6 through 5.34.0,
+    I have tested with DBI-1.643 .. DBI 1.643 and perl-5.8.6 through 5.40.0,
     but you might get it to work with DBI 0.93 or higher.  But then again, in
     that case you should consider an upgrade. As of DBD-Unify-0.40 I've made
     DBI-1.42 prerequisite.  DBD-Unify-0.70 raised the minimum supported

@@ -80,7 +80,7 @@ test_requires:
     Test::Harness:       0
     Test::More:          0.90
 test_recommends:
-    Test::More:          1.302198
+    Test::More:          1.302199
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          https://github.com/perl5-dbi/DBD-Unify
