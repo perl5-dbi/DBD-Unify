@@ -79,38 +79,38 @@
             may  not preserve the same accuracy when the string is used as a
             number.
 
-         Integers are returned as integer values (perl’s IV’s).
+         Integers are returned as integer values (perl's IV's).
 
          (Huge) amounts, floats, reals and doubles are returned as strings for
-         which  numeric  context  (perl’s  NV’s)  has been invoked already, so
+         which numeric context (perl's NV's) has been invoked already, so
          adding zero to force convert to numeric context is not needed.
 
-         Chars are returned as strings (perl’s PV’s).
+         Chars are returned as strings (perl's PV's).
 
-         Chars, Dates, Huge Dates and Times are returned  as  strings  (perl’s
-         PV’s).  Unify represents midnight with 00:00, not 24:00.
+         Chars, Dates, Huge Dates and Times are returned as strings (perl's
+         PV's).  Unify represents midnight with 00:00, not 24:00.
 
        connect
              connect ("DBI:Unify:dbname[;options]" [, user [, auth [, attr]]]);
 
-         Options  to  the  connection  are passed in the data‐source argument.
+         Options to the connection are passed in the data-source argument.
          This argument should contain the database name possibly followed by a
          semicolon and the database options which are ignored.
 
-         Since Unify database authorization is done using  grant’s  using  the
-         user  name,  the  [4muser[24m argument may be empty or undef. The [4mauth[24m field
-         will be used as a default schema. If  the  [4mauth[24m  field  is  empty  or
+         Since Unify database authorization is done using grant's using the
+         user name, the [4muser[24m argument may be empty or undef. The [4mauth[24m field
+         will be used as a default schema. If the [4mauth[24m field is empty or
          undefined connect will check for the environment variable $USCHEMA to
-         use  as  a default schema. If neither exists, you will end up in your
+         use as a default schema. If neither exists, you will end up in your
          default schema, or if none is assigned, in the schema PUBLIC.
 
-         At the moment none of the attributes documented in DBI’s  "ATTRIBUTES
+         At the moment none of the attributes documented in DBI's "ATTRIBUTES
          COMMON TO ALL HANDLES" are implemented specifically for the Unify DBD
-         driver,  but  they might have been inherited from DBI. The [4mChopBlanks[0m
-         attribute is implemented, but defaults  to  1  for  DBD::Unify.   The
-         Unify  driver  supports  "uni_scanlevel"  to set the transaction scan
-         level to a value between 1  and  16  and  "uni_verbose"  to  set  DBD
-         specific  debugging,  allowing  to  show only massages from DBD‐Unify
+         driver, but they might have been inherited from DBI. The [4mChopBlanks[0m
+         attribute is implemented, but defaults to 1 for DBD::Unify.  The
+         Unify driver supports "uni_scanlevel" to set the transaction scan
+         level to a value between 1 and 16 and "uni_verbose" to set DBD
+         specific debugging, allowing to show only massages from DBD-Unify
          without using the default DBI->trace () call.
 
          The connect call will result in statements like:
@@ -124,36 +124,36 @@
              connect ("/data/db/unify/v63AB", "", "SYS")
 
        AutoCommit
-         It is recommended that the "connect" call ends  with  the  attributes
+         It is recommended that the "connect" call ends with the attributes
          { AutoCommit = 0 }>, although it is not implemented (yet).
 
-         If  you  don’t  want  to  check  for  errors  after  [1mevery  [22mcall  use
+         If you don't want to check for errors after [1mevery [22mcall use
          { AutoCommit = 0, RaiseError => 1 }> instead. This will "die" with an
          error message if any DBI call fails.
 
        Unicode
-         By default, this driver is completely Unicode unaware: what  you  put
-         into  the  database  will  be  returned  to  you without the encoding
+         By default, this driver is completely Unicode unaware: what you put
+         into the database will be returned to you without the encoding
          applied.
 
-         To  enable  automatic  decoding  of  UTF-8  when  fetching  from  the
-         database,  set  the  "uni_unicode"  attribute to a true value for the
-         database handle (statement handles will inherit) or to the  statement
+         To enable automatic decoding of UTF-8 when fetching from the
+         database, set the "uni_unicode" attribute to a true value for the
+         database handle (statement handles will inherit) or to the statement
          handle.
 
            $dbh->{uni_unicode} = 1;
 
-         When  CHAR  or  TEXT  fields are retrieved and the content fetched is
+         When CHAR or TEXT fields are retrieved and the content fetched is
          valid UTF-8, the value will be marked as such.
 
-       re‐connect
+       re-connect
          Though both the syntax and the module support connecting to different
-         databases, even at the same time, the Unify libraries  seem  to  quit
+         databases, even at the same time, the Unify libraries seem to quit
          connecting to a new database, even if the old one is closed following
          every rule of precaution.
 
-         To  be  safe  in  closing a handle of all sorts, undef it after it is
-         done with, it will than be destroyed.  (As  of  0.12  this  is  tried
+         To be safe in closing a handle of all sorts, undef it after it is
+         done with, it will than be destroyed. (As of 0.12 this is tried
          internally for handles that proved to be finished)
 
          explicit:
@@ -178,45 +178,45 @@
        do
           $dbh->do ($statement)
 
-         This  is  implemented  as  a call to ’EXECUTE IMMEDIATE’ with all the
+         This is implemented as a call to 'EXECUTE IMMEDIATE' with all the
          limitations that this implies.
 
        commit and rollback invalidates open cursors
-         DBD::Unify does warn when a commit or rollback is issued  on  a  $dbh
+         DBD::Unify does warn when a commit or rollback is issued on a $dbh
          with open cursors.
 
-         Possibly  a  commit/rollback/disconnect should also undef the $sth’s.
-         (This should probably be done in the DBI‐layer as other drivers  will
+         Possibly a commit/rollback/disconnect should also undef the $sth's.
+         (This should probably be done in the DBI-layer as other drivers will
          have the same problems).
 
-         After a commit or rollback the cursors are all ->finish’ed, i.e. they
-         are  closed  and the DBI/DBD will warn if an attempt is made to fetch
+         After a commit or rollback the cursors are all ->finish'ed, i.e. they
+         are closed and the DBI/DBD will warn if an attempt is made to fetch
          from them.
 
-         A future version of DBD::Unify might re‐prepare the statement.
+         A future version of DBD::Unify might re-prepare the statement.
 
    [1mStuff implemented in perl[0m
        driver
-         Just here for DBI. No use in telling the end‐user what to do with  it
+         Just here for DBI. No use in telling the end-user what to do with it
          :)
 
        connect
        data_sources
-         There  is  no  way  for  Unify  to  tell  what  data sources might be
-         available.  There is no central files (like [4m/etc/oratab[24m  for  Oracle)
-         that  lists  all available sources, so this method will always return
+         There is no way for Unify to tell what data sources might be
+         available.  There is no central files (like [4m/etc/oratab[24m for Oracle)
+         that lists all available sources, so this method will always return
          an empty list.
 
        quote_identifier
-         As DBI’s "quote_identifier ()" gladly accepts the empty string  as  a
-         valid  identifier,  I have to override this method to translate empty
-         strings to undef, so the method  behaves  properly.  Unify  does  not
+         As DBI's "quote_identifier ()" gladly accepts the empty string as a
+         valid identifier, I have to override this method to translate empty
+         strings to undef, so the method behaves properly. Unify does not
          allow to select "NULL" as a constant as in:
 
              select NULL, foo from bar;
 
        prepare ($statement [, \%attr])
-         The  only  attribute currently supported is the "dbd_verbose" (or its
+         The only attribute currently supported is the "dbd_verbose" (or its
          alias "uni_verbose") level. See "trace" below.
 
        table_info ($;$$$$)
@@ -225,20 +225,20 @@
        link_info ($;$$$$)
        primary_key ($$$)
        uni_clear_cache ()
-         Note that these five get their info by  accessing  the  "SYS"  schema
+         Note that these five get their info by accessing the "SYS" schema
          which is relatively extremely slow. e.g. Getting all the primary keys
          might well run into seconds, rather than milliseconds.
 
-         This  is  work‐in‐progress, and we hope to find faster ways to get to
-         this information. Also note that in order  to  keep  it  fast  across
-         multiple  calls,  some  information  is cached, so when you alter the
+         This is work-in-progress, and we hope to find faster ways to get to
+         this information. Also note that in order to keep it fast across
+         multiple calls, some information is cached, so when you alter the
          data dictionary after a call to one of these, that cached information
          is not updated.
 
-         For "column_info ()", the returned "DATA_TYPE" is  deduced  from  the
-         "TYPE_NAME"  returned  from  "SYS.ACCESSIBLE_COLUMNS". The type is in
+         For "column_info ()", the returned "DATA_TYPE" is deduced from the
+         "TYPE_NAME" returned from "SYS.ACCESSIBLE_COLUMNS". The type is in
          the ODBC range and the original Unify type and type_name are returned
-         in the additional  fields  "uni_type"  and  "uni_type_name".  Somehow
+         in the additional fields "uni_type" and "uni_type_name". Somehow
          selecting from that table does not return valid statement handles for
          types "currency" and "huge integer".
 
@@ -273,9 +273,9 @@
            text                TEXT             -1   -9 TEXT
            time                TIME             10   -7 TIME
 
-         Currently  the  driver tries to cache information about the schema as
-         it is required. When there are fields  added,  removed,  or  altered,
-         references  are added or removed or primary keys or unique hashes are
+         Currently the driver tries to cache information about the schema as
+         it is required. When there are fields added, removed, or altered,
+         references are added or removed or primary keys or unique hashes are
          added or removed it is wise to call "$dbh->uni_clear_cache" to ensure
          that the info on next inquiries will be up to date.
 
@@ -283,28 +283,28 @@
 
    [1mStuff implemented in C (XS)[0m
        trace
-         The "DBI->trace (level)" call will promote the level  to  DBD::Unify,
-         showing  both  the  DBI  layer  debugging  messages  as  well  as the
-         DBD::Unify specific driver‐side debug messages.
+         The "DBI->trace (level)" call will promote the level to DBD::Unify,
+         showing both the DBI layer debugging messages as well as the
+         DBD::Unify specific driver-side debug messages.
 
-         It is however also possible to trace [1monly [22mthe DBD‐Unify  without  the
+         It is however also possible to trace [1monly [22mthe DBD-Unify without the
          "DBI->trace ()" call by using the "uni_verbose" attribute on "connect
-         ()"  or by setting it later to the database handle, the default level
+         ()" or by setting it later to the database handle, the default level
          is set from the environment variable $DBD_TRACE if defined:
 
            $dbh = DBI->connect ("DBI::Unify", "", "", { uni_verbose => 3 });
            $dbh->{uni_verbose} = 3;
 
-         As  DBD::Oracle  also  supports  this  scheme  since  version   1.22,
-         "dbd_verbose"  is  a  portable alias for "uni_verbose", which is also
+         As DBD::Oracle also supports this scheme since version 1.22,
+         "dbd_verbose" is a portable alias for "uni_verbose", which is also
          supported in DBD::Oracle.
 
-         DBD::Unify now also  allows  an  even  finer  grained  debugging,  by
-         allowing   "dbd_verbose"   on  statement  handles  too.  The  default
-         "dbd_verbose" for statement handles is the  global  "dbd_verbose"  at
+         DBD::Unify now also allows an even finer grained debugging, by
+         allowing "dbd_verbose" on statement handles too. The default
+         "dbd_verbose" for statement handles is the global "dbd_verbose" at
          creation time of the statement handle.
 
-         The  environment  variable  "DBD_VERBOSE"  is  used  if  defined  and
+         The environment variable "DBD_VERBOSE" is used if defined and
          overrules $DBD_TRACE.
 
            $dbh->{dbd_verbose} = 4;
@@ -315,7 +315,7 @@
          Currently, the following levels are defined:
 
          1 & 2
-           No DBD messages implemented at level 1 and 2, as they are  reserved
+           No DBD messages implemented at level 1 and 2, as they are reserved
            for DBI
 
          3
@@ -420,12 +420,12 @@
         my $dd = $dbh->func (1, "db_dict"); # force reload
 
        This function returns the data dictionary of the database in a hashref.
-       The  dictionary contains all information accessible to the current user
-       and will likely contain all accessible schema’s, tables,  columns,  and
+       The dictionary contains all information accessible to the current user
+       and will likely contain all accessible schema's, tables, columns, and
        simple links (referential integrity).
 
-       The  force_reload  argument is useful if the data dictionary might have
-       changed: adding/removing  tables/links/primary  keys,  altering  tables
+       The force_reload argument is useful if the data dictionary might have
+       changed: adding/removing tables/links/primary keys, altering tables
        etc.
 
        The dictionary will have 4 entries
@@ -433,7 +433,7 @@
        TYPE
           my $types = $dd->{TYPE};
 
-         This  holds  a  list  with the native type descriptions of the "TYPE"
+         This holds a list with the native type descriptions of the "TYPE"
          entries in the "COLUMN" hashes.
 
           say $dd->{TYPE}[3]; # DATE
@@ -441,15 +441,15 @@
        AUTH
           my $schemas = $dd->{AUTH};
 
-         This will return a reference to a list of  accessible  schema’s.  The
-         schema’s  that  are  not accessible or do not exist (anymore) have an
+         This will return a reference to a list of accessible schema's. The
+         schema's that are not accessible or do not exist (anymore) have an
          "undef" entry.
 
          Each auth entry is "undef" or a hashref with these entries:
 
          AID
-           Holds  the  AUTH  ID  of  the  schema  (INTEGER).  In  the  current
-           implementation,  the  "AID"  entry is identical to the index in the
+           Holds the AUTH ID of the schema (INTEGER). In the current
+           implementation, the "AID" entry is identical to the index in the
            list
 
             say $schemas->[3]{AID};
@@ -462,8 +462,8 @@
             # DBUTIL
 
          TABLES
-           Holds the list of accessible table ID’s in this  schema  (ARRAY  of
-           INTEGER’s)
+           Holds the list of accessible table ID's in this schema (ARRAY of
+           INTEGER's)
 
             say join ", " => $schemas->[3]{TABLES};
             # 43, 45, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61
@@ -471,8 +471,8 @@
        TABLE
           my $tables = $dd->{TABLE};
 
-         This  will  return  a  reference  to a list of accessible tables. The
-         tables that are not accessible or do  not  exist  (anymore)  have  an
+         This will return a reference to a list of accessible tables. The
+         tables that are not accessible or do not exist (anymore) have an
          "undef" entry.
 
          Each table entry is "undef" or a hashref with these entries:
@@ -490,8 +490,8 @@
             # UTLATH
 
          TID
-           Holds  the  TABLE  ID  of  the  table  (INTEGER).  In  the  current
-           implementation, the "TID" entry is identical to the  index  in  the
+           Holds the TABLE ID of the table (INTEGER). In the current
+           implementation, the "TID" entry is identical to the index in the
            list
 
             say $tables->[43]{TID};
@@ -504,8 +504,8 @@
             # UTLATH
 
          KEY
-           Holds  a  list  of column indices ("CID"’s) of the columns that are
-           the primary key of this table. The list can be empty if  the  table
+           Holds a list of column indices ("CID"'s) of the columns that are
+           the primary key of this table. The list can be empty if the table
            has no primary key.
 
             say for @{$tables->[43]{KEY}};
@@ -544,11 +544,11 @@
             # 1
 
          FIXEDSIZE
-           Holds  a  true/false  indication  of the table being of fixed size.
+           Holds a true/false indication of the table being of fixed size.
            See also EXPNUM
 
          EXPNUM
-           If FIXEDNUM is true, this entry holds the number of records of  the
+           If FIXEDNUM is true, this entry holds the number of records of the
            table
 
          OPTIONS
@@ -556,11 +556,11 @@
            Holds a true/false indication of the table being primary keyed
 
          SCATTERED
-           Holds  a  true/false  indication  if  the  table has data scattered
+           Holds a true/false indication if the table has data scattered
            across volumes
 
          COLUMNS
-           Holds a list of column indices ("CID"’s) of  the  columns  of  this
+           Holds a list of column indices ("CID"'s) of the columns of this
            table.
 
             say for @{$tables->[43]{COLUMNS}};
@@ -571,15 +571,15 @@
        COLUMN
           my $columns = $dd->{COLUMN};
 
-         This  will  return  a  reference to a list of accessible columns. The
-         columns that are not accessible or do not  exist  (anymore)  have  an
+         This will return a reference to a list of accessible columns. The
+         columns that are not accessible or do not exist (anymore) have an
          "undef" entry.
 
          Each columns entry is "undef" or a hashref with these entries:
 
          CID
-           Holds  the  COLUMN  ID  of  the  column  (INTEGER).  In the current
-           implementation, the "CID" entry is identical to the  index  in  the
+           Holds the COLUMN ID of the column (INTEGER). In the current
+           implementation, the "CID" entry is identical to the index in the
            list
 
             say $columns->[186]{CID};
@@ -609,7 +609,7 @@
             say $columns->[186]{TYPE};
             # 2
 
-           The  description  of  the  type can be found in the "TYPE" entry in
+           The description of the type can be found in the "TYPE" entry in
            "$dd-"{TYPE}>.
 
          LENGTH
@@ -625,7 +625,7 @@
             # 0
 
          NULLABLE
-           Holds the true/false indication of this column allowing  "NULL"  as
+           Holds the true/false indication of this column allowing "NULL" as
            value
 
             say $columns->[186]{NULLABLE};
@@ -652,7 +652,7 @@
             #
 
          OPTIONS
-           Holds  the internal (bitmap) representation of the options for this
+           Holds the internal (bitmap) representation of the options for this
            column.  Most, if not all, of these options have been translated to
            the other entries in this hash.
 
@@ -660,14 +660,14 @@
             # 16412
 
          PKEY
-           Holds a true/false indication of the column is a  (single)  primary
+           Holds a true/false indication of the column is a (single) primary
            key.
 
             say $columns->[186]{PKEY};
             # 1
 
          RDONLY
-           Holds a true/false indication of the column is read‐only.
+           Holds a true/false indication of the column is read-only.
 
             say $columns->[186]{RDONLY};
             # 0
@@ -679,14 +679,14 @@
             # 1
 
          LINK
-           Holds  the  "CID"  of  the  column  this  column  links  to through
+           Holds the "CID" of the column this column links to through
            referential integrity. This value is -1 if there is no link.
 
             say $columns->[186]{LINK};
             # -1
 
          REFS
-           Holds a list of column indices ("CID"’s) of the columns referencing
+           Holds a list of column indices ("CID"'s) of the columns referencing
            this column in a link.
 
             say for @{$columns->[186]{REFS}};
@@ -700,7 +700,7 @@
             # 0
 
          NHASH
-           Holds the number of hash‐tables the column belongs to
+           Holds the number of hash-tables the column belongs to
 
             say $columns->[186]{NHASH};
             # 0
@@ -717,48 +717,48 @@
             say $columns->[186]{NCLINK};
             # 0
 
-           If this entry holds 1, the "LINK" entry  holds  the  "CID"  of  the
+           If this entry holds 1, the "LINK" entry holds the "CID" of the
            parent column.
 
        Combining all of these into describing a table, might look like done in
        [4mexamples/describe.pl[0m
 
 [1mTODO[0m
-       As  this  module  is  probably far from complete, so will the TODO list
-       most likely will be far from complete. More generic  (test)  items  are
+       As this module is probably far from complete, so will the TODO list
+       most likely will be far from complete. More generic (test) items are
        mentioned in the README in the module distribution.
 
        Handle attributes
-           Check   if   all   documented  handle  (database-  and  statement-)
+           Check if all documented handle (database- and statement-)
            attributes are supported and work as expected.
 
              local $dbh->{RaiseError}       = 0;
              local $sth->{FetchHashKeyName} = "NAME";
 
        Statement attributes
-           Allow setting and getting statement attributes. A specific  example
+           Allow setting and getting statement attributes. A specific example
            might be
 
              $sth->{PrintError}       = 0;
              $sth->{FetchHashKeyName} = "NAME_uc";
 
        3-argument bind_param ()
-           Investigate  and  implement 3-argument versions of $sth->bind_param
+           Investigate and implement 3-argument versions of $sth->bind_param
            ()
 
        looks_as_number ()
-           Investigate if looks_as_number () should be  used  in  st_bind  ().
+           Investigate if looks_as_number () should be used in st_bind ().
            Comments are in where it should.
 
        Multiple open databases
-           Try  finding a way to open several different Unify databases at the
+           Try finding a way to open several different Unify databases at the
            same time for parallel (or at least sequential) processing.
 
 [1mSEE ALSO[0m
-       The DBI documentation in DBI, a lot of web pages, some very  good,  the
-       Perl  5  DBI  Home  page  (http://dbi.perl.org/),  other  DBD  modules’
-       documentation  (DBD‐Oracle  is  probably  the   most   complete),   the
-       comp.lang.perl.modules   newsgroup   and  the  dbi‐users  mailing  list
+       The DBI documentation in DBI, a lot of web pages, some very good, the
+       Perl 5 DBI Home page (http://dbi.perl.org/), other DBD modules'
+       documentation (DBD-Oracle is probably the most complete), the
+       comp.lang.perl.modules newsgroup and the dbi-users mailing list
        (mailto:dbi-users-help@perl.org)
 
 [1mAUTHOR[0m
@@ -769,9 +769,9 @@
        Todd Zervas has given a lot of feedback and patches.
 
 [1mCOPYRIGHT AND LICENSE[0m
-       Copyright (C) 1999-2024 H.Merijn Brand
+       Copyright (C) 1999-2026 H.Merijn Brand
 
        This library is free software; you can redistribute it and/or modify it
        under the same terms as Perl itself.
 
-perl v5.38.2                      2024‐01‐05                          [4mSTDIN[24m(1)
+perl v5.42.0                      2026-01-09                          [4mSTDIN[24m(1)

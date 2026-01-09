@@ -29,7 +29,7 @@ my %wm = (
     NAME          =>   "DBD::Unify",
     DISTNAME      =>   "DBD-Unify",
     VERSION_FROM  =>   "lib/DBD/Unify.pm",
-    AUTHOR        =>   "H.Merijn Brand <h.m.brand\@xs4all.nl>",
+    AUTHOR        =>   "H.Merijn Brand <hmbrand\@cpan.org>",
     ABSTRACT_FROM =>   "lib/DBD/Unify.pm",
 
     PREREQ_PM     => { # CORE stuff

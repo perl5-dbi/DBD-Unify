@@ -9,6 +9,7 @@
 \.xsi$
 \.perlcriticrc
 \.releaserc
+^\.test_info\.
 \.whitesource
 blib/
 csv/
