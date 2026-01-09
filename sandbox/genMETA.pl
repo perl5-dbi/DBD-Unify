@@ -62,7 +62,7 @@ requires:
     DynaLoader:          0
 recommends:
     perl:                5.018002
-    DBI:                 1.645
+    DBI:                 1.647
 suggests:
     perl:                5.038002
 configure_requires:
@@ -71,7 +71,7 @@ configure_requires:
     Cwd:                 0
     DBI::DBD:            0
 configure_recommends:
-    ExtUtils::MakeMaker: 7.70
+    ExtUtils::MakeMaker: 7.76
 build_requires:
     Config:              0
     File::Copy:          0
@@ -80,7 +80,7 @@ test_requires:
     Test::Harness:       0
     Test::More:          0.90
 test_recommends:
-    Test::More:          1.302207
+    Test::More:          1.302219
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          https://github.com/perl5-dbi/DBD-Unify
