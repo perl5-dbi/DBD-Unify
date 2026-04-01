@@ -71,7 +71,7 @@ configure_requires:
     Cwd:                 0
     DBI::DBD:            0
 configure_recommends:
-    ExtUtils::MakeMaker: 7.76
+    ExtUtils::MakeMaker: 7.78
 build_requires:
     Config:              0
     File::Copy:          0
