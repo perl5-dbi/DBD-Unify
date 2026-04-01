@@ -774,4 +774,4 @@ COPYRIGHT AND LICENSE
        This library is free software; you can redistribute it and/or modify it
        under the same terms as Perl itself.
 
-perl v5.42.0                      2026-01-09                     DBD::Unify(3)
+perl v5.42.2                      2026-04-01                     DBD::Unify(3)
