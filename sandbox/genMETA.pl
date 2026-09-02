@@ -42,7 +42,7 @@ version:                 VERSION
 abstract:                DBI driver for Unify database systems
 license:                 perl
 author:              
-    - H.Merijn Brand <hmbrand@cpan.org>
+    - H.Merijn Brand <perl5@tux.freedom.nl>
 generated_by:            Author
 distribution_type:       module
 provides:
@@ -62,7 +62,7 @@ requires:
     DynaLoader:          0
 recommends:
     perl:                5.018002
-    DBI:                 1.647
+    DBI:                 1.652
 suggests:
     perl:                5.038002
 configure_requires:
@@ -80,7 +80,7 @@ test_requires:
     Test::Harness:       0
     Test::More:          0.90
 test_recommends:
-    Test::More:          1.302219
+    Test::More:          1.302224
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          https://github.com/perl5-dbi/DBD-Unify
