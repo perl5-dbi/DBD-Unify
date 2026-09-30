@@ -1,6 +1,6 @@
 #!/pro/bin/perl
 
-use strict;
+use 5.026001;
 use warnings;
 
 use Getopt::Long qw(:config bundling nopermute);
@@ -62,7 +62,7 @@ requires:
     DynaLoader:          0
 recommends:
     perl:                5.018002
-    DBI:                 1.652
+    DBI:                 1.655
 suggests:
     perl:                5.038002
 configure_requires:
@@ -80,7 +80,7 @@ test_requires:
     Test::Harness:       0
     Test::More:          0.90
 test_recommends:
-    Test::More:          1.302224
+    Test::More:          1.302225
 resources:
     license:             http://dev.perl.org/licenses/
     repository:          https://github.com/perl5-dbi/DBD-Unify
